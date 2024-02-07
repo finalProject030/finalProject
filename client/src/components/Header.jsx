@@ -28,6 +28,13 @@ export default function Header() {
               Home
             </li>
           </Link>
+          {currentUser && (
+            <Link to="/posts">
+              <li className="hidden sm:inline text-slate-700  hover:underline">
+                Posts
+              </li>
+            </Link>
+          )}
           <Link to="/about">
             <li className="hidden sm:inline text-slate-700  hover:underline">
               About
