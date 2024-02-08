@@ -1,6 +1,2 @@
-# FinalProject
-# finalProject
-# finalProject
-# finalProject
-# finalProject
-# finalProject
+## FinalProject
+Do not forget to use tne .env files
