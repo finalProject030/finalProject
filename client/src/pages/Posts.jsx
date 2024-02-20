@@ -15,52 +15,45 @@ const Posts = () => {
   const [expandedQuestions, setExpandedQuestions] = useState({});
   const [answers, setAnswers] = useState({});
   const [expandedAnswers, setExpandedAnswers] = useState({});
+  const [selectedItems, setSelectedItems] = useState({});
 
-
-  useEffect(() => {
-    // getting the questions from the site 
-    const fetchQuestions = async () => {
-      try {
-        // Fetching data for questions with the specified tag
-        const response = await fetch(
-          `https://api.stackexchange.com/2.3/questions?order=desc&sort=votes&tagged=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`
-        );
-        const data = await response.json();
-        if (data.items) {
-          // Display a certain number of random questions (e.g., 5)
-          const randomQuestions = data.items.slice(0, 10);
-          setQuestions(randomQuestions);
-          // Fetch answers for each question
-          fetchAnswers(randomQuestions);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+  const fetchQuestions = async () => {
+    try {
+      // Fetching data for questions with the specified tag
+      const response = await fetch(
+        `https://api.stackexchange.com/2.3/questions?order=desc&sort=votes&tagged=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`
+      );
+      const data = await response.json();
+      if (data.items) {
+        // Display a certain number of random questions (e.g., 5)
+        const randomQuestions = data.items.slice(0, 10);
+        setQuestions(randomQuestions);
+        // Fetch answers for each question
+        fetchAnswers(randomQuestions);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-    // getting the answers from the site
-    const fetchAnswers = async (questions) => {
-      const answersPromises = questions.map(async (question) => {
-        const response = await fetch(
-          `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=desc&sort=votes&site=stackoverflow&filter=!6WPIomnMOOD*e`
-        );
-        const data = await response.json();
-        return { questionId: question.question_id, answers: data.items };
-      });
+  const fetchAnswers = async (questions) => {
+    const answersPromises = questions.map(async (question) => {
+      const response = await fetch(
+        `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=desc&sort=votes&site=stackoverflow&filter=!6WPIomnMOOD*e`
+      );
+      const data = await response.json();
+      return { questionId: question.question_id, answers: data.items };
+    });
 
-      const answersData = await Promise.all(answersPromises);
+    const answersData = await Promise.all(answersPromises);
 
-      const answersMap = {};
-      answersData.forEach(({ questionId, answers }) => {
-        answersMap[questionId] = answers;
-      });
+    const answersMap = {};
+    answersData.forEach(({ questionId, answers }) => {
+      answersMap[questionId] = answers;
+    });
 
-      setAnswers(answersMap);
-    };
-
-
-    fetchQuestions();
-  }, [tagged]);
+    setAnswers(answersMap);
+  };
 
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
@@ -69,8 +62,6 @@ const Posts = () => {
     }));
   };
 
-
-
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
       ...prev,
@@ -78,20 +69,22 @@ const Posts = () => {
     }));
   };
 
-
-
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
 
-
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    // Fetch data when the user presses Enter
+    fetchQuestions();
+  };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">
         Stack Overflow Questions Tagged with {tagged}
       </h1>
-      <form className="mb-4">
+      <form className="mb-4" onSubmit={handleFormSubmit}>
         <label className="mr-2">
           Enter Subject:
           <input
@@ -101,8 +94,11 @@ const Posts = () => {
             className="border p-2"
           />
         </label>
+        <button type="submit" className="bg-blue-500 text-white p-2">
+          Search
+        </button>
       </form>
-      <div className="grid grid-cols-1  gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {questions.map((question) => (
           <div
             key={question.question_id}
@@ -124,27 +120,25 @@ const Posts = () => {
                 ? "Close the Question"
                 : "Show me the full Question"}
             </button>
-
-            
-            {expandedQuestions[question.question_id] &&
-                <HTMLCodeDisplay htmlCode={question.body} />
-              }
-            
+            {expandedQuestions[question.question_id] && (
+              <HTMLCodeDisplay htmlCode={question.body} />
+            )}
             <button
-            onClick={() => toggleAnswers(question.question_id)}
-            className="text-blue-500 hover:underline mb-2 block"
-          >
-            {expandedAnswers[question.question_id]
+              onClick={() => toggleAnswers(question.question_id)}
+              className="text-blue-500 hover:underline mb-2 block"
+            >
+              {expandedAnswers[question.question_id]
                 ? "Close the Answers"
                 : "Show me The Answers"}
-
             </button>
             {expandedAnswers[question.question_id] &&
               answers[question.question_id] &&
               answers[question.question_id].map((answer) => (
-                <HTMLCodeDisplay key={answer.answer_id} htmlCode={answer.body} />
+                <HTMLCodeDisplay
+                  key={answer.answer_id}
+                  htmlCode={answer.body}
+                />
               ))}
-              
           </div>
         ))}
       </div>
