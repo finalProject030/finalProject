@@ -10,11 +10,15 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
 };
 
 const Posts = () => {
-  const [tagged, setTagged] = useState("react"); // Default tag
+  const [tagged, setTagged] = useState(""); // Default tag
   const [questions, setQuestions] = useState([]);
   const [expandedQuestions, setExpandedQuestions] = useState({});
+  const [answers, setAnswers] = useState({});
+  const [expandedAnswers, setExpandedAnswers] = useState({});
+
 
   useEffect(() => {
+    // getting the questions from the site 
     const fetchQuestions = async () => {
       try {
         // Fetching data for questions with the specified tag
@@ -23,33 +27,40 @@ const Posts = () => {
         );
         const data = await response.json();
         if (data.items) {
-          // Shuffle the array of questions
-          const shuffledQuestions = shuffleArray(data.items);
           // Display a certain number of random questions (e.g., 5)
-          const randomQuestions = shuffledQuestions.slice(0, 10);
+          const randomQuestions = data.items.slice(0, 10);
           setQuestions(randomQuestions);
+          // Fetch answers for each question
+          fetchAnswers(randomQuestions);
         }
-        // console.log(questions);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
+    // getting the answers from the site
+    const fetchAnswers = async (questions) => {
+      const answersPromises = questions.map(async (question) => {
+        const response = await fetch(
+          `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=desc&sort=votes&site=stackoverflow&filter=!6WPIomnMOOD*e`
+        );
+        const data = await response.json();
+        return { questionId: question.question_id, answers: data.items };
+      });
+
+      const answersData = await Promise.all(answersPromises);
+
+      const answersMap = {};
+      answersData.forEach(({ questionId, answers }) => {
+        answersMap[questionId] = answers;
+      });
+
+      setAnswers(answersMap);
+    };
+
+
     fetchQuestions();
   }, [tagged]);
-
-  // Function to shuffle an array
-  const shuffleArray = (array) => {
-    let shuffledArray = array.slice();
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [
-        shuffledArray[j],
-        shuffledArray[i],
-      ];
-    }
-    return shuffledArray;
-  };
 
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
@@ -58,24 +69,31 @@ const Posts = () => {
     }));
   };
 
+
+
+  const toggleAnswers = (questionId) => {
+    setExpandedAnswers((prev) => ({
+      ...prev,
+      [questionId]: !prev[questionId],
+    }));
+  };
+
+
+
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Fetch questions for the specified tag when the form is submitted
-    fetchData();
-  };
+
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">
         Stack Overflow Questions Tagged with {tagged}
       </h1>
-      <form onSubmit={handleSubmit} className="mb-4">
+      <form className="mb-4">
         <label className="mr-2">
-          Enter Tag:
+          Enter Subject:
           <input
             type="text"
             value={tagged}
@@ -83,12 +101,6 @@ const Posts = () => {
             className="border p-2"
           />
         </label>
-        {/* <button
-          type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          Fetch Questions
-        </button> */}
       </form>
       <div className="grid grid-cols-1  gap-4">
         {questions.map((question) => (
@@ -109,12 +121,30 @@ const Posts = () => {
               className="text-blue-500 hover:underline mb-2 block"
             >
               {expandedQuestions[question.question_id]
-                ? "Collapse HTML Code"
-                : "Expand HTML Code"}
+                ? "Close the Question"
+                : "Show me the full Question"}
             </button>
-            {expandedQuestions[question.question_id] && (
-              <HTMLCodeDisplay htmlCode={question.body} />
-            )}
+
+            
+            {expandedQuestions[question.question_id] &&
+                <HTMLCodeDisplay htmlCode={question.body} />
+              }
+            
+            <button
+            onClick={() => toggleAnswers(question.question_id)}
+            className="text-blue-500 hover:underline mb-2 block"
+          >
+            {expandedAnswers[question.question_id]
+                ? "Close the Answers"
+                : "Show me The Answers"}
+
+            </button>
+            {expandedAnswers[question.question_id] &&
+              answers[question.question_id] &&
+              answers[question.question_id].map((answer) => (
+                <HTMLCodeDisplay key={answer.answer_id} htmlCode={answer.body} />
+              ))}
+              
           </div>
         ))}
       </div>
