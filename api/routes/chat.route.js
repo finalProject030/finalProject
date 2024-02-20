@@ -23,7 +23,7 @@ async function processMessageToChatGPT(userMessage) {
   // Call OpenAI API to process the message and return the response
   // This is where you would make your API call to OpenAI
   // Example code:
-  const API_KEY = "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";
+  const API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
   const requestBody = {
     model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: userMessage }],
