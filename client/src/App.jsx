@@ -8,6 +8,7 @@ import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import CreateListing from "./pages/CreateListing";
 import Home from "./pages/Home";
+import Chatbot from "./components/Chatbot";
 
 export default function App() {
   return (
@@ -15,6 +16,10 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route
+          path="/chat"
+          element={<Chatbot userMessage="200-300 words!!!" />}
+        />
 
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
