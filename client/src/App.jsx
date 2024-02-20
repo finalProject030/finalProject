@@ -16,10 +16,7 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route
-          path="/chat"
-          element={<Chatbot userMessage="200-300 words!!!" />}
-        />
+        <Route path="/chat" element={<Chatbot message="8+7?" />} />
 
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
