@@ -1,23 +1,6 @@
 import React, { useState } from "react";
-import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-  MessageInput,
-  TypingIndicator,
-} from "@chatscope/chat-ui-kit-react";
 
-const API_KEY = "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";
-
-const systemMessage = {
-  role: "system",
-  content:
-    "Explain things like you're talking to a software professional with 2 years of experience.",
-};
-
-const Chatbot = ({ userMessage }) => {
+const Chatbot = (message) => {
   const [messages, setMessages] = useState([
     {
       message: "Hello, I'm ChatGPT! Ask me anything!",
@@ -25,80 +8,70 @@ const Chatbot = ({ userMessage }) => {
       sender: "ChatGPT",
     },
   ]);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isChatGPTTyping, setIsChatGPTTyping] = useState(false);
 
-  const handleSend = async () => {
-    const newMessage = {
-      message: userMessage,
-      direction: "outgoing",
-      sender: "user",
-    };
+  const handleSend = async (userMessage) => {
+    // Add the user's message to the chat interface
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { message: userMessage, sender: "user" },
+    ]);
 
-    const newMessages = [...messages, newMessage];
+    setIsChatGPTTyping(true); // Set typing indicator to true while waiting for response
 
-    setMessages(newMessages);
-
-    setIsTyping(true);
-    await processMessageToChatGPT(newMessages);
-  };
-
-  async function processMessageToChatGPT(chatMessages) {
-    let apiMessages = chatMessages.map((messageObject) => {
-      let role = "";
-      if (messageObject.sender === "ChatGPT") {
-        role = "assistant";
-      } else {
-        role = "user";
-      }
-      return { role: role, content: messageObject.message };
-    });
-
-    const apiRequestBody = {
-      model: "gpt-3.5-turbo",
-      messages: [systemMessage, ...apiMessages],
-    };
-
-    await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(apiRequestBody),
-    })
-      .then((data) => data.json())
-      .then((data) => {
-        setMessages([
-          ...chatMessages,
-          {
-            message: data.choices[0].message.content,
-            sender: "ChatGPT",
-          },
-        ]);
-        setIsTyping(false);
+    // Call the backend API to process the user's message
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userMessage }),
       });
-  }
+
+      if (!response.ok) {
+        throw new Error("Failed to send message to the server");
+      }
+
+      const data = await response.json();
+
+      // Add the response from the server to the chat interface
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { message: data.message, sender: "ChatGPT" },
+      ]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      // Optionally, handle errors here (e.g., display an error message to the user)
+    } finally {
+      setIsChatGPTTyping(false); // Reset typing indicator after receiving response
+    }
+  };
 
   return (
     <div className="App">
       <div style={{ position: "relative", height: "100%", width: "auto" }}>
-        <MainContainer>
-          <ChatContainer>
-            <MessageList
-              scrollBehavior="smooth"
-              typingIndicator={
-                isTyping ? (
-                  <TypingIndicator content="ChatGPT is typing" />
-                ) : null
-              }
+        <div
+          className="message-list"
+          style={{ overflowY: "auto", height: "300px" }}
+        >
+          {messages.map((message, i) => (
+            <div
+              key={i}
+              className={`message ${
+                message.sender === "user" ? "user" : "chatgpt"
+              }`}
             >
-              {messages.map((message, i) => (
-                <Message key={i} model={message} />
-              ))}
-            </MessageList>
-            <MessageInput placeholder="Type message here" onSend={handleSend} />
-          </ChatContainer>
-        </MainContainer>
+              {message.message}
+            </div>
+          ))}
+          {isChatGPTTyping && (
+            <div className="typing-indicator">ChatGPT is typing...</div>
+          )}
+        </div>
+        <div>
+          <button onClick={() => handleSend(message.message)}>Send</button>
+        </div>
       </div>
     </div>
   );
