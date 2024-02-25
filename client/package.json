@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@chatscope/chat-ui-kit-react": "^1.10.1",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.10",
     "@reduxjs/toolkit": "^2.0.1",
     "axios": "^1.6.7",
     "firebase": "^10.7.1",

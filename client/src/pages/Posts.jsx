@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import Checkbox from '@mui/material/Checkbox';
+
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -16,6 +18,8 @@ const Posts = () => {
   const [answers, setAnswers] = useState({});
   const [expandedAnswers, setExpandedAnswers] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
+  const [checkedItems, setCheckedItems] = useState({});
+
 
   const fetchQuestions = async () => {
     try {
@@ -79,6 +83,45 @@ const Posts = () => {
     fetchQuestions();
   };
 
+  const handleChange = (questionId) => {
+    setCheckedItems((prev) => {
+      const updatedItems = { ...prev };
+  
+      if (updatedItems[questionId] !== undefined) {
+        // If the item is already selected, remove it
+        delete updatedItems[questionId];
+      } else {
+        // If the item is not selected and there are less than 4 selected items, add it
+        if (Object.keys(updatedItems).length < 4) {
+          // Add an object with questionId and its corresponding answers
+          updatedItems[questionId] = {
+            questionId: questionId,
+            answers: answers[questionId],
+          };
+        } else {
+          // If there are already 4 selected items, do not add more
+          window.alert('You can only select up to 4 items.');
+        }
+      }
+  
+      return updatedItems;
+    });
+  };
+  
+  useEffect(() => {
+    // This block will run after the component has rendered and whenever checkedItems has been updated  
+    setSelectedItems(checkedItems);
+  }, [checkedItems]);
+  
+
+  useEffect(() => {
+    // This block will run whenever selectedItems has been updated
+  }, [selectedItems]);
+
+
+
+
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">
@@ -100,6 +143,7 @@ const Posts = () => {
       </form>
       <div className="grid grid-cols-1 gap-4">
         {questions.map((question) => (
+          
           <div
             key={question.question_id}
             className="bg-white p-4 border rounded-md shadow-md"
@@ -112,6 +156,7 @@ const Posts = () => {
             >
               {question.title}
             </a>
+            
             <button
               onClick={() => toggleQuestion(question.question_id)}
               className="text-blue-500 hover:underline mb-2 block"
@@ -139,6 +184,11 @@ const Posts = () => {
                   htmlCode={answer.body}
                 />
               ))}
+              <Checkbox
+              checked={Boolean(checkedItems[question.question_id])}
+              onChange={() => handleChange(question.question_id)}
+              inputProps={{ 'aria-label': 'controlled' }}
+              />
           </div>
         ))}
       </div>
