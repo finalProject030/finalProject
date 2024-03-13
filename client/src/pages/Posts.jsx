@@ -12,6 +12,7 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
 };
 
 const Posts = () => {
+  
   const [tagged, setTagged] = useState(""); // Default tag
   const [questions, setQuestions] = useState([]);
   const [expandedQuestions, setExpandedQuestions] = useState({});
