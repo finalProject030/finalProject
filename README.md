@@ -1,6 +1,12 @@
-## FinalProject
+# *Stack TextPro*
+This project is our final project.<br><br><br>
 
-Project Stack:
+
+
+
+
+
+## *Project Stack*:
 
 
  <img src="https://github.com/finalProject030/finalProject/assets/126160304/db36eeb6-9ab3-4953-9a9e-c08a1c0d8500" height="30" width="30">&nbsp;&nbsp;&nbsp;We're using React library for type safety and better developer experience.<br><br>
