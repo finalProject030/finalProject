@@ -1,8 +1,15 @@
+> [!NOTE]
+This project is still in processing.
+
+
+
+
+
+ <br><br><br><br>
+
+
 # *Stack TextPro*
 This project is our final project.<br><br><br>
-
-
-
 
 
 
@@ -15,8 +22,16 @@ This project is our final project.<br><br><br>
 
 <img src="https://github.com/finalProject030/finalProject/assets/126160304/9eb4b3c2-8676-49cb-8756-8c15677ae3a6" height="30" width="30">&nbsp;&nbsp;&nbsp;Custom VSCode settings have been set up for a consistent development environment.<br><br>
 
-<img src="https://github.com/finalProject030/finalProject/assets/126160304/2f4382e6-756e-4e2e-8696-14a581c05a88" height="30" width="30">&nbsp;&nbsp;&nbsp;MongoDB is the data base. <br><br>
+<img src="https://github.com/finalProject030/finalProject/assets/126160304/2f4382e6-756e-4e2e-8696-14a581c05a88" height="30" width="30">&nbsp;&nbsp;&nbsp;MongoDB is the data base. <br><br><br><br>
 
+
+ 
+## *🚀 Forking and Running the Project*:
+#### 1. Fork the Repository<br>
+Go to the GitHub repository you want to fork.<br>Click the "Fork" button at the top right.
+
+#### 2. Clone Your Forked Repository<br>
+    git clone https://github.com/YOUR_USERNAME/REPOSITORY_NAME.git 
 
 
 
