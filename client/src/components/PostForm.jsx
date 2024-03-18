@@ -82,7 +82,6 @@ export default function PostCreationForm() {
 
   const handleSend = async () => {
     generateJsonInstructions();
-    generateJsonInstructions();
 
     console.log("jsonInstructions:", jsonInstructions);
 
