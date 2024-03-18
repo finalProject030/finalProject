@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Checkbox from '@mui/material/Checkbox';
+import Select from 'react-select'
+import { FaFilter } from "react-icons/fa";
+import { LuFilter } from "react-icons/lu";
+
+
+
 
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
@@ -20,17 +26,47 @@ const Posts = () => {
   const [expandedAnswers, setExpandedAnswers] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
   const [checkedItems, setCheckedItems] = useState({});
+  const [sort, setSort] = useState("votes");
+  const [order, setOrder] = useState("desc");
+  const [relevance, setRelavance] = useState("");
+
+  const filterQuestionsList = [
+    { value: 'votes', label: 'Votes (deafult)' },
+    { value: 'activity', label: 'Activity' },
+    { value: 'creation', label: 'Cration date' },
+    { value: 'relevance', label: 'Relevance' },
+
+  ]
+
+  const orderQuestionsList = [
+    { value: 'desc', label: 'Desc (deafult)' },
+    { value: 'asc', label: 'Asc' }
+  ]
+  const dateQuestions = [
+    { value: 'desc', label: 'From date' },
+    { value: 'asc', label: 'To date' }
+  ]
+
+
+
+
+  
+
 
 
   const fetchQuestions = async () => {
     try {
-      // Fetching data for questions with the specified tag
-      const response = await fetch(
-        `https://api.stackexchange.com/2.3/questions?order=desc&sort=votes&tagged=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`
-      );
+        let api = "";
+        if (sort !== "relevance")
+          api = `https://api.stackexchange.com/2.3/search/advanced?order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+        else
+          api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
+        // filter=!nNPvSNPI3D
+
+      const response = await fetch(api);
       const data = await response.json();
       if (data.items) {
-        // Display a certain number of random questions (e.g., 5)
+        // Display 10 random questions
         const randomQuestions = data.items.slice(0, 10);
         setQuestions(randomQuestions);
         // Fetch answers for each question
@@ -41,17 +77,24 @@ const Posts = () => {
     }
   };
 
+
+
+
   const fetchAnswers = async (questions) => {
+    let api = ""
     const answersPromises = questions.map(async (question) => {
-      const response = await fetch(
-        `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=desc&sort=votes&site=stackoverflow&filter=!6WPIomnMOOD*e`
-      );
+      if (sort !== "relevance") 
+        api =  `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`
+
+      else
+        api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`
+
+      const response = await fetch(api);
       const data = await response.json();
       return { questionId: question.question_id, answers: data.items };
     });
 
     const answersData = await Promise.all(answersPromises);
-
     const answersMap = {};
     answersData.forEach(({ questionId, answers }) => {
       answersMap[questionId] = answers;
@@ -123,6 +166,11 @@ const Posts = () => {
 
 
 
+
+
+
+
+  
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">
@@ -141,6 +189,18 @@ const Posts = () => {
         <button type="submit" className="bg-blue-500 text-white p-2">
           Search
         </button>
+
+        <div>
+           <h1> Filters <LuFilter /> </h1>
+          <Select
+           options={filterQuestionsList}
+            onChange={(e) => setSort(e.value)}
+          />
+          <Select options={orderQuestionsList}
+          onChange={(e) => setOrder(e.value)}
+          />
+
+        </div>
       </form>
       <div className="grid grid-cols-1 gap-4">
         {questions.map((question) => (
