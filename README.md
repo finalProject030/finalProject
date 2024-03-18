@@ -5,11 +5,12 @@ This project is still in processing.
 
 
 
- <br><br><br><br>
+ <br><br><br>
 
 
 # *Stack TextPro*
-This project is our final project.<br><br><br>
+This project is our final project.<br>
+A site for creation automatic of professional content, Based on StackOverflow.com. <br><br><br>
 
 
 
@@ -32,7 +33,7 @@ Go to the GitHub repository you want to fork.<br>Click the "Fork" button at the 
 
 #### 2. Clone Your Forked Repository<br>
     git clone https://github.com/YOUR_USERNAME/REPOSITORY_NAME.git 
-
+<br><br><br><br>
 
 
 
@@ -42,5 +43,10 @@ Go to the GitHub repository you want to fork.<br>Click the "Fork" button at the 
 Do not forget to use tne .env files
 The first one contain the mongoDB api key and the JWT secret- its should be located with he readme.md file
 
-The second one sould be located inside the client folder and it should contain the VITE_FIREBASE_API_KEY 
+The second one sould be located inside the client folder and it should contain the VITE_FIREBASE_API_KEY <br><br><br><br>
+
+# Logo:
+<img src="https://github.com/finalProject030/finalProject/assets/126160304/f5e27809-5b9c-4a86-97d3-8535afed1f26" height="150" width="200">
+<br><br><br><br>
+
 
