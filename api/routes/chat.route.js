@@ -7,11 +7,12 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   try {
     const userMessage = req.body.userMessage;
-
     // Call OpenAI API to process the message
     const response = await processMessageToChatGPT(userMessage);
     // console.log(response);
     // Send response back to the client
+    console.log(userMessage);
+
     res.status(200).json({ message: response });
   } catch (error) {
     console.error("Error:", error);
@@ -23,7 +24,7 @@ async function processMessageToChatGPT(userMessage) {
   // Call OpenAI API to process the message and return the response
   // This is where you would make your API call to OpenAI
   // Example code:
-  const API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+  const API_KEY = "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";
   const requestBody = {
     model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: userMessage }],
