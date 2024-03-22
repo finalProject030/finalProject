@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Checkbox from '@mui/material/Checkbox';
 import Select from 'react-select'
-import { FaFilter } from "react-icons/fa";
 import { LuFilter } from "react-icons/lu";
-
-
 
 
 
@@ -17,6 +14,9 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
   );
 };
 
+
+
+
 const Posts = () => {
   
   const [tagged, setTagged] = useState(""); // Default tag
@@ -26,9 +26,11 @@ const Posts = () => {
   const [expandedAnswers, setExpandedAnswers] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
   const [checkedItems, setCheckedItems] = useState({});
+  const [pageNumber, setPageNumber] = useState(1);
+  const [search, setSearch] = useState(false);
+  const [nextPageLink, setNextPageLink] = useState(false);
   const [sort, setSort] = useState("votes");
   const [order, setOrder] = useState("desc");
-  const [relevance, setRelavance] = useState("");
 
   const filterQuestionsList = [
     { value: 'votes', label: 'Votes (deafult)' },
@@ -63,11 +65,13 @@ const Posts = () => {
           api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
         // filter=!nNPvSNPI3D
 
+      // console.log(api);
       const response = await fetch(api);
       const data = await response.json();
       if (data.items) {
         // Display 10 random questions
-        const randomQuestions = data.items.slice(0, 10);
+        const randomQuestions = data.items.slice(0, pageNumber * 10);
+        console.log(randomQuestions);
         setQuestions(randomQuestions);
         // Fetch answers for each question
         fetchAnswers(randomQuestions);
@@ -103,12 +107,16 @@ const Posts = () => {
     setAnswers(answersMap);
   };
 
+
+
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
       ...prev,
       [questionId]: !prev[questionId],
     }));
   };
+
+
 
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
@@ -117,15 +125,23 @@ const Posts = () => {
     }));
   };
 
+
+
+
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
 
+
+
   const handleFormSubmit = (e) => {
+    setSearch(true);
     e.preventDefault();
     // Fetch data when the user presses Enter
     fetchQuestions();
   };
+
+
 
   const handleChange = (questionId) => {
     setCheckedItems((prev) => {
@@ -193,11 +209,14 @@ const Posts = () => {
         <div>
            <h1> Filters <LuFilter /> </h1>
           <Select
-           options={filterQuestionsList}
+            defaultValue={filterQuestionsList[0]}
+            options={filterQuestionsList}
             onChange={(e) => setSort(e.value)}
           />
-          <Select options={orderQuestionsList}
-          onChange={(e) => setOrder(e.value)}
+          <Select
+            defaultValue={orderQuestionsList[0]}
+            options={orderQuestionsList}
+            onChange={(e) => setOrder(e.value)}
           />
 
         </div>
@@ -253,6 +272,22 @@ const Posts = () => {
           </div>
         ))}
       </div>
+
+      { search && questions.length >= 10 && (
+      <div className="nextPageLink">
+        <button 
+        type="button"
+        onClick={() => {
+          setPageNumber(pageNumber + 1);
+          fetchQuestions();}}
+        >
+          Show more 10 results
+        </button>
+        </div>
+      )
+}
+
+
     </div>
   );
 };
