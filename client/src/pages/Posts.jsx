@@ -1,18 +1,10 @@
 import React, { useEffect, useState } from "react";
-<<<<<<< HEAD
 import Checkbox from "@mui/material/Checkbox";
 import Select from "react-select";
 import { LuFilter } from "react-icons/lu";
 import { useRecoilState } from "recoil";
 import { recoilSelectedPosts } from "../recoil/state";
 import PostForm from "../components/PostForm";
-=======
-import Checkbox from '@mui/material/Checkbox';
-import Select from 'react-select'
-import { LuFilter } from "react-icons/lu";
-
-
->>>>>>> 3d8223ce988df6c06dec2c7b7cd0997bfc0707a7
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -23,9 +15,6 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
   );
 };
 
-
-
-
 const Posts = () => {
   const [tagged, setTagged] = useState(""); // Default tag
   const [questions, setQuestions] = useState([]);
@@ -33,7 +22,6 @@ const Posts = () => {
   const [answers, setAnswers] = useState({});
   const [expandedAnswers, setExpandedAnswers] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
-<<<<<<< HEAD
   const [checkedItems, setCheckedItems] = useRecoilState(recoilSelectedPosts);
   const [showTheNextStep, setShowTheNextStep] = useState(false);
 
@@ -42,12 +30,6 @@ const Posts = () => {
   };
   // const [checkedItems, setCheckedItems] = useState({});
 
-=======
-  const [checkedItems, setCheckedItems] = useState({});
-  const [pageNumber, setPageNumber] = useState(1);
-  const [search, setSearch] = useState(false);
-  const [nextPageLink, setNextPageLink] = useState(false);
->>>>>>> 3d8223ce988df6c06dec2c7b7cd0997bfc0707a7
   const [sort, setSort] = useState("votes");
   const [order, setOrder] = useState("desc");
 
@@ -76,13 +58,11 @@ const Posts = () => {
         api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
       // filter=!nNPvSNPI3D
 
-      // console.log(api);
       const response = await fetch(api);
       const data = await response.json();
       if (data.items) {
         // Display 10 random questions
-        const randomQuestions = data.items.slice(0, pageNumber * 10);
-        console.log(randomQuestions);
+        const randomQuestions = data.items.slice(0, 10);
         setQuestions(randomQuestions);
         // Fetch answers for each question
         fetchAnswers(randomQuestions);
@@ -114,16 +94,12 @@ const Posts = () => {
     setAnswers(answersMap);
   };
 
-
-
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
       ...prev,
       [questionId]: !prev[questionId],
     }));
   };
-
-
 
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
@@ -132,23 +108,15 @@ const Posts = () => {
     }));
   };
 
-
-
-
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
 
-
-
   const handleFormSubmit = (e) => {
-    setSearch(true);
     e.preventDefault();
     // Fetch data when the user presses Enter
     fetchQuestions();
   };
-
-
 
   const handleChange = (questionId) => {
     setCheckedItems((prev) => {
@@ -188,7 +156,6 @@ const Posts = () => {
   }, [selectedItems]);
 
   return (
-<<<<<<< HEAD
     <div>
       {!showTheNextStep ? (
         <div className="container mx-auto p-4">
@@ -203,88 +170,6 @@ const Posts = () => {
                 value={tagged}
                 onChange={handleTagChange}
                 className="border p-2"
-=======
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">
-        Stack Overflow Questions Tagged with {tagged}
-      </h1>
-      <form className="mb-4" onSubmit={handleFormSubmit}>
-        <label className="mr-2">
-          Enter Subject:
-          <input
-            type="text"
-            value={tagged}
-            onChange={handleTagChange}
-            className="border p-2"
-          />
-        </label>
-        <button type="submit" className="bg-blue-500 text-white p-2">
-          Search
-        </button>
-
-        <div>
-           <h1> Filters <LuFilter /> </h1>
-          <Select
-            defaultValue={filterQuestionsList[0]}
-            options={filterQuestionsList}
-            onChange={(e) => setSort(e.value)}
-          />
-          <Select
-            defaultValue={orderQuestionsList[0]}
-            options={orderQuestionsList}
-            onChange={(e) => setOrder(e.value)}
-          />
-
-        </div>
-      </form>
-      <div className="grid grid-cols-1 gap-4">
-        {questions.map((question) => (
-          
-          <div
-            key={question.question_id}
-            className="bg-white p-4 border rounded-md shadow-md"
-          >
-            <a
-              href={question.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline font-bold text-lg mb-2 block"
-            >
-              {question.title}
-            </a>
-            
-            <button
-              onClick={() => toggleQuestion(question.question_id)}
-              className="text-blue-500 hover:underline mb-2 block"
-            >
-              {expandedQuestions[question.question_id]
-                ? "Close the Question"
-                : "Show me the full Question"}
-            </button>
-            {expandedQuestions[question.question_id] && (
-              <HTMLCodeDisplay htmlCode={question.body} />
-            )}
-            <button
-              onClick={() => toggleAnswers(question.question_id)}
-              className="text-blue-500 hover:underline mb-2 block"
-            >
-              {expandedAnswers[question.question_id]
-                ? "Close the Answers"
-                : "Show me The Answers"}
-            </button>
-            {expandedAnswers[question.question_id] &&
-              answers[question.question_id] &&
-              answers[question.question_id].map((answer) => (
-                <HTMLCodeDisplay
-                  key={answer.answer_id}
-                  htmlCode={answer.body}
-                />
-              ))}
-              <Checkbox
-              checked={Boolean(checkedItems[question.question_id])}
-              onChange={() => handleChange(question.question_id)}
-              inputProps={{ 'aria-label': 'controlled' }}
->>>>>>> 3d8223ce988df6c06dec2c7b7cd0997bfc0707a7
               />
             </label>
             <button type="submit" className="bg-blue-500 text-white p-2">
@@ -364,7 +249,6 @@ const Posts = () => {
               </div>
             ))}
           </div>
-<<<<<<< HEAD
 
           {/* Render AnotherComponent based on the value of showAnotherComponent */}
           {showTheNextStep ? <About /> : null}
@@ -372,26 +256,6 @@ const Posts = () => {
       ) : (
         <PostForm />
       )}
-=======
-        ))}
-      </div>
-
-      { search && questions.length >= 10 && (
-      <div className="nextPageLink">
-        <button 
-        type="button"
-        onClick={() => {
-          setPageNumber(pageNumber + 1);
-          fetchQuestions();}}
-        >
-          Show more 10 results
-        </button>
-        </div>
-      )
-}
-
-
->>>>>>> 3d8223ce988df6c06dec2c7b7cd0997bfc0707a7
     </div>
   );
 };
