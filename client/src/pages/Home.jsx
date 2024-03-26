@@ -1,8 +1,7 @@
 import React from "react";
-import PostForm from "../components/PostForm";
 
 const Home = () => {
-  return <PostForm />;
+  return <div>Home Page</div>;
 };
 
 export default Home;

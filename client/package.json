@@ -25,6 +25,8 @@
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.1",
     "react-select": "^5.8.0",
+    "recoil": "^0.7.7",
+    "recoil-persist": "^5.1.0",
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
