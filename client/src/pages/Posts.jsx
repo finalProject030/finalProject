@@ -22,6 +22,8 @@ const Posts = () => {
   const [answers, setAnswers] = useState({});
   const [expandedAnswers, setExpandedAnswers] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
+  const [pageNumber, setPageNumber] = useState(1);
+  const [search, setSearch] = useState(false);
   const [checkedItems, setCheckedItems] = useRecoilState(recoilSelectedPosts);
   const [showTheNextStep, setShowTheNextStep] = useState(false);
 
@@ -111,8 +113,8 @@ const Posts = () => {
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
-
   const handleFormSubmit = (e) => {
+    setSearch(true);
     e.preventDefault();
     // Fetch data when the user presses Enter
     fetchQuestions();
@@ -175,25 +177,19 @@ const Posts = () => {
             <button type="submit" className="bg-blue-500 text-white p-2">
               Search
             </button>
-            {Object.keys(checkedItems).length > 0 && (
-              <button
-                type="button"
-                className="bg-blue-500 text-white p-2 m-5"
-                onClick={handleToggleComponent}
-              >
-                Move to the next step
-              </button>
-            )}
+
             <div>
               <h1>
                 {" "}
                 Filters <LuFilter />{" "}
               </h1>
               <Select
+                defaultValue={filterQuestionsList[0]}
                 options={filterQuestionsList}
                 onChange={(e) => setSort(e.value)}
               />
               <Select
+                defaultValue={orderQuestionsList[0]}
                 options={orderQuestionsList}
                 onChange={(e) => setOrder(e.value)}
               />
@@ -250,8 +246,20 @@ const Posts = () => {
             ))}
           </div>
 
-          {/* Render AnotherComponent based on the value of showAnotherComponent */}
-          {showTheNextStep ? <About /> : null}
+          {search && questions.length >= 10 && (
+            <div className="nextPageLink">
+              <button
+                type="button"
+                onClick={() => {
+                  setPageNumber(pageNumber + 1);
+                  // console.log("jdgnsjkn", selectedItems);
+                  fetchQuestions();
+                }}
+              >
+                Show more 10 results
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <PostForm />

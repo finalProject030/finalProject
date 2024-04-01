@@ -2,6 +2,8 @@
 
 import express from "express";
 const router = express.Router();
+import dotenv from "dotenv";
+dotenv.config();
 
 // Route to handle incoming chat messages
 router.post("/", async (req, res) => {
@@ -24,7 +26,7 @@ async function processMessageToChatGPT(userMessage) {
   // Call OpenAI API to process the message and return the response
   // This is where you would make your API call to OpenAI
   // Example code:
-  const API_KEY = "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";
+  const API_KEY = process.env.CHAT_API_KEY;
   const requestBody = {
     model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: userMessage }],

@@ -14,8 +14,8 @@ router.post("/", async (req, res) => {
 
     // Perform the summarization with desired options
     const result = await pipe(article, {
-      max_length: 1000,
-      min_length: 300,
+      max_length: 500,
+      min_length: 100,
     });
 
     // Send the result as response
