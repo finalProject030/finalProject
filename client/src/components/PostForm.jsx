@@ -1,56 +1,46 @@
 import React, { useState } from "react";
+import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
+import { useRecoilState } from "recoil";
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
+  const [step, setStep] = useRecoilState(recoilSelectedStep);
   const [maxEmojis, setMaxEmojis] = useState(5);
   const [minEmojis, setMinEmojis] = useState(1);
   const [wordCount, setWordCount] = useState(100);
   const [paragraphCount, setParagraphCount] = useState(1);
-  const [summary, setSummary] = useState(
-    "The Daily Discussion is a weekly feature on CNN.com's iReport.com.com. Please share your photos and stories you saw on CNN iReport. Click here for more stories. Visit CNN. com.com/daily discussion of stories you see on CNN's iReporter's weekly Newsquiz.com, or visit CNN.uk.com or visit iReport in a new story.com for a new article..com: Share your photos... Click here"
-  );
   const [loading, setLoading] = useState(false);
   const [handleSubmit, setHandleSubmit] = useState(false);
   const [jsonInstructions, setJsonInstructions] = useState("");
   const [chatResponse, setChatResponse] = useState("");
+  const [selectedItems, setSelectedItems] = useRecoilState(recoilSelectedPosts);
+  const [messageToSend, setMessageToSend] = useState("");
+  const [isChatGPTTyping, setIsChatGPTTyping] = useState(false);
 
-  const transformText = async () => {
-    setLoading(true);
+  // //////////////////////////////////////////////////////////////////////////Gemini
+  async function sendMessageToServer(messageToSend) {
     try {
-      console.log(jsonInstructions);
-      const res = await fetch("/api/transformText", {
+      const response = await fetch("/api/gemini", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          article: summary,
-        }),
+        body: JSON.stringify({ message: messageToSend }),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
 
-      const data = await res.json();
-      setSummary(data[0].summary_text);
+      const data = await response.json();
+      return data.message; // Assuming your server returns the processed message
     } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
+      console.error("There was a problem with the fetch operation:", error);
+      throw error;
     }
-  };
+  }
 
-  //   const handleFormSubmit = (event) => {
-  //     event.preventDefault();
-  //     setHandleSubmit(true);
-  //     // generateJsonInstructions();
-  //     // await transformText();
-  //     handleSend();
-  //     if (!loading) {
-  //       setHandleSubmit(false);
-  //     }
-  //   };
+  // //////////////////////////////////////////////////////////////////////////
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -75,48 +65,72 @@ export default function PostCreationForm() {
       "Incorporate relevant hashtags.",
       "End with a call to action, such as asking for comments or opinions.",
       "Proofread your post for grammar and spelling errors.",
-      `Here is what you should summary base on my rules above: ${summary}`, // Append the summary value to the instructions
+      `Here is what you should summary base on my rules above: ${messageToSend}`, // Append the summary value to the instructions
     ];
     setJsonInstructions(instructions.join("\n"));
   };
 
   const handleSend = async () => {
-    generateJsonInstructions();
+    generateJsonInstructions(); // Generate JSON instructions
 
-    console.log("jsonInstructions:", jsonInstructions);
+    const selectedPostsMessage = Object.entries(selectedItems).map(
+      ([questionId, item]) => {
+        return `Question ID: ${questionId}\n\nQuestion Body: ${
+          item.body
+        }\n\nAccepted Answers:\n${item.answers
+          .filter((answer) => answer.is_accepted)
+          .map((acceptedAnswer, index) => {
+            return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
+          })
+          .join("")}`;
+      }
+    );
+
+    const message = `${jsonInstructions}\n\nSelected Posts:\n${selectedPostsMessage.join(
+      "\n\n"
+    )}`;
+    setMessageToSend(message);
+
+    const article = message;
+
+    // console.log("Message to be sent:", message); // Log the message to the console
 
     try {
-      setLoading(true); // Set loading state to true before making the API call
+      setLoading(true);
 
-      const response = await fetch("/api/chat", {
+      const response = await fetch("/api/transformText", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userMessage: jsonInstructions }), // Correct JSON payload format
+        body: JSON.stringify({ article: message }), // Send the text to the server
       });
 
       if (!response.ok) {
         throw new Error("Failed to send message to the server");
       }
 
-      const data = await response.json();
-      setChatResponse(data.message); // Update chatResponse state
-
-      // Log chatResponse outside of the setChatResponse callback
-      //   console.log(data.message);
+      const data = await response.text(); // Receive text data from the server
+      // console.log("Text received:", data); // Log the received text
+      setChatResponse(data); // Set the received text as chatResponse
     } catch (error) {
       console.error("Error sending message:", error);
-      // Optionally, handle errors here (e.g., display an error message to the user)
     } finally {
-      setLoading(false); // Set loading state back to false once the response is received
-      setHandleSubmit(false); // Reset the handleSubmit state
+      setLoading(false);
+      setHandleSubmit(false);
     }
   };
 
-  console.log(chatResponse);
+  const moveToSelectedPostsPage = () => {
+    setStep("selectedPosts");
+  };
+
   return (
     <div>
+      <h2 className="text-2xl font-bold mb-4">
+        Instructions for build your post:
+      </h2>
+
       <form
         onSubmit={handleFormSubmit}
         className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
@@ -201,6 +215,10 @@ export default function PostCreationForm() {
             </div>
           </div>
         )}
+
+        {isChatGPTTyping && (
+          <div className="typing-indicator">is typing...</div>
+        )}
         <button
           type="submit"
           className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
@@ -210,15 +228,30 @@ export default function PostCreationForm() {
           }`}
           disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
         >
-          Create Post
+          Create Post Summary
         </button>
       </form>
+
+      <button
+        className={`px-4 py-2 m-2 rounded-md hover:bg-green-600 ${
+          handleSubmit || loading // Disable the button if handleSubmit or loading is true
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-green-500 text-white hover:bg-blue-600"
+        }`}
+        onClick={() => sendMessageToServer("Hi how are you?")}
+        disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
+      >
+        Send To OpenAI
+      </button>
+      {messageToSend}
       {loading && handleSubmit && <p>Loading...</p>}
-      {chatResponse && (
-        <div className="mt-4">
-          <p>chatResponse: {chatResponse}</p>
-        </div>
-      )}
+
+      <button
+        onClick={moveToSelectedPostsPage}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Move back
+      </button>
     </div>
   );
 }

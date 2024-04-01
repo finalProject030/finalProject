@@ -42,7 +42,8 @@ async function processMessageToChatGPT(userMessage) {
   });
 
   const data = await response.json();
-  return data.choices[0].message.content;
+  console.log(data);
+  return data;
 }
 
 export default router;

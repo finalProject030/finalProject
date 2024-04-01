@@ -3,8 +3,8 @@ import Checkbox from "@mui/material/Checkbox";
 import Select from "react-select";
 import { LuFilter } from "react-icons/lu";
 import { useRecoilState } from "recoil";
-import { recoilSelectedPosts } from "../recoil/state";
-import PostForm from "../components/PostForm";
+import { recoilSelectedPosts, recoilSelectedStep } from "../recoil/state";
+import SelectedPosts from "../components/SelectedPosts";
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -25,10 +25,12 @@ const Posts = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [search, setSearch] = useState(false);
   const [checkedItems, setCheckedItems] = useRecoilState(recoilSelectedPosts);
+  const [step, setStep] = useRecoilState(recoilSelectedStep);
   const [showTheNextStep, setShowTheNextStep] = useState(false);
 
   const handleToggleComponent = () => {
-    setShowTheNextStep((prev) => !prev);
+    setShowTheNextStep(true);
+    setStep("selectedPosts");
   };
   // const [checkedItems, setCheckedItems] = useState({});
 
@@ -134,7 +136,7 @@ const Posts = () => {
           updatedItems[questionId] = {
             questionId: questionId,
             body: questions.find((q) => q.question_id === questionId).body, // Get question body
-            answers: updatedItems[questionId], // Get answers
+            answers: answers[questionId], // Get answers
             // Include any other necessary data here
           };
         } else {
@@ -159,7 +161,7 @@ const Posts = () => {
 
   return (
     <div>
-      {!showTheNextStep ? (
+      {step === "posts" ? (
         <div className="container mx-auto p-4">
           <h1 className="text-3xl font-bold mb-4">
             Stack Overflow Questions Tagged with {tagged}
@@ -177,7 +179,15 @@ const Posts = () => {
             <button type="submit" className="bg-blue-500 text-white p-2">
               Search
             </button>
-
+            {Object.keys(checkedItems).length > 0 && (
+              <button
+                type="button"
+                className="bg-blue-500 text-white p-2 m-5"
+                onClick={handleToggleComponent}
+              >
+                Move to the next step
+              </button>
+            )}
             <div>
               <h1>
                 {" "}
@@ -249,6 +259,7 @@ const Posts = () => {
           {search && questions.length >= 10 && (
             <div className="nextPageLink">
               <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 type="button"
                 onClick={() => {
                   setPageNumber(pageNumber + 1);
@@ -262,7 +273,7 @@ const Posts = () => {
           )}
         </div>
       ) : (
-        <PostForm />
+        <SelectedPosts />
       )}
     </div>
   );

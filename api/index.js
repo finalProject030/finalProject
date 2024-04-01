@@ -8,6 +8,7 @@ import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
 import chatRouter from "./routes/chat.route.js"; // Import your chat router
 import tranformTextRouter from "./routes/transformText.route.js";
+import geminiRouter from "./routes/gemini.route.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -36,6 +37,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/chat", chatRouter); // Add your chat router here
 app.use("/api/transformText", tranformTextRouter);
+app.use("/api/gemini", geminiRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

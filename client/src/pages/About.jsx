@@ -1,47 +1,25 @@
 import React from "react";
-import { useRecoilState } from "recoil";
-import { recoilSelectedPosts } from "../recoil/state";
 
-export default function About() {
-  const [selectedItems, setSelectedItems] = useRecoilState(recoilSelectedPosts);
-
+const About = () => {
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">About</h2>
-      {Object.entries(selectedItems).map(([questionId, item]) => (
-        <div key={questionId} className="mb-8">
-          <h3 className="text-xl font-semibold mb-2">
-            Question ID: {questionId}
-          </h3>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold mb-2">Question Body:</h4>
-            <div dangerouslySetInnerHTML={{ __html: item.body }} />
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold mb-2">Accepted Answers:</h4>
-            <ul>
-              {item.answers &&
-                item.answers
-                  .filter((answer) => answer.is_accepted)
-                  .map((acceptedAnswer) => (
-                    <li key={acceptedAnswer.answer_id} className="mb-2">
-                      <strong className="text-green-600">Accepted:</strong> Yes
-                      <br />
-                      <strong className="text-lg font-semibold">
-                        Answer Body:
-                      </strong>
-                      <div
-                        className="ml-4"
-                        dangerouslySetInnerHTML={{
-                          __html: acceptedAnswer.body,
-                        }}
-                      />
-                    </li>
-                  ))}
-            </ul>
-          </div>
-        </div>
-      ))}
+    <div className="bg-gradient-to-b  from-gray-600 to-blue-300 h-screen flex justify-center items-center">
+      <div className="max-w-md p-8 bg-white rounded-lg shadow-lg text-center">
+        <h1 className="text-4xl font-bold text-gray-800 mb-6">About Us</h1>
+        <p className="text-lg text-gray-700 mb-8">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
+          finibus libero. Integer id nunc ac eros porttitor fermentum. Donec
+          sagittis placerat ex, sit amet tempor elit maximus vel. Integer
+          ullamcorper eros eu leo efficitur, id dapibus risus efficitur. Duis
+          sed augue id quam interdum pharetra sed nec lorem. Vestibulum in
+          lacinia purus, et vehicula mi. Cras congue sem at libero lobortis
+          tincidunt.
+        </p>
+        <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+          Learn More
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default About;
