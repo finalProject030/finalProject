@@ -14,6 +14,12 @@ A site for creation automatic of professional content, Based on StackOverflow.co
 
 
 
+# Alpha report video:
+
+https://github.com/finalProject030/finalProject/assets/126160304/39159a98-bbb4-4c42-aa4d-1a97f60d2c5a
+
+
+
 ## *Project Stack*:
 
 
@@ -50,12 +56,6 @@ The second one sould be located inside the client folder and it should contain t
 <br><br><br><br>
 
 
-
-
-
-# alpha report video:
-
-https://github.com/finalProject030/finalProject/assets/126160304/39159a98-bbb4-4c42-aa4d-1a97f60d2c5a
 
 
 
