@@ -19,7 +19,6 @@ A site for creation automatic of professional content, Based on StackOverflow.co
 https://github.com/finalProject030/finalProject/assets/126160304/39159a98-bbb4-4c42-aa4d-1a97f60d2c5a
 
 
-
 <br><br><br>
 
 
