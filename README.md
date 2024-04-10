@@ -42,7 +42,7 @@ https://github.com/finalProject030/finalProject/assets/126160304/39159a98-bbb4-4
 Go to the GitHub repository you want to fork.<br>Click the "Fork" button at the top right.
 
 #### 2. Clone Your Forked Repository<br>
-    git clone https://github.com/YOUR_USERNAME/REPOSITORY_NAME.git 
+    git clone https://github.com/finalProject030/finalProject.git
 <br><br><br><br>
 
 
