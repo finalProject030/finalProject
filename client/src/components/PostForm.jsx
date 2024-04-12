@@ -238,7 +238,7 @@ export default function PostCreationForm() {
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-green-500 text-white hover:bg-blue-600"
         }`}
-        onClick={() => sendMessageToServer("Hi how are you?")}
+        onClick={() => sendMessageToServer(messageToSend)}
         disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
       >
         Send To OpenAI

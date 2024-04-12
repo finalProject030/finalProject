@@ -5,6 +5,7 @@ import { LuFilter } from "react-icons/lu";
 import { useRecoilState } from "recoil";
 import { recoilSelectedPosts, recoilSelectedStep } from "../recoil/state";
 import SelectedPosts from "../components/SelectedPosts";
+// import { sleep } from "openai/core.mjs";
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -40,7 +41,7 @@ const Posts = () => {
   const filterQuestionsList = [
     { value: "votes", label: "Votes (deafult)" },
     { value: "activity", label: "Activity" },
-    { value: "creation", label: "Cration date" },
+    { value: "creation", label: "Creation date" },
     { value: "relevance", label: "Relevance" },
   ];
 
@@ -54,48 +55,67 @@ const Posts = () => {
   ];
 
   const fetchQuestions = async () => {
-    try {
-      let api = "";
-      if (sort !== "relevance")
-        api = `https://api.stackexchange.com/2.3/search/advanced?order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-      else
-        api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
-      // filter=!nNPvSNPI3D
+    setPageNumber(pageNumber + 1);
+    console.log(pageNumber + " questions");
+    // there is no input field
+    if(tagged != ""){
+      try {
+        let api = "";
+        if (sort !== "relevance")
+          api = `https://api.stackexchange.com/2.3/search/advanced?order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+        else
+          api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
+        // filter=!nNPvSNPI3D
 
-      const response = await fetch(api);
-      const data = await response.json();
-      if (data.items) {
-        // Display 10 random questions
-        const randomQuestions = data.items.slice(0, 10);
-        setQuestions(randomQuestions);
-        // Fetch answers for each question
-        fetchAnswers(randomQuestions);
+        const response = await fetch(api);
+        const data = await response.json();
+        
+        if (data.items) {
+          // Display 10 random questions
+          const randomQuestions = data.items.slice((pageNumber - 1) * 10, pageNumber * 10);
+          fetchAnswers(randomQuestions);
+
+          if(questions.length === 0) 
+            setQuestions(randomQuestions);
+    
+          else
+            questions.push(...randomQuestions);
+          
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
     }
   };
 
   const fetchAnswers = async (questions) => {
-    let api = "";
-    const answersPromises = questions.map(async (question) => {
-      if (sort !== "relevance")
-        api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-      else
-        api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+    if(questions.length > 0) {
+      try {
+        let api = "";
+        const answersPromises = questions.map(async (question) => {
+          console.log("moshe kaodhs");
+          if (sort !== "relevance")
+            api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+          else
+            api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
 
-      const response = await fetch(api);
-      const data = await response.json();
-      return { questionId: question.question_id, answers: data.items };
-    });
+          const response = await fetch(api);
+          const data = await response.json();
+          return { questionId: question.question_id, answers: data.items };
+        });
+        const answersData = await Promise.all(answersPromises);
+        const answersMap = {};
+        answersData.forEach(({ questionId, answers }) => {
+          answersMap[questionId] = answers;
+        });
+        setAnswers(answersMap);
+      }
+      catch (error) {
+        console.error("Error fetching answers data:", error);
 
-    const answersData = await Promise.all(answersPromises);
-    const answersMap = {};
-    answersData.forEach(({ questionId, answers }) => {
-      answersMap[questionId] = answers;
-    });
+      }
 
-    setAnswers(answersMap);
+    }
   };
 
   const toggleQuestion = (questionId) => {
@@ -112,15 +132,18 @@ const Posts = () => {
     }));
   };
 
+
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
+
+  
   const handleFormSubmit = (e) => {
     setSearch(true);
     e.preventDefault();
-    // Fetch data when the user presses Enter
-    fetchQuestions();
+    setPageNumber(1);
   };
+
 
   const handleChange = (questionId) => {
     setCheckedItems((prev) => {
@@ -155,9 +178,20 @@ const Posts = () => {
     setSelectedItems(checkedItems);
   }, [checkedItems]);
 
+
   useEffect(() => {
     // This block will run whenever selectedItems has been updated
   }, [selectedItems]);
+
+  
+  useEffect(() => {
+    if (pageNumber === 1) {
+      fetchQuestions();
+    }
+  }, [pageNumber]);
+  
+
+
 
   return (
     <div>
@@ -262,8 +296,6 @@ const Posts = () => {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 type="button"
                 onClick={() => {
-                  setPageNumber(pageNumber + 1);
-                  // console.log("jdgnsjkn", selectedItems);
                   fetchQuestions();
                 }}
               >
