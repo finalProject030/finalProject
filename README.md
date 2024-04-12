@@ -14,6 +14,9 @@ A site for creation automatic of professional content, Based on StackOverflow.co
 
 
 
+
+
+
 ## *Project Stack*:
 
 
@@ -32,7 +35,7 @@ A site for creation automatic of professional content, Based on StackOverflow.co
 Go to the GitHub repository you want to fork.<br>Click the "Fork" button at the top right.
 
 #### 2. Clone Your Forked Repository<br>
-    git clone https://github.com/YOUR_USERNAME/REPOSITORY_NAME.git 
+    git clone https://github.com/finalProject030/finalProject.git
 <br><br><br><br>
 
 
@@ -48,5 +51,15 @@ The second one sould be located inside the client folder and it should contain t
 # Logo:
 <img src="https://github.com/finalProject030/finalProject/assets/126160304/f5e27809-5b9c-4a86-97d3-8535afed1f26" height="150" width="200">
 <br><br><br><br>
+
+
+
+
+
+
+
+
+
+
 
 
