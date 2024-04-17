@@ -8,9 +8,7 @@ dotenv.config();
 // Route to handle incoming chat messages
 router.post("/", async (req, res) => {
   try {
-    console.log(req.body.message);
     const userMessage = req.body.message; // Assuming the message is sent in the 'message' property
-
     if (!userMessage) {
       throw new Error("Missing 'message' property in the request body");
     }

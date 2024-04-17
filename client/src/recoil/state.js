@@ -11,3 +11,8 @@ export const recoilSelectedStep = atom({
   key: "SelectedStep", // unique ID (with respect to other atoms/selectors)
   default: "posts", // default value (aka initial value)
 });
+
+export const globalJsonData = atom({
+  key: "globalJsonData",
+  default: "", // default value for the global string
+});

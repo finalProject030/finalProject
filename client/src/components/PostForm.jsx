@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
+import { globalJsonData } from "../recoil/state";
 import { useRecoilState } from "recoil";
 
 export default function PostCreationForm() {
@@ -16,10 +17,16 @@ export default function PostCreationForm() {
   const [selectedItems, setSelectedItems] = useRecoilState(recoilSelectedPosts);
   const [messageToSend, setMessageToSend] = useState("");
   const [isChatGPTTyping, setIsChatGPTTyping] = useState(false);
+  const [geminiResponse, setGeminiResponse] = useState("");
 
   // //////////////////////////////////////////////////////////////////////////Gemini
-  async function sendMessageToServer(messageToSend) {
+  // Function to send message to Gemini
+  async function sendMessageToServer() {
     try {
+      await generateJsonInstructions(); // Generate JSON instructions
+
+      setLoading(true);
+
       const response = await fetch("/api/gemini", {
         method: "POST",
         headers: {
@@ -28,50 +35,93 @@ export default function PostCreationForm() {
         body: JSON.stringify({ message: messageToSend }),
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
       const data = await response.json();
-      return data.message; // Assuming your server returns the processed message
+      const geminiResponseString = `${data.message}`;
+      setGeminiResponse(geminiResponseString);
+      console.log("Response from Gemini:", geminiResponseString);
+
+      // Handle response from Gemini if needed
     } catch (error) {
-      console.error("There was a problem with the fetch operation:", error);
-      throw error;
+      console.error("Error sending message to Gemini:", error);
+      // Handle error if needed
+    } finally {
+      setLoading(false);
     }
   }
 
-  // //////////////////////////////////////////////////////////////////////////
+  function GeminiResponse({ response }) {
+    return (
+      <div className="gemini-response">
+        <p>{response}</p>
+        <style jsx>{`
+          .gemini-response {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+          }
+          .gemini-response p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
+  // //////////////////////////////////////////////////////////////////////////
+  function stripHtmlTags(html) {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  }
+
+  // Function to handle form submission
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     setHandleSubmit(true);
     try {
-      handleSend();
+      await generateJsonInstructions(); // Generate JSON instructions
+      const selectedPostsMessage = Object.entries(selectedItems).map(
+        ([questionId, item]) => {
+          return `Question ID: ${questionId}\n\nQuestion Body: ${
+            item.body
+          }\n\nAccepted Answers:\n${item.answers
+            .filter((answer) => answer.is_accepted)
+            .map((acceptedAnswer, index) => {
+              return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
+            })
+            .join("")}`;
+        }
+      );
+      const message = `${jsonInstructions}\n\nSelected Posts:\n${selectedPostsMessage.join(
+        "\n\n"
+      )}`;
+      setMessageToSend(message);
+      await sendMessageToServer(); // Send message to Gemini
+    } catch (error) {
+      console.error("Error handling form submission:", error);
     } finally {
-      setHandleSubmit(false); // Reset handleSubmit state when submission is completed
-      setChatResponse(""); // Clear chatResponse state
+      setHandleSubmit(false);
     }
   };
 
+  // Function to generate JSON instructions
   const generateJsonInstructions = () => {
     const instructions = [
-      "Start your post with a catchy headline.",
-      "Include a brief introduction to the topic.",
-      `Use ${wordCount} words in your post.`,
+      "Hi, I want you to create a post for LinkdIn by the following instructions:",
+      "-A catchy headline.",
+      "-Include a brief introduction to the topic.",
+      `-Use ${wordCount} words in your post.`,
       `Include ${paragraphCount} paragraph(s) in your post.`,
       emojis === "yes"
         ? `Use emojis - Maximum: ${maxEmojis}, Minimum: ${minEmojis}.`
         : "Avoid using emojis in your post.",
-      "Incorporate relevant hashtags.",
-      "End with a call to action, such as asking for comments or opinions.",
-      "Proofread your post for grammar and spelling errors.",
-      `Here is what you should summary base on my rules above: ${messageToSend}`, // Append the summary value to the instructions
+      "-Incorporate relevant hashtags.",
+      "-End with a call to action, such as asking for comments or opinions.",
+      "Here is the question and the answer of what you should write on, dont miss my instructions!!:",
     ];
     setJsonInstructions(instructions.join("\n"));
-  };
-
-  const handleSend = async () => {
-    generateJsonInstructions(); // Generate JSON instructions
 
     const selectedPostsMessage = Object.entries(selectedItems).map(
       ([questionId, item]) => {
@@ -90,6 +140,10 @@ export default function PostCreationForm() {
       "\n\n"
     )}`;
     setMessageToSend(message);
+  };
+
+  const handleSend = async () => {
+    await generateJsonInstructions(); // Generate JSON instructions
 
     const article = message;
 
@@ -234,16 +288,17 @@ export default function PostCreationForm() {
 
       <button
         className={`px-4 py-2 m-2 rounded-md hover:bg-green-600 ${
-          handleSubmit || loading // Disable the button if handleSubmit or loading is true
+          handleSubmit || loading
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-green-500 text-white hover:bg-blue-600"
         }`}
-        onClick={() => sendMessageToServer(messageToSend)}
-        disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
+        onClick={sendMessageToServer}
+        disabled={handleSubmit || loading}
       >
-        Send To OpenAI
+        Send To Gemini
       </button>
-      {messageToSend}
+      {/* {geminiResponse} */}
+      <GeminiResponse response={geminiResponse} />
       {loading && handleSubmit && <p>Loading...</p>}
 
       <button

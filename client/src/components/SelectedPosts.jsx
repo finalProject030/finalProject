@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
-import { recoilSelectedPosts, recoilSelectedStep } from "../recoil/state";
+import {
+  recoilSelectedPosts,
+  recoilSelectedStep,
+  globalJsonData,
+} from "../recoil/state";
 import PostCreationForm from "../components/PostForm";
 
 export default function SelectedPosts() {
   const [selectedItems, setSelectedItems] = useRecoilState(recoilSelectedPosts);
   const [step, setStep] = useRecoilState(recoilSelectedStep);
+  const [globalJsonState, setGlobalJsonData] = useRecoilState(globalJsonData);
+
+  useEffect(() => {
+    // Build the global JSON when selectedItems change
+    buildGlobalJson();
+  }, [selectedItems]);
 
   const moveToPostsPage = () => {
     setStep("posts");
@@ -21,6 +31,26 @@ export default function SelectedPosts() {
       delete updatedSelectedItems[questionId];
       return updatedSelectedItems;
     });
+  };
+
+  const buildGlobalJson = () => {
+    const newGlobalJson = {
+      selectedPosts: Object.entries(selectedItems).map(
+        ([questionId, item]) => ({
+          id: questionId,
+          bodyMessage: item.body,
+          acceptedAnswers: item.answers
+            ? item.answers
+                .filter((answer) => answer.is_accepted)
+                .map((acceptedAnswer) => ({
+                  id: acceptedAnswer.answer_id,
+                  body: acceptedAnswer.body,
+                }))
+            : [],
+        })
+      ),
+    };
+    setGlobalJsonData(newGlobalJson);
   };
 
   return (
