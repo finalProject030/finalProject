@@ -23,12 +23,13 @@ const Posts = () => {
   const [answers, setAnswers] = useState({});
   const [expandedAnswers, setExpandedAnswers] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
-  const [pageNumber, setPageNumber] = useState(1);
+  const [addNumber, setaddNumber] = useState(1);
   const [search, setSearch] = useState(false);
   const [checkedItems, setCheckedItems] = useRecoilState(recoilSelectedPosts);
   const [step, setStep] = useRecoilState(recoilSelectedStep);
   const [showTheNextStep, setShowTheNextStep] = useState(false);
   const [questionsData, setQuestionsData] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
 
 
 
@@ -62,23 +63,35 @@ const Posts = () => {
 
 
   const fetchQuestions = () => {
-    setPageNumber(pageNumber + 1);
+    setaddNumber(addNumber + 1);
+
     // there is no input field
-    console.log(questionsData);
     if(tagged != ""){
+
+      if(addNumber == 10 && questionsData != undefined && questionsData.has_more){
+        let n = pageNumber + 1;
+        setPageNumber(n);
+        console.log(pageNumber);
+        setaddNumber(1);
+        return;
+      }
+        
+      //26 dont give
+      if(pageNumber >= 26){
+        window.alert("You reach to the limit");
+        return;
+      }
+
 
       if(questionsData === ""){
         try {
           let api = "";
           console.log("API called");
           if (sort !== "relevance")
-            api = `https://api.stackexchange.com/2.3/search/advanced?pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+            api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
           else
-            api = `https://api.stackexchange.com/2.3/search/advanced?pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
+            api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
           // filter=!nNPvSNPI3D
-
-          // const response = await fetch(api);
-          // const data = await response.json();
 
           fetch(api)
           .then((response) => response.json())
@@ -86,7 +99,7 @@ const Posts = () => {
             setQuestionsData(data);
             if (questionsData.items) {
             // Show 10 questions
-            const randomQuestions = data.items.slice((pageNumber - 1) * 10, pageNumber * 10);
+            const randomQuestions = data.items.slice((addNumber - 1) * 10, addNumber * 10);
       
             fetchAnswers(randomQuestions);
       
@@ -102,26 +115,20 @@ const Posts = () => {
         }
       }
 
-
-
-      else{
-        console.log(pageNumber + "ds");
+      else
+      {
+        console.log(addNumber + "ds");
         if (questionsData.items) {
           // Show 10 questions
-          const randomQuestions = questionsData.items.slice((pageNumber - 1) * 10, pageNumber * 10);
-    
+          const randomQuestions = questionsData.items.slice((addNumber - 1) * 10, addNumber * 10);
           fetchAnswers(randomQuestions);
-    
           if(questions.length === 0){
             setQuestions(randomQuestions);}
     
           else
             questions.push(...randomQuestions);
         }
-
       }
-
-
     }
   };
 
@@ -151,7 +158,6 @@ const Posts = () => {
         console.error("Error fetching answers data:", error);
 
       }
-
     }
   };
 
@@ -189,7 +195,7 @@ const Posts = () => {
     setSelectedItems({});
     setSearch(true);
     e.preventDefault();
-    setPageNumber(1);
+    setaddNumber(1);
   };
 
 
@@ -248,17 +254,23 @@ const Posts = () => {
     fetchQuestions();
   }, [questionsData]);
 
+
+
+  useEffect(() => {
+    // pageNumber++;
+  }, [pageNumber]);
+
   
 
 
   useEffect(() => {
-    if (pageNumber === 1) {
+    if (addNumber === 1) {
       if(questionsData != "")
         setQuestionsData("");
       else
         fetchQuestions();
     }
-  }, [pageNumber]);
+  }, [addNumber]);
   
 
 
