@@ -22,18 +22,22 @@ export default function PostCreationForm() {
   // //////////////////////////////////////////////////////////////////////////Gemini
   // Function to send message to Gemini
   async function sendMessageToServer() {
+    console.log("messageToSend", messageToSend);
     try {
-      await generateJsonInstructions(); // Generate JSON instructions
-
-      setLoading(true);
+      setLoading(true); // Set loading state to true before the asynchronous operation starts
+      generateJsonInstructions(); // Generate JSON instructions
 
       const response = await fetch("/api/gemini", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: messageToSend }),
+        body: JSON.stringify({ message: messageToSend }), // Include 'message' property in the request body
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to send message to Gemini");
+      }
 
       const data = await response.json();
       const geminiResponseString = `${data.message}`;
@@ -45,7 +49,7 @@ export default function PostCreationForm() {
       console.error("Error sending message to Gemini:", error);
       // Handle error if needed
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false after the asynchronous operation completes
     }
   }
 
@@ -143,14 +147,9 @@ export default function PostCreationForm() {
   };
 
   const handleSend = async () => {
-    await generateJsonInstructions(); // Generate JSON instructions
-
-    const article = message;
-
-    // console.log("Message to be sent:", message); // Log the message to the console
-
     try {
-      setLoading(true);
+      await generateJsonInstructions(); // Generate JSON instructions
+      setLoading(true); // Set loading state to true before the asynchronous operation starts
 
       const response = await fetch("/api/transformText", {
         method: "POST",
@@ -170,7 +169,7 @@ export default function PostCreationForm() {
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false after the asynchronous operation completes
       setHandleSubmit(false);
     }
   };
@@ -297,8 +296,25 @@ export default function PostCreationForm() {
       >
         Send To Gemini
       </button>
-      {/* {geminiResponse} */}
-      <GeminiResponse response={geminiResponse} />
+      <div className="gemini-response">
+        <pre className="gemini-response-text">{geminiResponse}</pre>
+        <style>{`
+    .gemini-response {
+      background-color: #f0f0f0;
+      padding: 20px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .gemini-response-text {
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 0;
+      white-space: pre-wrap; /* Preserve white space and allow wrapping */
+      word-wrap: break-word; /* Break long words to prevent overflow */
+    }
+  `}</style>
+      </div>
+
       {loading && handleSubmit && <p>Loading...</p>}
 
       <button
