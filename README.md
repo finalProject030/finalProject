@@ -42,13 +42,13 @@ Go to the GitHub repository you want to fork.<br>Click the "Fork" button at the 
 
 
 
-# Don't forget:
+## *Don't forget*:
 Do not forget to use tne .env files
 The first one contain the mongoDB api key and the JWT secret- its should be located with he readme.md file
 
 The second one sould be located inside the client folder and it should contain the VITE_FIREBASE_API_KEY <br><br><br><br>
 
-# Logo:
+## *Logo*:
 <img src="https://github.com/finalProject030/finalProject/assets/126160304/f5e27809-5b9c-4a86-97d3-8535afed1f26" height="150" width="200">
 <br><br><br><br>
 
