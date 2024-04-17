@@ -28,6 +28,9 @@ const Posts = () => {
   const [checkedItems, setCheckedItems] = useRecoilState(recoilSelectedPosts);
   const [step, setStep] = useRecoilState(recoilSelectedStep);
   const [showTheNextStep, setShowTheNextStep] = useState(false);
+  const [questionsData, setQuestionsData] = useState("");
+
+
 
   const handleToggleComponent = () => {
     setShowTheNextStep(true);
@@ -54,37 +57,71 @@ const Posts = () => {
     { value: "asc", label: "To date" },
   ];
 
-  const fetchQuestions = async () => {
+
+
+
+
+  const fetchQuestions = () => {
     setPageNumber(pageNumber + 1);
-    console.log(pageNumber + " questions");
     // there is no input field
+    console.log(questionsData);
     if(tagged != ""){
-      try {
-        let api = "";
-        if (sort !== "relevance")
-          api = `https://api.stackexchange.com/2.3/search/advanced?order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-        else
-          api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
-        // filter=!nNPvSNPI3D
 
-        const response = await fetch(api);
-        const data = await response.json();
-        
-        if (data.items) {
-          // Display 10 random questions
-          const randomQuestions = data.items.slice((pageNumber - 1) * 10, pageNumber * 10);
+      if(questionsData === ""){
+        try {
+          let api = "";
+          console.log("API called");
+          if (sort !== "relevance")
+            api = `https://api.stackexchange.com/2.3/search/advanced?pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+          else
+            api = `https://api.stackexchange.com/2.3/search/advanced?pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
+          // filter=!nNPvSNPI3D
+
+          // const response = await fetch(api);
+          // const data = await response.json();
+
+          fetch(api)
+          .then((response) => response.json())
+          .then((data) => {
+            setQuestionsData(data);
+            if (questionsData.items) {
+            // Show 10 questions
+            const randomQuestions = data.items.slice((pageNumber - 1) * 10, pageNumber * 10);
+      
+            fetchAnswers(randomQuestions);
+      
+            if(questions.length === 0){
+              setQuestions(randomQuestions);}
+      
+            else
+              questions.push(...randomQuestions);
+          }
+          });      
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+
+
+
+      else{
+        console.log(pageNumber + "ds");
+        if (questionsData.items) {
+          // Show 10 questions
+          const randomQuestions = questionsData.items.slice((pageNumber - 1) * 10, pageNumber * 10);
+    
           fetchAnswers(randomQuestions);
-
-          if(questions.length === 0) 
-            setQuestions(randomQuestions);
+    
+          if(questions.length === 0){
+            setQuestions(randomQuestions);}
     
           else
             questions.push(...randomQuestions);
-          
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+
       }
+
+
     }
   };
 
@@ -118,12 +155,16 @@ const Posts = () => {
     }
   };
 
+
+
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
       ...prev,
       [questionId]: !prev[questionId],
     }));
   };
+
+
 
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
@@ -133,16 +174,25 @@ const Posts = () => {
   };
 
 
+
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
 
   
+
   const handleFormSubmit = (e) => {
+    setQuestions([]);
+    setExpandedQuestions({});
+    setAnswers({});
+    setExpandedAnswers({});
+    setSelectedItems({});
     setSearch(true);
     e.preventDefault();
     setPageNumber(1);
   };
+
+
 
 
   const handleChange = (questionId) => {
@@ -173,20 +223,40 @@ const Posts = () => {
     });
   };
 
+
+
+
+
   useEffect(() => {
     // This block will run after the component has rendered and whenever checkedItems has been updated
     setSelectedItems(checkedItems);
   }, [checkedItems]);
 
 
+
+
+
   useEffect(() => {
     // This block will run whenever selectedItems has been updated
   }, [selectedItems]);
 
+
+
+
+
+  useEffect(() => {
+    fetchQuestions();
+  }, [questionsData]);
+
   
+
+
   useEffect(() => {
     if (pageNumber === 1) {
-      fetchQuestions();
+      if(questionsData != "")
+        setQuestionsData("");
+      else
+        fetchQuestions();
     }
   }, [pageNumber]);
   
