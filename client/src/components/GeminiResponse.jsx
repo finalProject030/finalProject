@@ -2,7 +2,7 @@ function GeminiResponse({ response }) {
   return (
     <div className="gemini-response">
       <pre>{response}</pre>
-      <style jsx>{`
+      <style>{`
         .gemini-response {
           background-color: #f0f0f0;
           padding: 20px;
