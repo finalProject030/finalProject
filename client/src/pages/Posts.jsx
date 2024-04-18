@@ -6,7 +6,11 @@ import { useRecoilState } from "recoil";
 import { recoilSelectedPosts, recoilSelectedStep } from "../recoil/state";
 import SelectedPosts from "../components/SelectedPosts";
 import Toolbar from "../components/Toolbar";
-// import { sleep } from "openai/core.mjs";
+import axios from 'axios';
+import Swal from 'sweetalert2'
+
+
+
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -16,6 +20,9 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
     />
   );
 };
+
+
+
 
 const Posts = () => {
   const [tagged, setTagged] = useState(""); // Default tag
@@ -31,6 +38,7 @@ const Posts = () => {
   const [showTheNextStep, setShowTheNextStep] = useState(false);
   const [questionsData, setQuestionsData] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
+
 
   const handleToggleComponent = () => {
     setShowTheNextStep(true);
@@ -76,7 +84,12 @@ const Posts = () => {
 
       //26 dont give
       if (pageNumber >= 26) {
-        window.alert("You reach to the limit");
+        Swal.fire({
+          title: "You reach the limit of the content.",
+          icon: "warning",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "Confirm"
+        });
         return;
       }
 
@@ -90,27 +103,29 @@ const Posts = () => {
             api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
           // filter=!nNPvSNPI3D
 
-          fetch(api)
-            .then((response) => response.json())
-            .then((data) => {
-              setQuestionsData(data);
-              if (questionsData.items) {
-                // Show 10 questions
-                const randomQuestions = data.items.slice(
-                  (addNumber - 1) * 10,
-                  addNumber * 10
-                );
+          axios.get(api)
+          .then((response) => {
+            setQuestionsData(response.data);
+            if (questionsData.items) {
+              // Show 10 questions
+              const randomQuestions = data.items.slice(
+                (addNumber - 1) * 10,
+                addNumber * 10
+              );
 
-                fetchAnswers(randomQuestions);
+              fetchAnswers(randomQuestions);
 
-                if (questions.length === 0) {
-                  setQuestions(randomQuestions);
-                } else questions.push(...randomQuestions);
-              }
-            });
+              if (questions.length === 0) {
+                setQuestions(randomQuestions);
+              } else questions.push(...randomQuestions);
+            }
+          });
+
+
         } catch (error) {
           console.error("Error fetching data:", error);
         }
+
       } else {
         console.log(addNumber + "ds");
         if (questionsData.items) {
@@ -133,15 +148,17 @@ const Posts = () => {
       try {
         let api = "";
         const answersPromises = questions.map(async (question) => {
-          console.log("moshe kaodhs");
+          console.log("API answers");
           if (sort !== "relevance")
             api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
           else
             api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-
-          const response = await fetch(api);
-          const data = await response.json();
-          return { questionId: question.question_id, answers: data.items };
+          let data;
+          await axios.get(api)
+          .then((response) => {
+            data = response.data.items;
+          });
+          return { questionId: question.question_id, answers: data };
         });
         const answersData = await Promise.all(answersPromises);
         const answersMap = {};
@@ -155,12 +172,14 @@ const Posts = () => {
     }
   };
 
+
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
       ...prev,
       [questionId]: !prev[questionId],
     }));
   };
+
 
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
@@ -169,9 +188,11 @@ const Posts = () => {
     }));
   };
 
+
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
+
 
   const handleFormSubmit = (e) => {
     setQuestions([]);
@@ -183,6 +204,7 @@ const Posts = () => {
     e.preventDefault();
     setaddNumber(1);
   };
+
 
   const handleChange = (questionId) => {
     setCheckedItems((prev) => {
@@ -202,32 +224,40 @@ const Posts = () => {
             // Include any other necessary data here
           };
         } else {
-          // If there are already 4 selected items, do not add more
-          window.alert("You can only select up to 4 items.");
+          Swal.fire({
+            title: "You can only select up to 4 items.",
+            icon: "warning",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "Confirm"
+          });
           return updatedItems; // Exit early if max limit reached
         }
       }
-
       return updatedItems;
     });
   };
+
 
   useEffect(() => {
     // This block will run after the component has rendered and whenever checkedItems has been updated
     setSelectedItems(checkedItems);
   }, [checkedItems]);
 
+
   useEffect(() => {
     // This block will run whenever selectedItems has been updated
   }, [selectedItems]);
+
 
   useEffect(() => {
     fetchQuestions();
   }, [questionsData]);
 
+
   useEffect(() => {
     // pageNumber++;
   }, [pageNumber]);
+
 
   useEffect(() => {
     if (addNumber === 1) {
@@ -235,6 +265,9 @@ const Posts = () => {
       else fetchQuestions();
     }
   }, [addNumber]);
+
+
+
 
   return (
     <div className="flex">

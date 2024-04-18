@@ -27,7 +27,8 @@
     "react-select": "^5.8.0",
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "sweetalert2": "^11.10.8"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
