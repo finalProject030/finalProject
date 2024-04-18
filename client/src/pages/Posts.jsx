@@ -5,6 +5,7 @@ import { LuFilter } from "react-icons/lu";
 import { useRecoilState } from "recoil";
 import { recoilSelectedPosts, recoilSelectedStep } from "../recoil/state";
 import SelectedPosts from "../components/SelectedPosts";
+import Toolbar from "../components/Toolbar";
 // import { sleep } from "openai/core.mjs";
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
@@ -31,8 +32,6 @@ const Posts = () => {
   const [questionsData, setQuestionsData] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
 
-
-
   const handleToggleComponent = () => {
     setShowTheNextStep(true);
     setStep("selectedPosts");
@@ -58,32 +57,30 @@ const Posts = () => {
     { value: "asc", label: "To date" },
   ];
 
-
-
-
-
   const fetchQuestions = () => {
     setaddNumber(addNumber + 1);
 
     // there is no input field
-    if(tagged != ""){
-
-      if(addNumber == 10 && questionsData != undefined && questionsData.has_more){
+    if (tagged != "") {
+      if (
+        addNumber == 10 &&
+        questionsData != undefined &&
+        questionsData.has_more
+      ) {
         let n = pageNumber + 1;
         setPageNumber(n);
         console.log(pageNumber);
         setaddNumber(1);
         return;
       }
-        
+
       //26 dont give
-      if(pageNumber >= 26){
+      if (pageNumber >= 26) {
         window.alert("You reach to the limit");
         return;
       }
 
-
-      if(questionsData === ""){
+      if (questionsData === "") {
         try {
           let api = "";
           console.log("API called");
@@ -94,46 +91,45 @@ const Posts = () => {
           // filter=!nNPvSNPI3D
 
           fetch(api)
-          .then((response) => response.json())
-          .then((data) => {
-            setQuestionsData(data);
-            if (questionsData.items) {
-            // Show 10 questions
-            const randomQuestions = data.items.slice((addNumber - 1) * 10, addNumber * 10);
-      
-            fetchAnswers(randomQuestions);
-      
-            if(questions.length === 0){
-              setQuestions(randomQuestions);}
-      
-            else
-              questions.push(...randomQuestions);
-          }
-          });      
+            .then((response) => response.json())
+            .then((data) => {
+              setQuestionsData(data);
+              if (questionsData.items) {
+                // Show 10 questions
+                const randomQuestions = data.items.slice(
+                  (addNumber - 1) * 10,
+                  addNumber * 10
+                );
+
+                fetchAnswers(randomQuestions);
+
+                if (questions.length === 0) {
+                  setQuestions(randomQuestions);
+                } else questions.push(...randomQuestions);
+              }
+            });
         } catch (error) {
           console.error("Error fetching data:", error);
         }
-      }
-
-      else
-      {
+      } else {
         console.log(addNumber + "ds");
         if (questionsData.items) {
           // Show 10 questions
-          const randomQuestions = questionsData.items.slice((addNumber - 1) * 10, addNumber * 10);
+          const randomQuestions = questionsData.items.slice(
+            (addNumber - 1) * 10,
+            addNumber * 10
+          );
           fetchAnswers(randomQuestions);
-          if(questions.length === 0){
-            setQuestions(randomQuestions);}
-    
-          else
-            questions.push(...randomQuestions);
+          if (questions.length === 0) {
+            setQuestions(randomQuestions);
+          } else questions.push(...randomQuestions);
         }
       }
     }
   };
 
   const fetchAnswers = async (questions) => {
-    if(questions.length > 0) {
+    if (questions.length > 0) {
       try {
         let api = "";
         const answersPromises = questions.map(async (question) => {
@@ -153,15 +149,11 @@ const Posts = () => {
           answersMap[questionId] = answers;
         });
         setAnswers(answersMap);
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Error fetching answers data:", error);
-
       }
     }
   };
-
-
 
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
@@ -170,8 +162,6 @@ const Posts = () => {
     }));
   };
 
-
-
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
       ...prev,
@@ -179,13 +169,9 @@ const Posts = () => {
     }));
   };
 
-
-
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
-
-  
 
   const handleFormSubmit = (e) => {
     setQuestions([]);
@@ -197,9 +183,6 @@ const Posts = () => {
     e.preventDefault();
     setaddNumber(1);
   };
-
-
-
 
   const handleChange = (questionId) => {
     setCheckedItems((prev) => {
@@ -229,54 +212,35 @@ const Posts = () => {
     });
   };
 
-
-
-
-
   useEffect(() => {
     // This block will run after the component has rendered and whenever checkedItems has been updated
     setSelectedItems(checkedItems);
   }, [checkedItems]);
 
-
-
-
-
   useEffect(() => {
     // This block will run whenever selectedItems has been updated
   }, [selectedItems]);
-
-
-
-
 
   useEffect(() => {
     fetchQuestions();
   }, [questionsData]);
 
-
-
   useEffect(() => {
     // pageNumber++;
   }, [pageNumber]);
 
-  
-
-
   useEffect(() => {
     if (addNumber === 1) {
-      if(questionsData != "")
-        setQuestionsData("");
-      else
-        fetchQuestions();
+      if (questionsData != "") setQuestionsData("");
+      else fetchQuestions();
     }
   }, [addNumber]);
-  
-
-
 
   return (
-    <div>
+    <div className="flex">
+      {" "}
+      {/* Set the height of the parent container */}
+      <Toolbar currentStep={step} />
       {step === "posts" ? (
         <div className="container mx-auto p-4">
           <h1 className="text-3xl font-bold mb-4">

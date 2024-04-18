@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
 import { globalJsonData } from "../recoil/state";
 import { useRecoilState } from "recoil";
@@ -25,7 +25,8 @@ export default function PostCreationForm() {
     console.log("messageToSend", messageToSend);
     try {
       setLoading(true); // Set loading state to true before the asynchronous operation starts
-      generateJsonInstructions(); // Generate JSON instructions
+
+      generateJsonInstructions(); // Call generateJsonInstructions and wait for it to complete
 
       const response = await fetch("/api/gemini", {
         method: "POST",
@@ -52,6 +53,62 @@ export default function PostCreationForm() {
       setLoading(false); // Set loading state to false after the asynchronous operation completes
     }
   }
+
+  // Function to generate JSON instructions
+  const generateJsonInstructions = () => {
+    // Initial set of instructions
+    let instructions = [
+      "Hi, I want you to create a post for LinkedIn by following these instructions:",
+      "- Include a catchy headline that grabs attention.",
+      "- Write a brief introduction to the topic to provide context.",
+      `- Use ${wordCount} words in your post to ensure it's concise and engaging.`,
+      `- Include ${paragraphCount} paragraph(s) to organize your content effectively.`,
+      emojis === "yes"
+        ? `- Use emojis to add visual appeal. (Maximum: ${maxEmojis}, Minimum: ${minEmojis}).`
+        : "- Avoid using emojis to maintain a professional tone.",
+      "- Incorporate relevant hashtags to increase visibility.",
+      "- End with a call to action, such as asking for comments or opinions.",
+      "Below is the question and its accepted answer for reference:",
+    ];
+
+    // Additional instructions based on selected posts
+    const selectedPostsMessage = Object.entries(selectedItems).map(
+      ([questionId, item]) => {
+        const acceptedAnswers = item.answers.filter(
+          (answer) => answer.is_accepted
+        );
+        let message = `\nQuestion ID: ${questionId}\n\nQuestion Body: ${item.body}\n\n`;
+
+        if (acceptedAnswers.length > 0) {
+          message += "Accepted Answers:\n";
+          message += acceptedAnswers
+            .map((acceptedAnswer, index) => {
+              return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
+            })
+            .join("");
+        } else {
+          message += "No accepted answers found.\n\n";
+        }
+
+        return message;
+      }
+    );
+
+    // Combine initial instructions and selected posts message
+    instructions = instructions.concat(selectedPostsMessage);
+
+    // Set the JSON instructions state
+    setJsonInstructions(instructions.join("\n"));
+
+    // Construct the message to send
+    const message = `${instructions.join("\n")}`;
+    setMessageToSend(message);
+  };
+
+  //When load the page call the generateJsonInstructions function.
+  useEffect(() => {
+    generateJsonInstructions();
+  }, []);
 
   function GeminiResponse({ response }) {
     return (
@@ -108,42 +165,6 @@ export default function PostCreationForm() {
     } finally {
       setHandleSubmit(false);
     }
-  };
-
-  // Function to generate JSON instructions
-  const generateJsonInstructions = () => {
-    const instructions = [
-      "Hi, I want you to create a post for LinkdIn by the following instructions:",
-      "-A catchy headline.",
-      "-Include a brief introduction to the topic.",
-      `-Use ${wordCount} words in your post.`,
-      `Include ${paragraphCount} paragraph(s) in your post.`,
-      emojis === "yes"
-        ? `Use emojis - Maximum: ${maxEmojis}, Minimum: ${minEmojis}.`
-        : "Avoid using emojis in your post.",
-      "-Incorporate relevant hashtags.",
-      "-End with a call to action, such as asking for comments or opinions.",
-      "Here is the question and the answer of what you should write on, dont miss my instructions!!:",
-    ];
-    setJsonInstructions(instructions.join("\n"));
-
-    const selectedPostsMessage = Object.entries(selectedItems).map(
-      ([questionId, item]) => {
-        return `Question ID: ${questionId}\n\nQuestion Body: ${
-          item.body
-        }\n\nAccepted Answers:\n${item.answers
-          .filter((answer) => answer.is_accepted)
-          .map((acceptedAnswer, index) => {
-            return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
-          })
-          .join("")}`;
-      }
-    );
-
-    const message = `${jsonInstructions}\n\nSelected Posts:\n${selectedPostsMessage.join(
-      "\n\n"
-    )}`;
-    setMessageToSend(message);
   };
 
   const handleSend = async () => {
