@@ -8,7 +8,7 @@ import chatRouter from "./routes/chat.route.js"; // Import your chat router
 import tranformTextRouter from "./routes/transformText.route.js";
 import geminiRouter from "./routes/gemini.route.js";
 import cookieParser from "cookie-parser";
-import createPost from "./routes/userPost.route.js"; // Import the createPost route handler
+import userPostsRouter from "./routes/userPost.route.js"; // Import the createPost route handler
 
 dotenv.config();
 
@@ -37,7 +37,7 @@ app.use("/api/listing", listingRouter);
 app.use("/api/chat", chatRouter); // Add your chat router here
 app.use("/api/transformText", tranformTextRouter);
 app.use("/api/gemini", geminiRouter);
-app.post("/api/post", createPost); // Route to save a new post
+app.use("/api/post", userPostsRouter); // Route to save a new post
 
 // Error handling middleware
 app.use((err, req, res, next) => {

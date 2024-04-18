@@ -11,23 +11,17 @@ const router = express.Router();
 router.use(express.json());
 
 // Route handler to save a new post
-router.post("/api/post", verifyToken, async (req, res, next) => {
+router.post("/", verifyToken, async (req, res, next) => {
   try {
     // Extract post data from request body
-    console.log("req.body: " + req.body);
-
     const { title, content, author } = req.body;
 
-    console.log("title: " + title);
-    console.log("content: " + content);
-    console.log("author: " + author);
     // Create a new post document
     const post = new Post({
       title,
       content,
       author,
     });
-    console.log("post" + post);
 
     // Save the new post to the database
     const savedPost = await post.save();
@@ -40,6 +34,60 @@ router.post("/api/post", verifyToken, async (req, res, next) => {
       success: true,
       message: "Post created successfully",
       post: savedPost,
+    });
+  } catch (error) {
+    // Pass any errors to the error handling middleware
+    next(error);
+  }
+});
+
+// Define the route handler to get user posts
+router.get("/:userId", verifyToken, async (req, res, next) => {
+  try {
+    // Get the userId from the request params
+    const userId = req.params.userId;
+
+    // Query the database for posts belonging to the user
+    const userPosts = await Post.find({ author: userId });
+
+    // Send the user posts as a response
+    res.status(200).json({
+      success: true,
+      message: "User posts retrieved successfully",
+      posts: userPosts,
+    });
+  } catch (error) {
+    // Pass any errors to the error handling middleware
+    next(error);
+  }
+});
+
+// Route handler to delete a post
+// Route handler to delete a post
+router.delete("/:postId", verifyToken, async (req, res, next) => {
+  try {
+    // Get the postId from the request params
+    const postId = req.params.postId;
+
+    // Find the post
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    // Delete the post from the database
+    await Post.findByIdAndDelete(postId);
+
+    // Remove the postId from the user's posts array
+    await User.findByIdAndUpdate(post.author, { $pull: { posts: postId } });
+
+    // Send success response
+    res.status(200).json({
+      success: true,
+      message: "Post deleted successfully",
     });
   } catch (error) {
     // Pass any errors to the error handling middleware
