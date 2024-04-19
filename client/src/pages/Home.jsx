@@ -1,8 +1,14 @@
 import React from "react";
+import backgroundVideo from '../../backgroundVideo1.mp4';
 
 const Home = () => {
   return (
     <div className="bg-gradient-to-b from-gray-600 to-blue-300 min-h-screen flex flex-col justify-center items-center text-white">
+      <video autoPlay loop muted id='video'>
+        <source src = {backgroundVideo} type='video/mp4'/>
+
+      </video>
+      
       <h1 className="text-4xl font-extrabold mb-6">Welcome to Our Website</h1>
       <p className="text-lg text-center mb-8">
         Discover amazing content, connect with our community, and stay up to
