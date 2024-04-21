@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
 import { globalJsonData } from "../recoil/state";
 import { useRecoilState } from "recoil";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
@@ -18,6 +20,15 @@ export default function PostCreationForm() {
   const [messageToSend, setMessageToSend] = useState("");
   const [isChatGPTTyping, setIsChatGPTTyping] = useState(false);
   const [geminiResponse, setGeminiResponse] = useState("");
+  const { currentUser, error } = useSelector((state) => state.user);
+
+
+
+
+
+
+
+
 
   // //////////////////////////////////////////////////////////////////////////Gemini
   // Function to send message to Gemini
@@ -43,7 +54,8 @@ export default function PostCreationForm() {
       const data = await response.json();
       const geminiResponseString = `${data.message}`;
       setGeminiResponse(geminiResponseString);
-      console.log("Response from Gemini:", geminiResponseString);
+      console.log(geminiResponse);
+      // console.log("Response from Gemini:", geminiResponseString);
 
       // Handle response from Gemini if needed
     } catch (error) {
@@ -199,6 +211,88 @@ export default function PostCreationForm() {
     setStep("selectedPosts");
   };
 
+
+  const savePost = () => {
+    // console.log(currentUser._id);
+    let i;
+    let title = "";
+
+    if(geminiResponse.includes("Headline")){ 
+      for(i = 14; i < geminiResponse.length; i++){
+        if(geminiResponse[i] == "\n")
+          break;
+      }
+      title = geminiResponse.substring(14, i);
+  }
+    else if(geminiResponse[0] == "*" || geminiResponse[1] == "*"){
+      for(i = 2; i < geminiResponse.length; i++){
+            if(geminiResponse[i] == "*")
+              break;
+          }
+        title = geminiResponse.substring(2, i);
+    }
+
+    else{
+      for(i = 0; i < geminiResponse.length; i++){
+        if(geminiResponse[i] == "\n")
+          break;
+      }
+    title = geminiResponse.substring(0, i);
+  }
+    let content = geminiResponse.slice(title.length);
+    
+    console.log(title);
+
+
+    // axios.post("/api/post", {
+    //   title: title,
+    //   content: content,
+    //   author: currentUser._id
+    // }, {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   }
+    // });
+
+
+    fetch('/api/post', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: title,
+        content: content,
+        author: currentUser._id
+      }),
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+
+
+
+
+
+
+
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">
@@ -287,6 +381,21 @@ export default function PostCreationForm() {
                 className="p-2 border rounded-md w-full"
               />
             </div>
+            <div className="mb-4">
+              <label
+                // htmlFor="paragraphCount"
+                className="block font-semibold mb-1"
+              >
+                Free text you want to display:
+              </label>
+              <input
+                type="text"
+                // id="paragraphCount"
+                // value={paragraphCount}
+                // onChange={(e) => setParagraphCount(parseInt(e.target.value))}
+                // className="p-2 border rounded-md w-full"
+              />
+            </div>
           </div>
         )}
 
@@ -298,15 +407,16 @@ export default function PostCreationForm() {
           className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
             handleSubmit || loading // Disable the button if handleSubmit or loading is true
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-600"
+              : "bg-green-500 text-white hover:bg-blue-600"
           }`}
+          onClick={sendMessageToServer}
           disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
         >
-          Create Post Summary
+          Create My Post
         </button>
       </form>
 
-      <button
+      {/* <button
         className={`px-4 py-2 m-2 rounded-md hover:bg-green-600 ${
           handleSubmit || loading
             ? "bg-gray-400 cursor-not-allowed"
@@ -316,7 +426,7 @@ export default function PostCreationForm() {
         disabled={handleSubmit || loading}
       >
         Send To Gemini
-      </button>
+      </button> */}
       <div className="gemini-response">
         <pre className="gemini-response-text">{geminiResponse}</pre>
         <style>{`
@@ -344,6 +454,18 @@ export default function PostCreationForm() {
       >
         Move back
       </button>
+
+      <button
+        onClick={savePost}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Save this post
+      </button>
+
+
+
+
+
     </div>
   );
 }

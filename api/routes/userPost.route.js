@@ -11,8 +11,9 @@ const router = express.Router();
 router.use(express.json());
 
 // Route handler to save a new post
-router.post("/", verifyToken, async (req, res, next) => {
+router.post("/", async(req, res, next) => {
   try {
+    // console.log("im here!! ");
     // Extract post data from request body
     const { title, content, author } = req.body;
 
@@ -23,6 +24,7 @@ router.post("/", verifyToken, async (req, res, next) => {
       author,
     });
 
+
     // Save the new post to the database
     const savedPost = await post.save();
 
@@ -30,7 +32,7 @@ router.post("/", verifyToken, async (req, res, next) => {
     await User.findByIdAndUpdate(author, { $push: { posts: savedPost._id } });
 
     // Send the saved post as a response
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       message: "Post created successfully",
       post: savedPost,
