@@ -32,7 +32,7 @@ router.post("/", async(req, res, next) => {
     await User.findByIdAndUpdate(author, { $push: { posts: savedPost._id } });
 
     // Send the saved post as a response
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Post created successfully",
       post: savedPost,

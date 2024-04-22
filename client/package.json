@@ -28,6 +28,7 @@
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
     "redux-persist": "^6.0.0",
+    "sweetalert": "^2.1.2",
     "sweetalert2": "^11.10.8"
   },
   "devDependencies": {

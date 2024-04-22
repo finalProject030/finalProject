@@ -4,6 +4,12 @@ import { globalJsonData } from "../recoil/state";
 import { useRecoilState } from "recoil";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import Swal from 'sweetalert2'
+import swal from 'sweetalert';
+
+
+
+
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
@@ -21,7 +27,7 @@ export default function PostCreationForm() {
   const [isChatGPTTyping, setIsChatGPTTyping] = useState(false);
   const [geminiResponse, setGeminiResponse] = useState("");
   const { currentUser, error } = useSelector((state) => state.user);
-
+  let postFlag = 0;
 
 
 
@@ -212,19 +218,22 @@ export default function PostCreationForm() {
   };
 
 
+
+
   const savePost = () => {
     // console.log(currentUser._id);
     let i;
     let title = "";
+    let content = "";
 
-    if(geminiResponse.includes("Headline")){ 
+    if(geminiResponse.includes("**Headline**")){ 
       for(i = 14; i < geminiResponse.length; i++){
         if(geminiResponse[i] == "\n")
           break;
       }
       title = geminiResponse.substring(14, i);
   }
-    else if(geminiResponse[0] == "*" || geminiResponse[1] == "*"){
+    else if(geminiResponse[0] == "*"){
       for(i = 2; i < geminiResponse.length; i++){
             if(geminiResponse[i] == "*")
               break;
@@ -236,58 +245,116 @@ export default function PostCreationForm() {
       for(i = 0; i < geminiResponse.length; i++){
         if(geminiResponse[i] == "\n")
           break;
+        if(geminiResponse[i] == '*')
+          continue;
+        title += geminiResponse[i];
       }
-    title = geminiResponse.substring(0, i);
+      content = geminiResponse.slice(i);
+    // title = geminiResponse.substring(0, i);
   }
-    let content = geminiResponse.slice(title.length);
+    // let content = geminiResponse.slice(title.length);
     
-    console.log(title);
+    // console.log(title);
+    content = geminiResponse.slice(i);
 
 
-    // axios.post("/api/post", {
-    //   title: title,
-    //   content: content,
-    //   author: currentUser._id
-    // }, {
+    Swal.fire({
+      title: title,
+      text: content,
+      confirmButtonColor: "#3085d6",
+      confirmButtonText: "Confirm"
+    });
+
+
+    // fetch('/api/post', {
+    //   method: 'POST',
     //   headers: {
-    //     "Content-Type": "application/json",
-    //   }
-    // });
-
-
-    fetch('/api/post', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: title,
-        content: content,
-        author: currentUser._id
-      }),
-    })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error('Error:', error));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     title: title,
+    //     content: content,
+    //     author: currentUser._id
+    //   }),
+    // })
+    // .then(response => {
+    //   if (response.status === 200) {
+    //   Swal.fire({
+    //     title: title,
+    //     text: content,
+    //     icon: "success",
+    //     confirmButtonColor: "#3085d6",
+    //     confirmButtonText: "Confirm"
+    //   });
+    // }})
+    // .catch(error => console.error('Error:', error));
   }
 
 
 
+
+
+const showGeminiResponse = () => {
+    // if(postFlag == 1)
+    //   return;
+    console.log("im gemini+++++++\n\n" + geminiResponse);
+    let i;
+    let title = "";
+    let content = "";
+
+    if(geminiResponse.includes("Headline")){ 
+      console.log("im here!!!!!");
+
+      for(i = 14; i < geminiResponse.length; i++){
+        if(geminiResponse[i] == "\n")
+          break;
+      }
+      title = geminiResponse.substring(14, i);
+  }
+    else if(geminiResponse[0] == "*"){
+      console.log("im here1!!!!!");
+
+      for(i = 2; i < geminiResponse.length; i++){
+            if(geminiResponse[i] == "*")
+              break;
+          }
+        title = geminiResponse.substring(2, i);
+    }
+
+    else{
+      console.log("im here2!!!!!");
+
+      for(i = 0; i < geminiResponse.length; i++){
+        if(geminiResponse[i] == "\n")
+          break;
+        if(geminiResponse[i] == '*')
+          continue;
+        title += geminiResponse[i];
+      }
+      content = geminiResponse.slice(i);
+    // title = geminiResponse.substring(0, i);
+  }
+    // let content = geminiResponse.slice(title.length);
+    
+    content = geminiResponse.slice(i);
+
+
+    swal({
+      title: title,
+      text: content,
+      confirmButtonColor: "#3085d6",
+      showCloseButton: true,
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Save Post",
+      denyButtonText: "Generate New Post",
+      focusDeny:true,
+
+    });
+
+    // postFlag = 1;
+
+}
 
 
 
@@ -295,128 +362,135 @@ export default function PostCreationForm() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">
-        Instructions for build your post:
-      </h2>
 
-      <form
-        onSubmit={handleFormSubmit}
-        className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
-      >
-        {!handleSubmit && (
-          <div>
-            <div className="mb-4">
-              <label htmlFor="emojis" className="block font-semibold mb-1">
-                Do you want emojis?
-              </label>
-              <select
-                id="emojis"
-                value={emojis}
-                onChange={(e) => setEmojis(e.target.value)}
-                className="p-2 border rounded-md w-full"
-              >
-                <option value="yes">Yes, a lot</option>
-                <option value="few">Yes, but a few</option>
-                <option value="no">No</option>
-              </select>
-            </div>
-            {emojis === "yes" && (
-              <>
-                <div className="mb-4">
-                  <label
-                    htmlFor="maxEmojis"
-                    className="block font-semibold mb-1"
-                  >
-                    Maximum number of emojis:
-                  </label>
-                  <input
-                    type="number"
-                    id="maxEmojis"
-                    value={maxEmojis}
-                    onChange={(e) => setMaxEmojis(parseInt(e.target.value))}
-                    className="p-2 border rounded-md w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="minEmojis"
-                    className="block font-semibold mb-1"
-                  >
-                    Minimum number of emojis:
-                  </label>
-                  <input
-                    type="number"
-                    id="minEmojis"
-                    value={minEmojis}
-                    onChange={(e) => setMinEmojis(parseInt(e.target.value))}
-                    className="p-2 border rounded-md w-full"
-                  />
-                </div>
-              </>
-            )}
-            <div className="mb-4">
-              <label htmlFor="wordCount" className="block font-semibold mb-1">
-                Desired word count:
-              </label>
-              <input
-                type="number"
-                id="wordCount"
-                value={wordCount}
-                onChange={(e) => setWordCount(parseInt(e.target.value))}
-                className="p-2 border rounded-md w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="paragraphCount"
-                className="block font-semibold mb-1"
-              >
-                Desired paragraph count:
-              </label>
-              <input
-                type="number"
-                id="paragraphCount"
-                value={paragraphCount}
-                onChange={(e) => setParagraphCount(parseInt(e.target.value))}
-                className="p-2 border rounded-md w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                // htmlFor="paragraphCount"
-                className="block font-semibold mb-1"
-              >
-                Free text you want to display:
-              </label>
-              <input
-                type="text"
-                // id="paragraphCount"
-                // value={paragraphCount}
-                // onChange={(e) => setParagraphCount(parseInt(e.target.value))}
-                // className="p-2 border rounded-md w-full"
-              />
-            </div>
-          </div>
-        )}
 
-        {isChatGPTTyping && (
-          <div className="typing-indicator">is typing...</div>
-        )}
-        <button
-          type="submit"
-          className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
-            handleSubmit || loading // Disable the button if handleSubmit or loading is true
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-500 text-white hover:bg-blue-600"
-          }`}
-          onClick={sendMessageToServer}
-          disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
+
+
+    {geminiResponse == "" && (
+      <div>
+        <h2 className="text-2xl font-bold mb-4">
+          Instructions for build your post:
+        </h2>
+
+        <form
+          onSubmit={handleFormSubmit}
+          className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
         >
-          Create My Post
-        </button>
-      </form>
+          {!handleSubmit && (
+            <div>
+              <div className="mb-4">
+                <label htmlFor="emojis" className="block font-semibold mb-1">
+                  Do you want emojis?
+                </label>
+                <select
+                  id="emojis"
+                  value={emojis}
+                  onChange={(e) => setEmojis(e.target.value)}
+                  className="p-2 border rounded-md w-full"
+                >
+                  <option value="yes">Yes, a lot</option>
+                  <option value="few">Yes, but a few</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              {emojis === "yes" && (
+                <>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="maxEmojis"
+                      className="block font-semibold mb-1"
+                    >
+                      Maximum number of emojis:
+                    </label>
+                    <input
+                      type="number"
+                      id="maxEmojis"
+                      value={maxEmojis}
+                      onChange={(e) => setMaxEmojis(parseInt(e.target.value))}
+                      className="p-2 border rounded-md w-full"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="minEmojis"
+                      className="block font-semibold mb-1"
+                    >
+                      Minimum number of emojis:
+                    </label>
+                    <input
+                      type="number"
+                      id="minEmojis"
+                      value={minEmojis}
+                      onChange={(e) => setMinEmojis(parseInt(e.target.value))}
+                      className="p-2 border rounded-md w-full"
+                    />
+                  </div>
+                </>
+              )}
+              <div className="mb-4">
+                <label htmlFor="wordCount" className="block font-semibold mb-1">
+                  Desired word count:
+                </label>
+                <input
+                  type="number"
+                  id="wordCount"
+                  value={wordCount}
+                  onChange={(e) => setWordCount(parseInt(e.target.value))}
+                  className="p-2 border rounded-md w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="paragraphCount"
+                  className="block font-semibold mb-1"
+                >
+                  Desired paragraph count:
+                </label>
+                <input
+                  type="number"
+                  id="paragraphCount"
+                  value={paragraphCount}
+                  onChange={(e) => setParagraphCount(parseInt(e.target.value))}
+                  className="p-2 border rounded-md w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  // htmlFor="paragraphCount"
+                  className="block font-semibold mb-1"
+                >
+                  Free text you want to display:
+                </label>
+                <input
+                  type="text"
+                  // id="paragraphCount"
+                  // value={paragraphCount}
+                  // onChange={(e) => setParagraphCount(parseInt(e.target.value))}
+                  // className="p-2 border rounded-md w-full"
+                />
+              </div>
+            </div>
+          )}
 
-      {/* <button
+          {isChatGPTTyping && (
+            <div className="typing-indicator">is typing...</div>
+          )}
+          <button
+            type="submit"
+            className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
+              handleSubmit || loading // Disable the button if handleSubmit or loading is true
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-500 text-white hover:bg-blue-600"
+            }`}
+            onClick={sendMessageToServer}
+            disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
+          >
+            Create My Post
+          </button>
+        </form>
+      </div>
+
+      /* <button
         className={`px-4 py-2 m-2 rounded-md hover:bg-green-600 ${
           handleSubmit || loading
             ? "bg-gray-400 cursor-not-allowed"
@@ -426,27 +500,49 @@ export default function PostCreationForm() {
         disabled={handleSubmit || loading}
       >
         Send To Gemini
-      </button> */}
-      <div className="gemini-response">
-        <pre className="gemini-response-text">{geminiResponse}</pre>
-        <style>{`
-    .gemini-response {
-      background-color: #f0f0f0;
-      padding: 20px;
-      border-radius: 5px;
-      margin-top: 20px;
-    }
-    .gemini-response-text {
-      font-size: 16px;
-      line-height: 1.5;
-      margin: 0;
-      white-space: pre-wrap; /* Preserve white space and allow wrapping */
-      word-wrap: break-word; /* Break long words to prevent overflow */
-    }
-  `}</style>
-      </div>
+      // </button> */
 
-      {loading && handleSubmit && <p>Loading...</p>}
+
+    
+    )
+    }
+      {/* <div className="gemini-response"> */}
+
+
+      {geminiResponse != "" && (
+      <div className="gemini-response">
+        {showGeminiResponse()}
+        {console.log("Gemini Response\n\n")}
+       
+      </div>
+    )}
+
+
+
+        
+        {/* <pre className="gemini-response-text">{geminiResponse}</pre>
+        <style>{`
+          .gemini-response {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+          }
+          .gemini-response-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0;
+            white-space: pre-wrap; /* Preserve white space and allow wrapping */
+            // word-wrap: break-word; /* Break long words to prevent overflow */
+          // }
+        // `
+        // }
+        // </style> */}
+
+
+      // </div>
+
+      // {loading && handleSubmit && <p>Loading...</p>}
 
       <button
         onClick={moveToSelectedPostsPage}
@@ -454,13 +550,16 @@ export default function PostCreationForm() {
       >
         Move back
       </button>
-
+}
+    {geminiResponse != "" && (
       <button
         onClick={savePost}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         Save this post
       </button>
+    )
+    }
 
 
 
