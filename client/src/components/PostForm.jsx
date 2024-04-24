@@ -128,26 +128,26 @@ export default function PostCreationForm() {
     generateJsonInstructions();
   }, []);
 
-  function GeminiResponse({ response }) {
-    return (
-      <div className="gemini-response">
-        <p>{response}</p>
-        <style jsx>{`
-          .gemini-response {
-            background-color: #f0f0f0;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 20px;
-          }
-          .gemini-response p {
-            font-size: 16px;
-            line-height: 1.5;
-            margin: 0;
-          }
-        `}</style>
-      </div>
-    );
-  }
+  // function GeminiResponse({ response }) {
+  //   return (
+  //     <div className="gemini-response">
+  //       <p>{response}</p>
+  //       <style jsx>{`
+  //         .gemini-response {
+  //           background-color: #f0f0f0;
+  //           padding: 20px;
+  //           border-radius: 5px;
+  //           margin-top: 20px;
+  //         }
+  //         .gemini-response p {
+  //           font-size: 16px;
+  //           line-height: 1.5;
+  //           margin: 0;
+  //         }
+  //       `}</style>
+  //     </div>
+  //   );
+  // }
 
   // //////////////////////////////////////////////////////////////////////////
   function stripHtmlTags(html) {
@@ -185,33 +185,33 @@ export default function PostCreationForm() {
     }
   };
 
-  const handleSend = async () => {
-    try {
-      await generateJsonInstructions(); // Generate JSON instructions
-      setLoading(true); // Set loading state to true before the asynchronous operation starts
+  // const handleSend = async () => {
+  //   try {
+  //     await generateJsonInstructions(); // Generate JSON instructions
+  //     setLoading(true); // Set loading state to true before the asynchronous operation starts
 
-      const response = await fetch("/api/transformText", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ article: message }), // Send the text to the server
-      });
+  //     const response = await fetch("/api/transformText", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ article: message }), // Send the text to the server
+  //     });
 
-      if (!response.ok) {
-        throw new Error("Failed to send message to the server");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to send message to the server");
+  //     }
 
-      const data = await response.text(); // Receive text data from the server
-      // console.log("Text received:", data); // Log the received text
-      setChatResponse(data); // Set the received text as chatResponse
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      setLoading(false); // Set loading state to false after the asynchronous operation completes
-      setHandleSubmit(false);
-    }
-  };
+  //     const data = await response.text(); // Receive text data from the server
+  //     // console.log("Text received:", data); // Log the received text
+  //     setChatResponse(data); // Set the received text as chatResponse
+  //   } catch (error) {
+  //     console.error("Error sending message:", error);
+  //   } finally {
+  //     setLoading(false); // Set loading state to false after the asynchronous operation completes
+  //     setHandleSubmit(false);
+  //   }
+  // };
 
   const moveToSelectedPostsPage = () => {
     setStep("selectedPosts");
@@ -220,75 +220,81 @@ export default function PostCreationForm() {
 
 
 
-  const savePost = () => {
-    // console.log(currentUser._id);
-    let i;
-    let title = "";
-    let content = "";
-
-    if(geminiResponse.includes("**Headline**")){ 
-      for(i = 14; i < geminiResponse.length; i++){
-        if(geminiResponse[i] == "\n")
-          break;
-      }
-      title = geminiResponse.substring(14, i);
-  }
-    else if(geminiResponse[0] == "*"){
-      for(i = 2; i < geminiResponse.length; i++){
-            if(geminiResponse[i] == "*")
-              break;
-          }
-        title = geminiResponse.substring(2, i);
+  const savePost = (title, content, ) => {
+    
+    fetch('/api/post', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: title,
+        content: content,
+        author: currentUser._id
+      }),
+    })
+    .then(response => {
+      if (response.status === 200) {
+        swal({
+          icon: "success",
+          text: "The Post Saved Successfully!"
+        });
     }
 
     else{
-      for(i = 0; i < geminiResponse.length; i++){
-        if(geminiResponse[i] == "\n")
-          break;
-        if(geminiResponse[i] == '*')
-          continue;
-        title += geminiResponse[i];
-      }
-      content = geminiResponse.slice(i);
-    // title = geminiResponse.substring(0, i);
+      Swal.fire({
+        icon: "error",
+        text: "The post failed to save successfully.",
+        confirmButtonText: "Try again",
+        showLoaderOnConfirm: true,
+        cancelButtonText: "OK",
+        showCancelButton: true,
+
+        preConfirm: async () => {
+          try {
+            const response = await fetch('/api/post', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                title: title,
+                content: content,
+                author: currentUser._id
+              }),
+            })
+
+            if (!response.ok) {
+              return Swal.showValidationMessage(`
+                Error saving the post
+              `);
+            }
+            return response.json();
+          } catch (error) {
+            Swal.showValidationMessage(`
+              Request failed: ${error}
+            `);
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+              icon: "success",
+              text: "The Post Saved Successfully!"
+          });}
+      });
+    }
+  })}
+
+
+
+  const generateNewPost = async () => {
+    await sendMessageToServer();
+    showGeminiResponse();
   }
-    // let content = geminiResponse.slice(title.length);
-    
-    // console.log(title);
-    content = geminiResponse.slice(i);
+  
 
-
-    Swal.fire({
-      title: title,
-      text: content,
-      confirmButtonColor: "#3085d6",
-      confirmButtonText: "Confirm"
-    });
-
-
-    // fetch('/api/post', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     title: title,
-    //     content: content,
-    //     author: currentUser._id
-    //   }),
-    // })
-    // .then(response => {
-    //   if (response.status === 200) {
-    //   Swal.fire({
-    //     title: title,
-    //     text: content,
-    //     icon: "success",
-    //     confirmButtonColor: "#3085d6",
-    //     confirmButtonText: "Confirm"
-    //   });
-    // }})
-    // .catch(error => console.error('Error:', error));
-  }
 
 
 
@@ -339,20 +345,25 @@ const showGeminiResponse = () => {
     content = geminiResponse.slice(i);
 
 
-    swal({
+    Swal.fire({
       title: title,
       text: content,
-      confirmButtonColor: "#3085d6",
-      showCloseButton: true,
       showDenyButton: true,
       showCancelButton: true,
       confirmButtonText: "Save Post",
-      denyButtonText: "Generate New Post",
-      focusDeny:true,
+      denyButtonText: "Generate new Post",
+      // preDeny: sendMessageToServer(),
 
+    })
+    .then((result) => {
+      if(result.isConfirmed) 
+        savePost(title, content);
+      else if(result.isDenied)
+        generateNewPost();
+      else
+        return;
     });
 
-    // postFlag = 1;
 
 }
 
