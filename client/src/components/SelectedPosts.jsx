@@ -113,12 +113,14 @@ export default function SelectedPosts() {
           >
             Move back
           </button>
-          <button
-            onClick={moveToFormPage}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Move to the next step
-          </button>
+          {Object.keys(selectedItems).length > 0 && (
+            <button
+              onClick={moveToFormPage}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Move to the next step
+            </button>
+          )}
         </>
       )}
       {step === "postCreationForm" && <PostCreationForm />}
