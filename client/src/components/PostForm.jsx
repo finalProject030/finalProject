@@ -155,6 +155,9 @@ export default function PostCreationForm() {
     return doc.body.textContent || "";
   }
 
+
+
+
   // Function to handle form submission
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -213,6 +216,8 @@ export default function PostCreationForm() {
   //   }
   // };
 
+
+
   const moveToSelectedPostsPage = () => {
     setStep("selectedPosts");
   };
@@ -221,7 +226,6 @@ export default function PostCreationForm() {
 
 
   const savePost = (title, content, ) => {
-    
     fetch('/api/post', {
       method: 'POST',
       headers: {
@@ -289,10 +293,10 @@ export default function PostCreationForm() {
 
 
 
-  const generateNewPost = async () => {
-    await sendMessageToServer();
-    showGeminiResponse();
-  }
+  // const generateNewPost = async () => {
+  //   await sendMessageToServer();
+  //   showGeminiResponse();
+  // }
   
 
 
@@ -352,17 +356,24 @@ const showGeminiResponse = () => {
       showCancelButton: true,
       confirmButtonText: "Save Post",
       denyButtonText: "Generate new Post",
-      // preDeny: sendMessageToServer(),
+      showLoaderOnDeny: true,
+      allowOutsideClick: () => !Swal.isLoading(),
+
+      preDeny: sendMessageToServer,
 
     })
     .then((result) => {
       if(result.isConfirmed) 
         savePost(title, content);
       else if(result.isDenied)
-        generateNewPost();
+          // showGeminiResponse();
+        console.log("moshe\n\n");
       else
         return;
     });
+    
+    
+    
 
 
 }
