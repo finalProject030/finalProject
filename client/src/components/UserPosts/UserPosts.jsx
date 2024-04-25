@@ -37,6 +37,25 @@ const UserPosts = () => {
     }
   };
 
+  const toggleVisibility = async (postId, isPublic) => {
+    try {
+      const res = await fetch(`/api/post/${postId}/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isPublic: !isPublic }), // Toggle visibility
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update the posts list to reflect the change
+        setPosts(posts.map((post) => (post._id === postId ? data.post : post)));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-4">Your Posts</h2>
@@ -53,12 +72,22 @@ const UserPosts = () => {
               <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
               <p className="text-gray-700">{post.content}</p>
             </div>
-            <button
-              onClick={() => handleDeletePost(post._id)}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
-            >
-              Delete
-            </button>
+            <div>
+              <button
+                onClick={() => toggleVisibility(post._id, post.isPublic)}
+                className={`${
+                  post.isPublic ? "bg-green-500" : "bg-red-500"
+                } hover:bg-opacity-75 text-white font-semibold py-2 px-4 rounded mr-2`}
+              >
+                {post.isPublic ? "Make Private" : "Make Public"}
+              </button>
+              <button
+                onClick={() => handleDeletePost(post._id)}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>

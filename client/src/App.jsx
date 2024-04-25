@@ -10,6 +10,8 @@ import CreateListing from "./pages/CreateListing";
 import Home from "./pages/Home";
 import Chatbot from "./components/Chatbot";
 import UserPosts from "./components/UserPosts/UserPosts";
+import Footer from "./components/Footer";
+import Feed from "./pages/Feed";
 
 export default function App() {
   return (
@@ -26,10 +28,12 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/posts" element={<Posts />} />
+          <Route path="/feed" element={<Feed />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/user-posts" element={<UserPosts />} />
         </Route>
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
