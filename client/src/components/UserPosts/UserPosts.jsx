@@ -105,34 +105,56 @@ const UserPosts = () => {
   };
 
   return (
-    <div className="grid grid-cols-6 md:grid-flow-row">
-      <div className="col-span-6 md:col-span-6">
-        <h1 className="flex justify-center text-5xl">My Posts</h1>
+    <>
+      {/* Wave shape */}
+      <div className="left-0 w-full -mb-1">
+        <svg
+          className="fill-current text-white dark:text-gray-800"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 320"
+        >
+          <path
+            fillOpacity="1"
+            d="M0,64L48,85.3C96,107,192,149,288,170.7C384,192,480,192,576,165.3C672,139,768,85,864,64C960,43,1056,53,1152,74.7C1248,96,1344,128,1392,144L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+          ></path>
+        </svg>
       </div>
-      {loading && <p className="col-span-6">Loading...</p>}
-      {error && <p className="col-span-6">Error: {error}</p>}
-      <PostFilters
-        filter={filter}
-        setFilter={setFilter}
-        visibilityFilter={visibilityFilter}
-        setVisibilityFilter={setVisibilityFilter}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-      />
-      <div className="col-span-6 md:col-span-5">
-        {applyFilter().map((post) => (
-          <PostItem
-            key={post._id}
-            post={post}
-            dropdownOpen={dropdownOpen}
-            setDropdownOpen={setDropdownOpen}
-            toggleVisibility={toggleVisibility}
-            handleDeletePost={handleDeletePost}
-            copyPost={copyPost}
-          />
-        ))}
+
+      <div className="container mx-auto py-8 px-4">
+        <h1 className="text-7xl font-bold text-center mb-8">My Posts</h1>
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+          {/* Filter Section */}
+          <div className="col-span-1 md:col-span-2">
+            <PostFilters
+              filter={filter}
+              setFilter={setFilter}
+              visibilityFilter={visibilityFilter}
+              setVisibilityFilter={setVisibilityFilter}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+            />
+          </div>
+          {/* Posts Section */}
+          <div className="col-span-1 md:col-span-4">
+            {loading && <p className="text-center">Loading...</p>}
+            {error && (
+              <p className="text-center text-red-500">Error: {error}</p>
+            )}
+            {posts.map((post) => (
+              <PostItem
+                key={post._id}
+                post={post}
+                dropdownOpen={dropdownOpen}
+                setDropdownOpen={setDropdownOpen}
+                toggleVisibility={toggleVisibility}
+                handleDeletePost={handleDeletePost}
+                copyPost={copyPost}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

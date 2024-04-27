@@ -9,8 +9,8 @@ const PostFilters = ({
   setSortBy,
 }) => {
   return (
-    <div className="col-span-6 m-2 mr-1 md:col-span-1 bg-white rounded-lg shadow-lg shadow-cyan-500/50 dark:bg-gray-900 dark:text-gray-300 p-4">
-      <h1 className="mb-4 text-lg font-semibold">Filters</h1>
+    <div className="bg-gray-900 dark:bg-gray-800 dark:text-gray-300 rounded-lg shadow-lg p-4">
+      <h1 className="text-lg font-semibold mb-4 text-gray-300">Filters</h1>
       <input
         type="text"
         placeholder="Filter by title"
@@ -27,7 +27,7 @@ const PostFilters = ({
         <option value="public">Public</option>
         <option value="private">Private</option>
       </select>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium  text-gray-500 mb-2">
         Sort by:
       </label>
       <select

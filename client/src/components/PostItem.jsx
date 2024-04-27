@@ -19,7 +19,7 @@ const PostItem = ({
   copyPost,
 }) => {
   return (
-    <div className="relative flex flex-col gap-2 m-2 ml-1 p-4 bg-white rounded-lg shadow-lg shadow-cyan-500/50 dark:bg-gray-900 dark:text-gray-300">
+    <div className="relative flex flex-col gap-2 m-2 ml-1 p-4 bg-white rounded-lg shadow-lg shadow-cyan-500/50 dark:bg-white dark:text-black-300">
       <div className="row-span-1">
         <h3 className="text-lg m-4 font-semibold">{post.title}</h3>
         <p className="text-sm text-gray-600">{formatDate(post.createdAt)}</p>
