@@ -9,6 +9,7 @@ import FeaturesIcon from "../../assets/Features.png";
 import TwitterIcon from "../../assets/Twitter.png";
 import SocialAIIcon from "../../assets/SocialAi.png";
 import { Link } from "react-router-dom";
+import "./About.css"; // Import CSS file for animations
 
 const About = () => {
   return (
@@ -41,7 +42,7 @@ const About = () => {
         </svg>
       </div>
       {/* Icon Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 fade-in">
         {/* Icon 1 */}
         <div className="flex flex-col items-center">
           <img src={InstagramIcon} className="w-12 h-12 mb-2" alt="Instagram" />
@@ -79,7 +80,7 @@ const About = () => {
         </div>
       </div>
       {/* Explanation Section */}
-      <div className="flex flex-col items-center md:flex-row pb-10 pt-10 mb-8 bg-white dark:bg-gray-800 text-black dark:text-white">
+      <div className="flex flex-col items-center md:flex-row pb-10 pt-10 mb-8 bg-white dark:bg-gray-800 text-black dark:text-white fade-in">
         <div className="md:w-full text-black dark:text-white">
           <h2 className="text-4xl font-semibold mb-6 p-4 text-center">
             How it Works
