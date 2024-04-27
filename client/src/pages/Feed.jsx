@@ -98,7 +98,7 @@ const Feed = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Public Posts</h2>
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
