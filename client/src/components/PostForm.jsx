@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import Swal from 'sweetalert2'
 import swal from 'sweetalert';
+import copy from "copy-to-clipboard";
+
 
 
 
@@ -30,16 +32,10 @@ export default function PostCreationForm() {
   let postFlag = 0;
 
 
-
-
-
-
-
-
-  // //////////////////////////////////////////////////////////////////////////Gemini
   // Function to send message to Gemini
   async function sendMessageToServer() {
-    console.log("messageToSend", messageToSend);
+    console.log("API GEMINI");
+    // console.log("messageToSend", messageToSend);
     try {
       setLoading(true); // Set loading state to true before the asynchronous operation starts
 
@@ -60,14 +56,15 @@ export default function PostCreationForm() {
       const data = await response.json();
       const geminiResponseString = `${data.message}`;
       setGeminiResponse(geminiResponseString);
-      console.log(geminiResponse);
-      // console.log("Response from Gemini:", geminiResponseString);
-
       // Handle response from Gemini if needed
+      showGeminiResponse(geminiResponseString);
+
+     
     } catch (error) {
       console.error("Error sending message to Gemini:", error);
       // Handle error if needed
     } finally {
+      
       setLoading(false); // Set loading state to false after the asynchronous operation completes
     }
   }
@@ -188,35 +185,6 @@ export default function PostCreationForm() {
     }
   };
 
-  // const handleSend = async () => {
-  //   try {
-  //     await generateJsonInstructions(); // Generate JSON instructions
-  //     setLoading(true); // Set loading state to true before the asynchronous operation starts
-
-  //     const response = await fetch("/api/transformText", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ article: message }), // Send the text to the server
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to send message to the server");
-  //     }
-
-  //     const data = await response.text(); // Receive text data from the server
-  //     // console.log("Text received:", data); // Log the received text
-  //     setChatResponse(data); // Set the received text as chatResponse
-  //   } catch (error) {
-  //     console.error("Error sending message:", error);
-  //   } finally {
-  //     setLoading(false); // Set loading state to false after the asynchronous operation completes
-  //     setHandleSubmit(false);
-  //   }
-  // };
-
-
 
   const moveToSelectedPostsPage = () => {
     setStep("selectedPosts");
@@ -292,91 +260,66 @@ export default function PostCreationForm() {
   })}
 
 
+const showGeminiResponse = (geminiResponseString) => {
+  const [title, content] = getInfo(geminiResponseString);
+  const htmlContent = content.replace(/\n/g, '<br>');
 
-  // const generateNewPost = async () => {
-  //   await sendMessageToServer();
-  //   showGeminiResponse();
-  // }
-  
+    Swal.fire({
+      title: title,
+      html: htmlContent,
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Copy to clipboard",
+      denyButtonText: "Generate new Post",
+      cancelButtonText: "Save Post",
+      showLoaderOnDeny: true,
+      showCloseButton: true,
+      allowEnterKey: false,
+      allowOutsideClick: false,
+
+      preDeny: async () => {
+          await sendMessageToServer();
+      },
+      preConfirm: () => {
+        copy(geminiResponseString);
+        return false;}
+    })
+    .then((result) => {
+      if(result.isConfirmed || result.isDenied || result["dismiss"] === "close") 
+        return;
+      else{// dismiss: cancel
+        savePost(title, content);
+      }
+    });
+}
 
 
 
-
-
-
-const showGeminiResponse = () => {
-    // if(postFlag == 1)
-    //   return;
-    console.log("im gemini+++++++\n\n" + geminiResponse);
+const getInfo = (geminiResponse) => {
     let i;
     let title = "";
     let content = "";
 
-    if(geminiResponse.includes("Headline")){ 
-      console.log("im here!!!!!");
+    for(i = 0; i < geminiResponse.length; i++) 
+      if(geminiResponse[i] == '\n')
+        break;
 
-      for(i = 14; i < geminiResponse.length; i++){
-        if(geminiResponse[i] == "\n")
-          break;
-      }
-      title = geminiResponse.substring(14, i);
-  }
-    else if(geminiResponse[0] == "*"){
-      console.log("im here1!!!!!");
+    title = geminiResponse.substring(0, i);
 
-      for(i = 2; i < geminiResponse.length; i++){
-            if(geminiResponse[i] == "*")
-              break;
-          }
-        title = geminiResponse.substring(2, i);
-    }
+    // Remove all the '*' from the title
+    title = title.replace(/\*/g,"");
 
-    else{
-      console.log("im here2!!!!!");
-
-      for(i = 0; i < geminiResponse.length; i++){
-        if(geminiResponse[i] == "\n")
-          break;
-        if(geminiResponse[i] == '*')
-          continue;
-        title += geminiResponse[i];
-      }
-      content = geminiResponse.slice(i);
-    // title = geminiResponse.substring(0, i);
-  }
-    // let content = geminiResponse.slice(title.length);
-    
+    // Remove the Headlines
+    if(title.includes("Headline:"))
+      title = title.substring(9, i)
+    else if(title.includes("Headline"))
+      title = title.substring(8, i)
     content = geminiResponse.slice(i);
-
-
-    Swal.fire({
-      title: title,
-      text: content,
-      showDenyButton: true,
-      showCancelButton: true,
-      confirmButtonText: "Save Post",
-      denyButtonText: "Generate new Post",
-      showLoaderOnDeny: true,
-      allowOutsideClick: () => !Swal.isLoading(),
-
-      preDeny: sendMessageToServer,
-
-    })
-    .then((result) => {
-      if(result.isConfirmed) 
-        savePost(title, content);
-      else if(result.isDenied)
-          // showGeminiResponse();
-        console.log("moshe\n\n");
-      else
-        return;
-    });
-    
-    
-    
-
-
+    return [title, content];
 }
+
+
+
 
 
 
@@ -384,10 +327,6 @@ const showGeminiResponse = () => {
 
   return (
     <div>
-
-
-
-
     {geminiResponse == "" && (
       <div>
         <h2 className="text-2xl font-bold mb-4">
@@ -494,9 +433,12 @@ const showGeminiResponse = () => {
             </div>
           )}
 
-          {isChatGPTTyping && (
+          {/* {isChatGPTTyping && (
             <div className="typing-indicator">is typing...</div>
-          )}
+          )} */}
+
+
+
           <button
             type="submit"
             className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
@@ -531,13 +473,15 @@ const showGeminiResponse = () => {
       {/* <div className="gemini-response"> */}
 
 
-      {geminiResponse != "" && (
+      {/* {
+      geminiResponse != "" && (
       <div className="gemini-response">
         {showGeminiResponse()}
-        {console.log("Gemini Response\n\n")}
+        {/* {console.log("Gemini Response\n\n")} */}
        
-      </div>
-    )}
+      {/* </div> */}
+    {/* // ) */}
+    {/* // }  */}
 
 
 
@@ -573,7 +517,10 @@ const showGeminiResponse = () => {
         Move back
       </button>
 }
-    {geminiResponse != "" && (
+
+
+    {/* {
+    geminiResponse != "" && (
       <button
         onClick={savePost}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -581,11 +528,7 @@ const showGeminiResponse = () => {
         Save this post
       </button>
     )
-    }
-
-
-
-
+    } */}
 
     </div>
   );
