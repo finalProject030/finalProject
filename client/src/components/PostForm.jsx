@@ -4,14 +4,9 @@ import { globalJsonData } from "../recoil/state";
 import { useRecoilState } from "recoil";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import Swal from 'sweetalert2'
-import swal from 'sweetalert';
+import Swal from "sweetalert2";
+import swal from "sweetalert";
 import copy from "copy-to-clipboard";
-
-
-
-
-
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
@@ -30,7 +25,6 @@ export default function PostCreationForm() {
   const [geminiResponse, setGeminiResponse] = useState("");
   const { currentUser, error } = useSelector((state) => state.user);
   let postFlag = 0;
-
 
   // Function to send message to Gemini
   async function sendMessageToServer() {
@@ -58,13 +52,10 @@ export default function PostCreationForm() {
       setGeminiResponse(geminiResponseString);
       // Handle response from Gemini if needed
       showGeminiResponse(geminiResponseString);
-
-     
     } catch (error) {
-      console.error("Error sending message to Gemini:", error);
+      console.error("Error sending message to Gemini:", error.message);
       // Handle error if needed
     } finally {
-      
       setLoading(false); // Set loading state to false after the asynchronous operation completes
     }
   }
@@ -152,9 +143,6 @@ export default function PostCreationForm() {
     return doc.body.textContent || "";
   }
 
-
-
-
   // Function to handle form submission
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -185,84 +173,78 @@ export default function PostCreationForm() {
     }
   };
 
-
   const moveToSelectedPostsPage = () => {
     setStep("selectedPosts");
   };
 
-
-
-
-  const savePost = (title, content, ) => {
-    fetch('/api/post', {
-      method: 'POST',
+  const savePost = (title, content) => {
+    fetch("/api/post", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         title: title,
         content: content,
-        author: currentUser._id
+        author: currentUser._id,
       }),
-    })
-    .then(response => {
+    }).then((response) => {
       if (response.status === 200) {
         swal({
           icon: "success",
-          text: "The Post Saved Successfully!"
+          text: "The Post Saved Successfully!",
         });
-    }
+      } else {
+        Swal.fire({
+          icon: "error",
+          text: "The post failed to save successfully.",
+          confirmButtonText: "Try again",
+          showLoaderOnConfirm: true,
+          cancelButtonText: "OK",
+          showCancelButton: true,
 
-    else{
-      Swal.fire({
-        icon: "error",
-        text: "The post failed to save successfully.",
-        confirmButtonText: "Try again",
-        showLoaderOnConfirm: true,
-        cancelButtonText: "OK",
-        showCancelButton: true,
+          preConfirm: async () => {
+            try {
+              const response = await fetch("/api/post", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  title: title,
+                  content: content,
+                  author: currentUser._id,
+                }),
+              });
 
-        preConfirm: async () => {
-          try {
-            const response = await fetch('/api/post', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                title: title,
-                content: content,
-                author: currentUser._id
-              }),
-            })
-
-            if (!response.ok) {
-              return Swal.showValidationMessage(`
+              if (!response.ok) {
+                return Swal.showValidationMessage(`
                 Error saving the post
               `);
-            }
-            return response.json();
-          } catch (error) {
-            Swal.showValidationMessage(`
+              }
+              return response.json();
+            } catch (error) {
+              Swal.showValidationMessage(`
               Request failed: ${error}
             `);
-          }
-        },
-        allowOutsideClick: () => !Swal.isLoading()
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
+            }
+          },
+          allowOutsideClick: () => !Swal.isLoading(),
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire({
               icon: "success",
-              text: "The Post Saved Successfully!"
-          });}
-      });
-    }
-  })}
+              text: "The Post Saved Successfully!",
+            });
+          }
+        });
+      }
+    });
+  };
 
-
-const showGeminiResponse = (geminiResponseString) => {
-  const [title, content] = getInfo(geminiResponseString);
-  const htmlContent = content.replace(/\n/g, '<br>');
+  const showGeminiResponse = (geminiResponseString) => {
+    const [title, content] = getInfo(geminiResponseString);
+    const htmlContent = content.replace(/\n/g, "<br>");
 
     Swal.fire({
       title: title,
@@ -278,183 +260,179 @@ const showGeminiResponse = (geminiResponseString) => {
       allowOutsideClick: false,
 
       preDeny: async () => {
-          await sendMessageToServer();
+        await sendMessageToServer();
       },
       preConfirm: () => {
         copy(geminiResponseString);
-        return false;}
-    })
-    .then((result) => {
-      if(result.isConfirmed || result.isDenied || result["dismiss"] === "close") 
+        return false;
+      },
+    }).then((result) => {
+      if (
+        result.isConfirmed ||
+        result.isDenied ||
+        result["dismiss"] === "close"
+      )
         return;
-      else{// dismiss: cancel
+      else {
+        // dismiss: cancel
         savePost(title, content);
       }
     });
-}
+  };
 
-
-
-const getInfo = (geminiResponse) => {
+  const getInfo = (geminiResponse) => {
     let i;
     let title = "";
     let content = "";
 
-    for(i = 0; i < geminiResponse.length; i++) 
-      if(geminiResponse[i] == '\n')
-        break;
+    for (i = 0; i < geminiResponse.length; i++)
+      if (geminiResponse[i] == "\n") break;
 
     title = geminiResponse.substring(0, i);
 
     // Remove all the '*' from the title
-    title = title.replace(/\*/g,"");
+    title = title.replace(/\*/g, "");
 
     // Remove the Headlines
-    if(title.includes("Headline:"))
-      title = title.substring(9, i)
-    else if(title.includes("Headline"))
-      title = title.substring(8, i)
+    if (title.includes("Headline:")) title = title.substring(9, i);
+    else if (title.includes("Headline")) title = title.substring(8, i);
     content = geminiResponse.slice(i);
     return [title, content];
-}
-
-
-
-
-
-
-
+  };
 
   return (
     <div>
-    {geminiResponse == "" && (
-      <div>
-        <h2 className="text-2xl font-bold mb-4">
-          Instructions for build your post:
-        </h2>
+      {geminiResponse == "" && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">
+            Instructions for build your post:
+          </h2>
 
-        <form
-          onSubmit={handleFormSubmit}
-          className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
-        >
-          {!handleSubmit && (
-            <div>
-              <div className="mb-4">
-                <label htmlFor="emojis" className="block font-semibold mb-1">
-                  Do you want emojis?
-                </label>
-                <select
-                  id="emojis"
-                  value={emojis}
-                  onChange={(e) => setEmojis(e.target.value)}
-                  className="p-2 border rounded-md w-full"
-                >
-                  <option value="yes">Yes, a lot</option>
-                  <option value="few">Yes, but a few</option>
-                  <option value="no">No</option>
-                </select>
+          <form
+            onSubmit={handleFormSubmit}
+            className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
+          >
+            {!handleSubmit && (
+              <div>
+                <div className="mb-4">
+                  <label htmlFor="emojis" className="block font-semibold mb-1">
+                    Do you want emojis?
+                  </label>
+                  <select
+                    id="emojis"
+                    value={emojis}
+                    onChange={(e) => setEmojis(e.target.value)}
+                    className="p-2 border rounded-md w-full"
+                  >
+                    <option value="yes">Yes, a lot</option>
+                    <option value="few">Yes, but a few</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                {emojis === "yes" && (
+                  <>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="maxEmojis"
+                        className="block font-semibold mb-1"
+                      >
+                        Maximum number of emojis:
+                      </label>
+                      <input
+                        type="number"
+                        id="maxEmojis"
+                        value={maxEmojis}
+                        onChange={(e) => setMaxEmojis(parseInt(e.target.value))}
+                        className="p-2 border rounded-md w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label
+                        htmlFor="minEmojis"
+                        className="block font-semibold mb-1"
+                      >
+                        Minimum number of emojis:
+                      </label>
+                      <input
+                        type="number"
+                        id="minEmojis"
+                        value={minEmojis}
+                        onChange={(e) => setMinEmojis(parseInt(e.target.value))}
+                        className="p-2 border rounded-md w-full"
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="mb-4">
+                  <label
+                    htmlFor="wordCount"
+                    className="block font-semibold mb-1"
+                  >
+                    Desired word count:
+                  </label>
+                  <input
+                    type="number"
+                    id="wordCount"
+                    value={wordCount}
+                    onChange={(e) => setWordCount(parseInt(e.target.value))}
+                    className="p-2 border rounded-md w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="paragraphCount"
+                    className="block font-semibold mb-1"
+                  >
+                    Desired paragraph count:
+                  </label>
+                  <input
+                    type="number"
+                    id="paragraphCount"
+                    value={paragraphCount}
+                    onChange={(e) =>
+                      setParagraphCount(parseInt(e.target.value))
+                    }
+                    className="p-2 border rounded-md w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    // htmlFor="paragraphCount"
+                    className="block font-semibold mb-1"
+                  >
+                    Free text you want to display:
+                  </label>
+                  <input
+                    type="text"
+                    // id="paragraphCount"
+                    // value={paragraphCount}
+                    // onChange={(e) => setParagraphCount(parseInt(e.target.value))}
+                    // className="p-2 border rounded-md w-full"
+                  />
+                </div>
               </div>
-              {emojis === "yes" && (
-                <>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="maxEmojis"
-                      className="block font-semibold mb-1"
-                    >
-                      Maximum number of emojis:
-                    </label>
-                    <input
-                      type="number"
-                      id="maxEmojis"
-                      value={maxEmojis}
-                      onChange={(e) => setMaxEmojis(parseInt(e.target.value))}
-                      className="p-2 border rounded-md w-full"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="minEmojis"
-                      className="block font-semibold mb-1"
-                    >
-                      Minimum number of emojis:
-                    </label>
-                    <input
-                      type="number"
-                      id="minEmojis"
-                      value={minEmojis}
-                      onChange={(e) => setMinEmojis(parseInt(e.target.value))}
-                      className="p-2 border rounded-md w-full"
-                    />
-                  </div>
-                </>
-              )}
-              <div className="mb-4">
-                <label htmlFor="wordCount" className="block font-semibold mb-1">
-                  Desired word count:
-                </label>
-                <input
-                  type="number"
-                  id="wordCount"
-                  value={wordCount}
-                  onChange={(e) => setWordCount(parseInt(e.target.value))}
-                  className="p-2 border rounded-md w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="paragraphCount"
-                  className="block font-semibold mb-1"
-                >
-                  Desired paragraph count:
-                </label>
-                <input
-                  type="number"
-                  id="paragraphCount"
-                  value={paragraphCount}
-                  onChange={(e) => setParagraphCount(parseInt(e.target.value))}
-                  className="p-2 border rounded-md w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label
-                  // htmlFor="paragraphCount"
-                  className="block font-semibold mb-1"
-                >
-                  Free text you want to display:
-                </label>
-                <input
-                  type="text"
-                  // id="paragraphCount"
-                  // value={paragraphCount}
-                  // onChange={(e) => setParagraphCount(parseInt(e.target.value))}
-                  // className="p-2 border rounded-md w-full"
-                />
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* {isChatGPTTyping && (
+            {/* {isChatGPTTyping && (
             <div className="typing-indicator">is typing...</div>
           )} */}
 
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
+                handleSubmit || loading // Disable the button if handleSubmit or loading is true
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-500 text-white hover:bg-blue-600"
+              }`}
+              onClick={sendMessageToServer}
+              disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
+            >
+              Create My Post
+            </button>
+          </form>
+        </div>
 
-
-          <button
-            type="submit"
-            className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
-              handleSubmit || loading // Disable the button if handleSubmit or loading is true
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-500 text-white hover:bg-blue-600"
-            }`}
-            onClick={sendMessageToServer}
-            disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
-          >
-            Create My Post
-          </button>
-        </form>
-      </div>
-
-      /* <button
+        /* <button
         className={`px-4 py-2 m-2 rounded-md hover:bg-green-600 ${
           handleSubmit || loading
             ? "bg-gray-400 cursor-not-allowed"
@@ -465,28 +443,21 @@ const getInfo = (geminiResponse) => {
       >
         Send To Gemini
       // </button> */
-
-
-    
-    )
-    }
+      )}
       {/* <div className="gemini-response"> */}
-
 
       {/* {
       geminiResponse != "" && (
       <div className="gemini-response">
         {showGeminiResponse()}
         {/* {console.log("Gemini Response\n\n")} */}
-       
+
       {/* </div> */}
-    {/* // ) */}
-    {/* // }  */}
+      {/* // ) */}
+      {/* // }  */}
 
-
-
-        
-        {/* <pre className="gemini-response-text">{geminiResponse}</pre>
+      {
+        /* <pre className="gemini-response-text">{geminiResponse}</pre>
         <style>{`
           .gemini-response {
             background-color: #f0f0f0;
@@ -499,27 +470,25 @@ const getInfo = (geminiResponse) => {
             line-height: 1.5;
             margin: 0;
             white-space: pre-wrap; /* Preserve white space and allow wrapping */
-            // word-wrap: break-word; /* Break long words to prevent overflow */
-          // }
+        // word-wrap: break-word; /* Break long words to prevent overflow */
+        // }
         // `
         // }
         // </style> */}
 
+        // </div>
 
-      // </div>
+        // {loading && handleSubmit && <p>Loading...</p>}
 
-      // {loading && handleSubmit && <p>Loading...</p>}
+        <button
+          onClick={moveToSelectedPostsPage}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Move back
+        </button>
+      }
 
-      <button
-        onClick={moveToSelectedPostsPage}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Move back
-      </button>
-}
-
-
-    {/* {
+      {/* {
     geminiResponse != "" && (
       <button
         onClick={savePost}
@@ -529,7 +498,6 @@ const getInfo = (geminiResponse) => {
       </button>
     )
     } */}
-
     </div>
   );
 }
