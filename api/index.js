@@ -10,9 +10,7 @@ import geminiRouter from "./routes/gemini.route.js";
 import cookieParser from "cookie-parser";
 import userPostsRouter from "./routes/userPost.route.js"; // Import the createPost route handler
 import axios from "axios";
-
-
-
+import path from "path";
 
 dotenv.config();
 
@@ -25,8 +23,9 @@ mongoose
     console.log(err);
   });
 
-const app = express();
+const __dirname = path.resolve();
 
+const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -44,6 +43,12 @@ app.use("/api/transformText", tranformTextRouter);
 app.use("/api/gemini", geminiRouter);
 app.use("/api/post", userPostsRouter); // Route to save a new post
 
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
@@ -55,26 +60,24 @@ app.use((err, req, res, next) => {
   });
 });
 
-
-
 // app.get('/posts', async (req, res) => {
 //   console.log("im here!!!!");
-  // const { sort, order, questionId } = req.query;
-  // let api;
+// const { sort, order, questionId } = req.query;
+// let api;
 
-  // console.log(req.query);
+// console.log(req.query);
 
-  // if (sort !== "relevance") {
-  //   api = `https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-  // } else {
-  //   api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-  // }
+// if (sort !== "relevance") {
+//   api = `https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+// } else {
+//   api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+// }
 
-  // try {
-  //   const response = await axios.get(api);
-  //   res.json(response.data);
-  // } catch (error) {
-  //   console.error("Error fetching data from Stack Exchange API:", error);
-  //   res.status(500).json({ error: "Internal server error" });
-  // }
+// try {
+//   const response = await axios.get(api);
+//   res.json(response.data);
+// } catch (error) {
+//   console.error("Error fetching data from Stack Exchange API:", error);
+//   res.status(500).json({ error: "Internal server error" });
+// }
 // });
