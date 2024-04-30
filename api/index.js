@@ -32,7 +32,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://eclectic-boba-3095b3.netlify.app", // Allow requests from this specific origin
+    origin: "*", // Allow requests from this specific origin
   })
 );
 
