@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BiLike, BiDislike } from "react-icons/bi";
+import { urlServer } from "../recoil/state.js";
 
 const Feed = () => {
   const [publicPosts, setPublicPosts] = useState([]);
@@ -16,9 +17,13 @@ const Feed = () => {
 
   const fetchPublicPosts = async () => {
     try {
-      const response = await fetch(
-        "https://finalproject-a66r.onrender.com/api/post/public/postslikes"
-      );
+      const response = await fetch(`${urlServer}/api/post/public/postslikes`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: localStorage.getItem("token"),
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -47,15 +52,12 @@ const Feed = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      const response = await fetch(
-        `https://finalproject-a66r.onrender.com/api/post/${postId}/like`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${urlServer}/api/post/${postId}/like`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
 
@@ -77,15 +79,12 @@ const Feed = () => {
 
   const handleDislikePost = async (postId) => {
     try {
-      const response = await fetch(
-        `https://finalproject-a66r.onrender.com/api/post/${postId}/dislike`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${urlServer}/api/post/${postId}/dislike`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
 

@@ -2,8 +2,6 @@
 
 import express from "express";
 const router = express.Router();
-import dotenv from "dotenv";
-dotenv.config();
 
 // Route to handle incoming chat messages
 router.post("/", async (req, res) => {

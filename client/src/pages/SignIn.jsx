@@ -7,6 +7,7 @@ import {
   signInFailure,
 } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
+import { urlServer } from "../recoil/state.js";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -26,20 +27,19 @@ export default function SignIn() {
 
     try {
       dispatch(signInStart());
-      const res = await fetch(
-        "https://finalproject-a66r.onrender.com/api/auth/signin",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`${urlServer}/api/auth/signin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const data = await res.json();
+
       if (data.success === false) {
         dispatch(signInFailure(data.message));
         return;
       }
+      localStorage.setItem("token", data.token);
       dispatch(signInSuccess(data));
       navigate("/");
     } catch (error) {

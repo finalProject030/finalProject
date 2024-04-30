@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { HiDotsVertical } from "react-icons/hi";
 import PostFilters from "../PostFilters";
 import PostItem from "../PostItem";
+import { urlServer } from "../../recoil/state";
 
 const UserPosts = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -21,9 +22,13 @@ const UserPosts = () => {
 
   const fetchUserPosts = async (userId) => {
     try {
-      const res = await fetch(
-        `https://finalproject-a66r.onrender.com/api/post/${userId}`
-      );
+      const res = await fetch(`${urlServer}/api/post/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: localStorage.getItem("token"),
+        },
+      });
       const data = await res.json();
       if (data.success) {
         setPosts(data.posts);
@@ -35,12 +40,12 @@ const UserPosts = () => {
 
   const handleDeletePost = async (postId) => {
     try {
-      const res = await fetch(
-        `https://finalproject-a66r.onrender.com/api/post/${postId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const res = await fetch(`${urlServer}/api/post/${postId}`, {
+        method: "DELETE",
+        headers: {
+          authorization: localStorage.getItem("token"),
+        },
+      });
       const data = await res.json();
       if (data.success) {
         setPosts(posts.filter((post) => post._id !== postId));
@@ -52,16 +57,14 @@ const UserPosts = () => {
 
   const toggleVisibility = async (postId, isPublic) => {
     try {
-      const res = await fetch(
-        `https://finalproject-a66r.onrender.com/api/post/${postId}/visibility`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isPublic: !isPublic }), // Toggle visibility
-        }
-      );
+      const res = await fetch(`${urlServer}/api/post/${postId}/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ isPublic: !isPublic }), // Toggle visibility
+      });
       const data = await res.json();
       if (data.success) {
         setPosts(posts.map((post) => (post._id === postId ? data.post : post)));

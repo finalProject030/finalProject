@@ -7,6 +7,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import swal from "sweetalert";
 import copy from "copy-to-clipboard";
+import { urlServer } from "../recoil/state.js";
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
@@ -35,16 +36,13 @@ export default function PostCreationForm() {
 
       generateJsonInstructions(); // Call generateJsonInstructions and wait for it to complete
 
-      const response = await fetch(
-        "https://finalproject-a66r.onrender.com/api/gemini",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message: messageToSend }), // Include 'message' property in the request body
-        }
-      );
+      const response = await fetch(`${urlServer}/api/gemini`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: messageToSend }), // Include 'message' property in the request body
+      });
 
       if (!response.ok) {
         throw new Error("Failed to send message to Gemini");
@@ -181,7 +179,7 @@ export default function PostCreationForm() {
   };
 
   const savePost = (title, content) => {
-    fetch("/api/post", {
+    fetch(`${urlServer}/api/post`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -208,20 +206,17 @@ export default function PostCreationForm() {
 
           preConfirm: async () => {
             try {
-              const response = await fetch(
-                "https://finalproject-a66r.onrender.com/api/post",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    title: title,
-                    content: content,
-                    author: currentUser._id,
-                  }),
-                }
-              );
+              const response = await fetch(`${urlServer}/api/post`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  title: title,
+                  content: content,
+                  author: currentUser._id,
+                }),
+              });
 
               if (!response.ok) {
                 return Swal.showValidationMessage(`

@@ -8,6 +8,7 @@ import {
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { urlServer } from "../recoil/state.js";
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -31,6 +32,7 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
   console.log(formData);
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -132,19 +134,16 @@ export default function CreateListing() {
         return setError("Discount price must be lower than regular price");
       setLoading(true);
       setError(false);
-      const res = await fetch(
-        "https://finalproject-a66r.onrender.com/api/listing/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...formData,
-            userRef: currentUser._id,
-          }),
-        }
-      );
+      const res = await fetch(`${urlServer}/api/listing/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          userRef: currentUser._id,
+        }),
+      });
       const data = await res.json();
       setLoading(false);
       if (data.success === false) {

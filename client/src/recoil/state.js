@@ -16,3 +16,8 @@ export const globalJsonData = atom({
   key: "globalJsonData",
   default: "", // default value for the global string
 });
+
+export const urlServer = atom({
+  key: "urlServer",
+  default: "http://localhost:3000", // default value for the global string
+});
