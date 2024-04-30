@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://finalproject-a66r.onrender.com", // Update the target URL
+        target: "", // Update the target URL
         secure: false,
         changeOrigin: true, // Add this option if needed
       },

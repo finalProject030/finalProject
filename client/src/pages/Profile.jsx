@@ -82,6 +82,7 @@ export default function Profile() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            authorization: localStorage.getItem("token"),
           },
           body: JSON.stringify(formData),
         }
@@ -106,6 +107,9 @@ export default function Profile() {
         `${urlServer}/api/user/delete/${currentUser._id}`,
         {
           method: "DELETE",
+          headers: {
+            authorization: localStorage.getItem("token"),
+          },
         }
       );
       const data = await res.json();
@@ -122,7 +126,12 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
-      const res = await fetch(`${urlServer}/api/auth/signout`);
+      const res = await fetch(`${urlServer}/api/auth/signout`, {
+        method: "GET",
+        headers: {
+          authorization: localStorage.getItem("token"),
+        },
+      });
       const data = await res.json();
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
@@ -138,7 +147,13 @@ export default function Profile() {
     try {
       setShowListingsError(false);
       const res = await fetch(
-        `${urlServer}/api/user/listings/${currentUser._id}`
+        `${urlServer}/api/user/listings/${currentUser._id}`,
+        {
+          method: "GET",
+          headers: {
+            authorization: localStorage.getItem("token"),
+          },
+        }
       );
       const data = await res.json();
       if (data.success === false) {
@@ -156,6 +171,9 @@ export default function Profile() {
     try {
       const res = await fetch(`${urlServer}/api/listing/delete/${listingId}`, {
         method: "DELETE",
+        headers: {
+          authorization: localStorage.getItem("token"),
+        },
       });
       const data = await res.json();
       if (data.success === false) {
