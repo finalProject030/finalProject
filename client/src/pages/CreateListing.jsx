@@ -8,7 +8,7 @@ import {
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { urlServer } from "../recoil/state.js";
+import { urlServer } from "../variables";
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);

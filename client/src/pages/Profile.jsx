@@ -18,7 +18,7 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { urlServer } from "../recoil/state.js";
+import { urlServer } from "../variables";
 
 export default function Profile() {
   const fileRef = useRef(null);

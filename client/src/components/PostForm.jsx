@@ -7,7 +7,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import swal from "sweetalert";
 import copy from "copy-to-clipboard";
-import { urlServer } from "../recoil/state.js";
+import { urlServer } from "../variables";
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");

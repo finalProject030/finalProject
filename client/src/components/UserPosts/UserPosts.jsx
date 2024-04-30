@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { HiDotsVertical } from "react-icons/hi";
 import PostFilters from "../PostFilters";
 import PostItem from "../PostItem";
-import { urlServer } from "../../recoil/state";
+import { urlServer } from "../../variables";
 
 const UserPosts = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);

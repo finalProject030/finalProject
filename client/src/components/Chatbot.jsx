@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { urlServer } from "../recoil/state.js";
+import { urlServer } from "../variables";
 
 const Chatbot = (message) => {
   const [messages, setMessages] = useState([

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BiLike, BiDislike } from "react-icons/bi";
-import { urlServer } from "../recoil/state.js";
+import { urlServer } from "../variables";
 
 const Feed = () => {
   const [publicPosts, setPublicPosts] = useState([]);

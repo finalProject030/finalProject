@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { urlServer } from "../recoil/state.js";
+import { urlServer } from "../variables";
 
 export default function OAuth() {
   const dispatch = useDispatch();
