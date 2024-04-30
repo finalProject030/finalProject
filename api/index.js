@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors"; // Import cors package
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
@@ -29,6 +30,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors()); // Use cors middleware
 
 // Use your routers
 app.use("/api/user", userRouter);
