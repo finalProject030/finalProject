@@ -30,7 +30,11 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors()); // Use cors middleware
+app.use(
+  cors({
+    origin: "https://eclectic-boba-3095b3.netlify.app", // Allow requests from this specific origin
+  })
+);
 
 // Use your routers
 app.use("/api/user", userRouter);
