@@ -56,6 +56,7 @@ const Feed = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          authorization: localStorage.getItem("token"),
         },
       });
 
@@ -83,6 +84,7 @@ const Feed = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          authorization: localStorage.getItem("token"),
         },
       });
 
