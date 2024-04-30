@@ -20,7 +20,6 @@ const Feed = () => {
       const response = await fetch(`${urlServer}/api/post/public/postslikes`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
           authorization: localStorage.getItem("token"),
         },
       });
