@@ -23,17 +23,20 @@ export default function OAuth() {
 
         if (result && result.user) {
           // User successfully signed in
-          const res = await fetch("/api/auth/google", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: result.user.displayName,
-              email: result.user.email,
-              photo: result.user.photoURL,
-            }),
-          });
+          const res = await fetch(
+            "https://finalproject-a66r.onrender.com/api/auth/google",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name: result.user.displayName,
+                email: result.user.email,
+                photo: result.user.photoURL,
+              }),
+            }
+          );
           const data = await res.json();
           dispatch(signInSuccess(data));
           navigate("/");

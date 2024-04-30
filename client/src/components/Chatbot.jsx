@@ -21,13 +21,16 @@ const Chatbot = (message) => {
 
     // Call the backend API to process the user's message
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userMessage }),
-      });
+      const response = await fetch(
+        "https://finalproject-a66r.onrender.com/api/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userMessage }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to send message to the server");

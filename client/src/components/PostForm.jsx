@@ -35,13 +35,16 @@ export default function PostCreationForm() {
 
       generateJsonInstructions(); // Call generateJsonInstructions and wait for it to complete
 
-      const response = await fetch("/api/gemini", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: messageToSend }), // Include 'message' property in the request body
-      });
+      const response = await fetch(
+        "https://finalproject-a66r.onrender.com/api/gemini",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: messageToSend }), // Include 'message' property in the request body
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to send message to Gemini");
@@ -205,17 +208,20 @@ export default function PostCreationForm() {
 
           preConfirm: async () => {
             try {
-              const response = await fetch("/api/post", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  title: title,
-                  content: content,
-                  author: currentUser._id,
-                }),
-              });
+              const response = await fetch(
+                "https://finalproject-a66r.onrender.com/api/post",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    title: title,
+                    content: content,
+                    author: currentUser._id,
+                  }),
+                }
+              );
 
               if (!response.ok) {
                 return Swal.showValidationMessage(`

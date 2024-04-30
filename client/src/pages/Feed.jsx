@@ -16,7 +16,9 @@ const Feed = () => {
 
   const fetchPublicPosts = async () => {
     try {
-      const response = await fetch("/api/post/public/postslikes");
+      const response = await fetch(
+        "https://finalproject-a66r.onrender.com/api/post/public/postslikes"
+      );
       const data = await response.json();
 
       if (data.success) {
@@ -45,12 +47,15 @@ const Feed = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      const response = await fetch(`/api/post/${postId}/like`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `https://finalproject-a66r.onrender.com/api/post/${postId}/like`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const data = await response.json();
 
@@ -72,12 +77,15 @@ const Feed = () => {
 
   const handleDislikePost = async (postId) => {
     try {
-      const response = await fetch(`/api/post/${postId}/dislike`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `https://finalproject-a66r.onrender.com/api/post/${postId}/dislike`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const data = await response.json();
 
