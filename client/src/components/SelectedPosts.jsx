@@ -34,6 +34,7 @@ export default function SelectedPosts() {
   };
 
   const buildGlobalJson = () => {
+    // console.log(Object.entries(selectedItems));
     const newGlobalJson = {
       selectedPosts: Object.entries(selectedItems).map(
         ([questionId, item]) => ({

@@ -207,6 +207,7 @@ const Posts = () => {
 
 
   const handleChange = (questionId) => {
+    console.log(checkedItems);
     setCheckedItems((prev) => {
       const updatedItems = { ...prev };
 
@@ -330,7 +331,7 @@ const Posts = () => {
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:underline font-bold text-lg mb-2 block"
                 >
-                  {question.title}
+                  <HTMLCodeDisplay htmlCode={question.title} />
                 </a>
 
                 <button
@@ -378,7 +379,7 @@ const Posts = () => {
                   fetchQuestions();
                 }}
               >
-                Show more 10 results
+                Show 10 more results
               </button>
             </div>
           )}

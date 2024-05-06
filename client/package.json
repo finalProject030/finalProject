@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
-,
+    "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -27,6 +26,7 @@
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.1",
     "react-select": "^5.8.0",
+    "react-spinners": "^0.13.8",
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
     "redux-persist": "^6.0.0",

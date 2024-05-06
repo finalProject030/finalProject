@@ -3,11 +3,12 @@ import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
 import { globalJsonData } from "../recoil/state";
 import { useRecoilState } from "recoil";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import Swal from "sweetalert2";
-import swal from "sweetalert";
 import copy from "copy-to-clipboard";
 import { urlServer } from "../variables";
+import PuffLoader from "react-spinners/PuffLoader";
+
+
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
@@ -19,29 +20,24 @@ export default function PostCreationForm() {
   const [loading, setLoading] = useState(false);
   const [handleSubmit, setHandleSubmit] = useState(false);
   const [jsonInstructions, setJsonInstructions] = useState("");
-  const [chatResponse, setChatResponse] = useState("");
   const [selectedItems, setSelectedItems] = useRecoilState(recoilSelectedPosts);
   const [messageToSend, setMessageToSend] = useState("");
-  const [isChatGPTTyping, setIsChatGPTTyping] = useState(false);
   const [geminiResponse, setGeminiResponse] = useState("");
   const { currentUser, error } = useSelector((state) => state.user);
-  let postFlag = 0;
+  const [finish, setFinish] = useState(false);
+
 
   // Function to send message to Gemini
   async function sendMessageToServer() {
     console.log("API GEMINI");
-    // console.log("messageToSend", messageToSend);
     try {
-      setLoading(true); // Set loading state to true before the asynchronous operation starts
-
-      generateJsonInstructions(); // Call generateJsonInstructions and wait for it to complete
-
+      console.log(generateJsonInstructions());
       const response = await fetch(`${urlServer}/api/gemini`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: messageToSend }), // Include 'message' property in the request body
+        body: JSON.stringify({ message: generateJsonInstructions() }), // Include 'message' property in the request body
       });
 
       if (!response.ok) {
@@ -65,22 +61,25 @@ export default function PostCreationForm() {
   const generateJsonInstructions = () => {
     // Initial set of instructions
     let instructions = [
-      "Hi, I want you to create a post for LinkedIn by following these instructions:",
+      "Hi, I want you to create a post for LinkedIn by following exactly these instructions:",
       "- Include a catchy headline that grabs attention.",
       "- Write a brief introduction to the topic to provide context.",
-      `- Use ${wordCount} words in your post to ensure it's concise and engaging.`,
-      `- Include ${paragraphCount} paragraph(s) to organize your content effectively.`,
+      `- Keep the post concise at around ${wordCount} words.`,
+      // `- Use exactly ${wordCount} words in your post to ensure it's concise and engaging.`,
+      `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
       emojis === "yes"
         ? `- Use emojis to add visual appeal. (Maximum: ${maxEmojis}, Minimum: ${minEmojis}).`
         : "- Avoid using emojis to maintain a professional tone.",
       "- Incorporate relevant hashtags to increase visibility.",
       "- End with a call to action, such as asking for comments or opinions.",
       "Below is the question and its accepted answer for reference:",
-    ];
+    ]    ;
 
     // Additional instructions based on selected posts
     const selectedPostsMessage = Object.entries(selectedItems).map(
       ([questionId, item]) => {
+        if(item.answers === undefined)
+          return;
         const acceptedAnswers = item.answers.filter(
           (answer) => answer.is_accepted
         );
@@ -96,7 +95,6 @@ export default function PostCreationForm() {
         } else {
           message += "No accepted answers found.\n\n";
         }
-
         return message;
       }
     );
@@ -110,6 +108,7 @@ export default function PostCreationForm() {
     // Construct the message to send
     const message = `${instructions.join("\n")}`;
     setMessageToSend(message);
+    return message;
   };
 
   //When load the page call the generateJsonInstructions function.
@@ -117,28 +116,7 @@ export default function PostCreationForm() {
     generateJsonInstructions();
   }, []);
 
-  // function GeminiResponse({ response }) {
-  //   return (
-  //     <div className="gemini-response">
-  //       <p>{response}</p>
-  //       <style jsx>{`
-  //         .gemini-response {
-  //           background-color: #f0f0f0;
-  //           padding: 20px;
-  //           border-radius: 5px;
-  //           margin-top: 20px;
-  //         }
-  //         .gemini-response p {
-  //           font-size: 16px;
-  //           line-height: 1.5;
-  //           margin: 0;
-  //         }
-  //       `}</style>
-  //     </div>
-  //   );
-  // }
-
-  // //////////////////////////////////////////////////////////////////////////
+ 
   function stripHtmlTags(html) {
     const doc = new DOMParser().parseFromString(html, "text/html");
     return doc.body.textContent || "";
@@ -147,6 +125,7 @@ export default function PostCreationForm() {
   // Function to handle form submission
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
     setHandleSubmit(true);
     try {
       await generateJsonInstructions(); // Generate JSON instructions
@@ -191,7 +170,7 @@ export default function PostCreationForm() {
       }),
     }).then((response) => {
       if (response.status === 200) {
-        swal({
+        Swal.fire({
           icon: "success",
           text: "The Post Saved Successfully!",
         });
@@ -241,6 +220,8 @@ export default function PostCreationForm() {
         });
       }
     });
+    setSelectedItems([]);
+    // setStep("posts");
   };
 
   const showGeminiResponse = (geminiResponseString) => {
@@ -268,12 +249,22 @@ export default function PostCreationForm() {
         return false;
       },
     }).then((result) => {
-      if (
-        result.isConfirmed ||
-        result.isDenied ||
-        result["dismiss"] === "close"
-      )
+      // if (
+      //   result.isConfirmed ||
+      //   result.isDenied ||
+      //   result["dismiss"] === "close"
+      // ){
+      //   setSelectedItems([]);
+      //   return;}
+      if (result.isConfirmed || result.isDenied)
         return;
+      else if(result["dismiss"] === "close"){
+        setSelectedItems([]);
+        setFinish(true);
+        return;
+      }
+        
+      
       else {
         // dismiss: cancel
         savePost(title, content);
@@ -281,30 +272,50 @@ export default function PostCreationForm() {
     });
   };
 
-  const getInfo = (geminiResponse) => {
-    let i;
+  const getInfo = (geminiResponse1) => {
+    let i, j;
     let title = "";
     let content = "";
 
-    for (i = 0; i < geminiResponse.length; i++)
-      if (geminiResponse[i] == "\n") break;
+    for (i = 0; i < geminiResponse1.length; i++)
+      if (geminiResponse1[i] == "\n") break;
 
-    title = geminiResponse.substring(0, i);
+    title = geminiResponse1.substring(0, i);
 
     // Remove all the '*' from the title
     title = title.replace(/\*/g, "");
 
     // Remove the Headlines
-    if (title.includes("Headline:")) title = title.substring(9, i);
+    if (title.includes("Headline:")) {
+      // if doesnt start with 'Headline' only
+      if(title.substring(0, 8).toUpperCase() !== 'HEADLINE'){
+        for (j = 0; j < title.length; j++)
+          if (title[j] == ":"){
+            j++;
+            title = title.substring(j, i);
+            break;
+          } 
+        }
+      else title = title.substring(9, i);
+    }
     else if (title.includes("Headline")) title = title.substring(8, i);
-    content = geminiResponse.slice(i);
+    content = geminiResponse1.slice(i);
     return [title, content];
   };
 
+
+
+  
   return (
     <div>
-      {geminiResponse == "" && (
+
+      {geminiResponse == ""  && (
         <div>
+
+        {!handleSubmit && (
+
+        <div>
+
           <h2 className="text-2xl font-bold mb-4">
             Instructions for build your post:
           </h2>
@@ -313,7 +324,7 @@ export default function PostCreationForm() {
             onSubmit={handleFormSubmit}
             className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
           >
-            {!handleSubmit && (
+            {/* {!handleSubmit && ( */}
               <div>
                 <div className="mb-4">
                   <label htmlFor="emojis" className="block font-semibold mb-1">
@@ -405,18 +416,10 @@ export default function PostCreationForm() {
                   </label>
                   <input
                     type="text"
-                    // id="paragraphCount"
-                    // value={paragraphCount}
-                    // onChange={(e) => setParagraphCount(parseInt(e.target.value))}
-                    // className="p-2 border rounded-md w-full"
                   />
                 </div>
               </div>
-            )}
-
-            {/* {isChatGPTTyping && (
-            <div className="typing-indicator">is typing...</div>
-          )} */}
+            {/* )}  */}
 
             <button
               type="submit"
@@ -425,80 +428,59 @@ export default function PostCreationForm() {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-green-500 text-white hover:bg-blue-600"
               }`}
-              onClick={sendMessageToServer}
+              // onClick={sendMessageToServer}
               disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
             >
               Create My Post
             </button>
           </form>
+
+          <button
+            onClick={moveToSelectedPostsPage}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+          Previous Step
+          </button>
+
+        </div>
+          )}
+        
+
+          {loading && (
+
+            <div>
+              <PuffLoader
+              color="#36d7b7"
+              loading
+            />
+           </div>
+          )}
+          
+        </div>
+      )}
+
+      {geminiResponse != "" && finish && (
+        <div>
+
+        <button>
+          Back Home
+        </button>
+
+        <p>
+        <br></br><br></br><br></br>
+          All rights reserved &copy; STACK TEXTPRO.<br></br> 
+          This includes but is not limited to the rights of reproduction, distribution, adaptation, and public display of all content, materials, and intellectual property owned or created by STACK TEXTPRO. <br></br>
+          No part of our proprietary information, including text, graphics, logos, images, audio, or video content, may be reproduced, distributed, transmitted, or otherwise utilized without the express written permission of STACK TEXTPRO.<br></br>
+           Any unauthorized use or reproduction of our intellectual property will be subject to legal action.<br></br>
+        </p>
+
         </div>
 
-        /* <button
-        className={`px-4 py-2 m-2 rounded-md hover:bg-green-600 ${
-          handleSubmit || loading
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-green-500 text-white hover:bg-blue-600"
-        }`}
-        onClick={sendMessageToServer}
-        disabled={handleSubmit || loading}
-      >
-        Send To Gemini
-      // </button> */
       )}
-      {/* <div className="gemini-response"> */}
 
-      {/* {
-      geminiResponse != "" && (
-      <div className="gemini-response">
-        {showGeminiResponse()}
-        {/* {console.log("Gemini Response\n\n")} */}
 
-      {/* </div> */}
-      {/* // ) */}
-      {/* // }  */}
-
-      {
-        /* <pre className="gemini-response-text">{geminiResponse}</pre>
-        <style>{`
-          .gemini-response {
-            background-color: #f0f0f0;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 20px;
-          }
-          .gemini-response-text {
-            font-size: 16px;
-            line-height: 1.5;
-            margin: 0;
-            white-space: pre-wrap; /* Preserve white space and allow wrapping */
-        // word-wrap: break-word; /* Break long words to prevent overflow */
-        // }
-        // `
-        // }
-        // </style> */}
-
-        // </div>
-
-        // {loading && handleSubmit && <p>Loading...</p>}
-
-        <button
-          onClick={moveToSelectedPostsPage}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Move back
-        </button>
-      }
-
-      {/* {
-    geminiResponse != "" && (
-      <button
-        onClick={savePost}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Save this post
-      </button>
-    )
-    } */}
     </div>
+
+
   );
 }
