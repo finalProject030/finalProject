@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "", // Update the target URL
+        target: "http://localhost:3000", // Update the target URL
         secure: false,
         changeOrigin: true, // Add this option if needed
       },
