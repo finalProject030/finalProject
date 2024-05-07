@@ -153,9 +153,16 @@ const About = () => {
 
         <Link
           to="/sign-up"
-          className="inline-block bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out"
+          className="inline-block bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out mr-4"
         >
           Sign Up Now
+        </Link>
+
+        <Link
+          to="/sign-in"
+          className="inline-block bg-gray-600 text-white py-3 px-8 rounded-lg hover:bg-gray-700 transition duration-300 ease-in-out"
+        >
+          Sign In
         </Link>
       </div>
     </div>
