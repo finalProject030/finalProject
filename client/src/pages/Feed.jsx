@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { BiLike, BiDislike } from "react-icons/bi";
 import { urlServer } from "../variables";
+import LoadingSpinner from "../components/LoadingSpinner"; // Import the LoadingSpinner component
 
 const Feed = () => {
   const [publicPosts, setPublicPosts] = useState([]);
@@ -124,8 +125,7 @@ const Feed = () => {
         <h2 className="text-4xl md:text-7xl font-bold mb-4 flex justify-center items-center">
           Public Posts
         </h2>
-
-        {loading && <p>Loading...</p>}
+        {loading && <LoadingSpinner />}
         {error && <p className="text-red-500">Error: {error}</p>}
 
         <div className="mt-8 flex flex-wrap ">

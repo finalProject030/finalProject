@@ -82,9 +82,11 @@ const UserPosts = () => {
   };
 
   const applyFilter = () => {
-    // Filter posts based on the filter value and visibility filter
-    let filteredPosts = posts.filter((post) =>
-      post.title.toLowerCase().includes(filter.toLowerCase())
+    // Filter posts based on the filter value, visibility filter, and content
+    let filteredPosts = posts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(filter.toLowerCase()) ||
+        post.content.toLowerCase().includes(filter.toLowerCase())
     );
 
     if (visibilityFilter === "public") {
@@ -143,6 +145,7 @@ const UserPosts = () => {
               setVisibilityFilter={setVisibilityFilter}
               sortBy={sortBy}
               setSortBy={setSortBy}
+              placeholder="Search by title or content" // Add placeholder prop
             />
           </div>
           {/* Posts Section */}
@@ -151,7 +154,7 @@ const UserPosts = () => {
             {error && (
               <p className="text-center text-red-500">Error: {error}</p>
             )}
-            {posts.map((post) => (
+            {applyFilter().map((post) => (
               <PostItem
                 key={post._id}
                 post={post}

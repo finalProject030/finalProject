@@ -7,13 +7,14 @@ const PostFilters = ({
   setVisibilityFilter,
   sortBy,
   setSortBy,
+  placeholder,
 }) => {
   return (
     <div className="bg-gray-900 dark:bg-gray-800 dark:text-gray-300 rounded-lg shadow-lg p-4">
       <h1 className="text-lg font-semibold mb-4 text-gray-300">Filters</h1>
       <input
         type="text"
-        placeholder="Filter by title"
+        placeholder={placeholder}
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         className="w-full border border-gray-300 rounded-md px-4 py-2 mb-2 focus:outline-none focus:ring focus:border-blue-300"
