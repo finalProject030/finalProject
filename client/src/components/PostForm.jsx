@@ -8,8 +8,6 @@ import copy from "copy-to-clipboard";
 import { urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
 
-
-
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
@@ -26,18 +24,18 @@ export default function PostCreationForm() {
   const { currentUser, error } = useSelector((state) => state.user);
   const [finish, setFinish] = useState(false);
 
-
   // Function to send message to Gemini
   async function sendMessageToServer() {
     console.log("API GEMINI");
     try {
-      console.log(generateJsonInstructions());
+      const valueToSend = generateJsonInstructions();
+      console.log(valueToSend);
       const response = await fetch(`${urlServer}/api/gemini`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: generateJsonInstructions() }), // Include 'message' property in the request body
+        body: JSON.stringify({ message: valueToSend }), // Include 'message' property in the request body
       });
 
       if (!response.ok) {
@@ -73,13 +71,12 @@ export default function PostCreationForm() {
       "- Incorporate relevant hashtags to increase visibility.",
       "- End with a call to action, such as asking for comments or opinions.",
       "Below is the question and its accepted answer for reference:",
-    ]    ;
+    ];
 
     // Additional instructions based on selected posts
     const selectedPostsMessage = Object.entries(selectedItems).map(
       ([questionId, item]) => {
-        if(item.answers === undefined)
-          return;
+        if (item.answers === undefined) return;
         const acceptedAnswers = item.answers.filter(
           (answer) => answer.is_accepted
         );
@@ -116,7 +113,6 @@ export default function PostCreationForm() {
     generateJsonInstructions();
   }, []);
 
- 
   function stripHtmlTags(html) {
     const doc = new DOMParser().parseFromString(html, "text/html");
     return doc.body.textContent || "";
@@ -256,16 +252,12 @@ export default function PostCreationForm() {
       // ){
       //   setSelectedItems([]);
       //   return;}
-      if (result.isConfirmed || result.isDenied)
-        return;
-      else if(result["dismiss"] === "close"){
+      if (result.isConfirmed || result.isDenied) return;
+      else if (result["dismiss"] === "close") {
         setSelectedItems([]);
         setFinish(true);
         return;
-      }
-        
-      
-      else {
+      } else {
         // dismiss: cancel
         savePost(title, content);
       }
@@ -288,199 +280,188 @@ export default function PostCreationForm() {
     // Remove the Headlines
     if (title.includes("Headline:")) {
       // if doesnt start with 'Headline' only
-      if(title.substring(0, 8).toUpperCase() !== 'HEADLINE'){
+      if (title.substring(0, 8).toUpperCase() !== "HEADLINE") {
         for (j = 0; j < title.length; j++)
-          if (title[j] == ":"){
+          if (title[j] == ":") {
             j++;
             title = title.substring(j, i);
             break;
-          } 
-        }
-      else title = title.substring(9, i);
-    }
-    else if (title.includes("Headline")) title = title.substring(8, i);
+          }
+      } else title = title.substring(9, i);
+    } else if (title.includes("Headline")) title = title.substring(8, i);
     content = geminiResponse1.slice(i);
     return [title, content];
   };
 
-
-
-  
   return (
     <div>
-
-      {geminiResponse == ""  && (
+      {geminiResponse == "" && (
         <div>
+          {!handleSubmit && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">
+                Instructions for build your post:
+              </h2>
 
-        {!handleSubmit && (
-
-        <div>
-
-          <h2 className="text-2xl font-bold mb-4">
-            Instructions for build your post:
-          </h2>
-
-          <form
-            onSubmit={handleFormSubmit}
-            className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
-          >
-            {/* {!handleSubmit && ( */}
-              <div>
-                <div className="mb-4">
-                  <label htmlFor="emojis" className="block font-semibold mb-1">
-                    Do you want emojis?
-                  </label>
-                  <select
-                    id="emojis"
-                    value={emojis}
-                    onChange={(e) => setEmojis(e.target.value)}
-                    className="p-2 border rounded-md w-full"
-                  >
-                    <option value="yes">Yes, a lot</option>
-                    <option value="few">Yes, but a few</option>
-                    <option value="no">No</option>
-                  </select>
+              <form
+                onSubmit={handleFormSubmit}
+                className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
+              >
+                {/* {!handleSubmit && ( */}
+                <div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="emojis"
+                      className="block font-semibold mb-1"
+                    >
+                      Do you want emojis?
+                    </label>
+                    <select
+                      id="emojis"
+                      value={emojis}
+                      onChange={(e) => setEmojis(e.target.value)}
+                      className="p-2 border rounded-md w-full"
+                    >
+                      <option value="yes">Yes, a lot</option>
+                      <option value="few">Yes, but a few</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+                  {emojis === "yes" && (
+                    <>
+                      <div className="mb-4">
+                        <label
+                          htmlFor="maxEmojis"
+                          className="block font-semibold mb-1"
+                        >
+                          Maximum number of emojis:
+                        </label>
+                        <input
+                          type="number"
+                          id="maxEmojis"
+                          value={maxEmojis}
+                          onChange={(e) =>
+                            setMaxEmojis(parseInt(e.target.value))
+                          }
+                          className="p-2 border rounded-md w-full"
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label
+                          htmlFor="minEmojis"
+                          className="block font-semibold mb-1"
+                        >
+                          Minimum number of emojis:
+                        </label>
+                        <input
+                          type="number"
+                          id="minEmojis"
+                          value={minEmojis}
+                          onChange={(e) =>
+                            setMinEmojis(parseInt(e.target.value))
+                          }
+                          className="p-2 border rounded-md w-full"
+                        />
+                      </div>
+                    </>
+                  )}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="wordCount"
+                      className="block font-semibold mb-1"
+                    >
+                      Desired word count:
+                    </label>
+                    <input
+                      type="number"
+                      id="wordCount"
+                      value={wordCount}
+                      onChange={(e) => setWordCount(parseInt(e.target.value))}
+                      className="p-2 border rounded-md w-full"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="paragraphCount"
+                      className="block font-semibold mb-1"
+                    >
+                      Desired paragraph count:
+                    </label>
+                    <input
+                      type="number"
+                      id="paragraphCount"
+                      value={paragraphCount}
+                      onChange={(e) =>
+                        setParagraphCount(parseInt(e.target.value))
+                      }
+                      className="p-2 border rounded-md w-full"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      // htmlFor="paragraphCount"
+                      className="block font-semibold mb-1"
+                    >
+                      Free text you want to display:
+                    </label>
+                    <input type="text" />
+                  </div>
                 </div>
-                {emojis === "yes" && (
-                  <>
-                    <div className="mb-4">
-                      <label
-                        htmlFor="maxEmojis"
-                        className="block font-semibold mb-1"
-                      >
-                        Maximum number of emojis:
-                      </label>
-                      <input
-                        type="number"
-                        id="maxEmojis"
-                        value={maxEmojis}
-                        onChange={(e) => setMaxEmojis(parseInt(e.target.value))}
-                        className="p-2 border rounded-md w-full"
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label
-                        htmlFor="minEmojis"
-                        className="block font-semibold mb-1"
-                      >
-                        Minimum number of emojis:
-                      </label>
-                      <input
-                        type="number"
-                        id="minEmojis"
-                        value={minEmojis}
-                        onChange={(e) => setMinEmojis(parseInt(e.target.value))}
-                        className="p-2 border rounded-md w-full"
-                      />
-                    </div>
-                  </>
-                )}
-                <div className="mb-4">
-                  <label
-                    htmlFor="wordCount"
-                    className="block font-semibold mb-1"
-                  >
-                    Desired word count:
-                  </label>
-                  <input
-                    type="number"
-                    id="wordCount"
-                    value={wordCount}
-                    onChange={(e) => setWordCount(parseInt(e.target.value))}
-                    className="p-2 border rounded-md w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    htmlFor="paragraphCount"
-                    className="block font-semibold mb-1"
-                  >
-                    Desired paragraph count:
-                  </label>
-                  <input
-                    type="number"
-                    id="paragraphCount"
-                    value={paragraphCount}
-                    onChange={(e) =>
-                      setParagraphCount(parseInt(e.target.value))
-                    }
-                    className="p-2 border rounded-md w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label
-                    // htmlFor="paragraphCount"
-                    className="block font-semibold mb-1"
-                  >
-                    Free text you want to display:
-                  </label>
-                  <input
-                    type="text"
-                  />
-                </div>
-              </div>
-            {/* )}  */}
+                {/* )}  */}
 
-            <button
-              type="submit"
-              className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
-                handleSubmit || loading // Disable the button if handleSubmit or loading is true
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-500 text-white hover:bg-blue-600"
-              }`}
-              // onClick={sendMessageToServer}
-              disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
-            >
-              Create My Post
-            </button>
-          </form>
+                <button
+                  type="submit"
+                  className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
+                    handleSubmit || loading // Disable the button if handleSubmit or loading is true
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-500 text-white hover:bg-blue-600"
+                  }`}
+                  // onClick={sendMessageToServer}
+                  disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
+                >
+                  Create My Post
+                </button>
+              </form>
 
-          <button
-            onClick={moveToSelectedPostsPage}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-          Previous Step
-          </button>
-
-        </div>
+              <button
+                onClick={moveToSelectedPostsPage}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Previous Step
+              </button>
+            </div>
           )}
-        
 
           {loading && (
-
             <div>
-              <PuffLoader
-              color="#36d7b7"
-              loading
-            />
-           </div>
+              <PuffLoader color="#36d7b7" loading />
+            </div>
           )}
-          
         </div>
       )}
 
       {geminiResponse != "" && finish && (
         <div>
+          <button>Back Home</button>
 
-        <button>
-          Back Home
-        </button>
-
-        <p>
-        <br></br><br></br><br></br>
-          All rights reserved &copy; STACK TEXTPRO.<br></br> 
-          This includes but is not limited to the rights of reproduction, distribution, adaptation, and public display of all content, materials, and intellectual property owned or created by STACK TEXTPRO. <br></br>
-          No part of our proprietary information, including text, graphics, logos, images, audio, or video content, may be reproduced, distributed, transmitted, or otherwise utilized without the express written permission of STACK TEXTPRO.<br></br>
-           Any unauthorized use or reproduction of our intellectual property will be subject to legal action.<br></br>
-        </p>
-
+          <p>
+            <br></br>
+            <br></br>
+            <br></br>
+            All rights reserved &copy; STACK TEXTPRO.<br></br>
+            This includes but is not limited to the rights of reproduction,
+            distribution, adaptation, and public display of all content,
+            materials, and intellectual property owned or created by STACK
+            TEXTPRO. <br></br>
+            No part of our proprietary information, including text, graphics,
+            logos, images, audio, or video content, may be reproduced,
+            distributed, transmitted, or otherwise utilized without the express
+            written permission of STACK TEXTPRO.<br></br>
+            Any unauthorized use or reproduction of our intellectual property
+            will be subject to legal action.<br></br>
+          </p>
         </div>
-
       )}
-
-
     </div>
-
-
   );
 }

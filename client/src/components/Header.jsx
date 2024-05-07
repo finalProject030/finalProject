@@ -56,39 +56,46 @@ export default function Header() {
             >
               Home
             </Link>
-            <Link
-              to="/posts"
-              onClick={handleLinkClick}
-              className={`block py-2 px-3 rounded md:bg-transparent md:p-0 ${
-                location.pathname === "/posts"
-                  ? "text-blue-700 dark:text-white"
-                  : "text-gray-900 dark:text-gray-400 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              }`}
-            >
-              Posts
-            </Link>
-            <Link
-              to="/feed"
-              onClick={handleLinkClick}
-              className={`block py-2 px-3 rounded md:bg-transparent md:p-0 ${
-                location.pathname === "/feed"
-                  ? "text-blue-700 dark:text-white"
-                  : "text-gray-900 dark:text-gray-400 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              }`}
-            >
-              Feed
-            </Link>
-            <Link
-              to="/user-posts"
-              onClick={handleLinkClick}
-              className={`block py-2 px-3 rounded md:bg-transparent md:p-0 ${
-                location.pathname === "/user-posts"
-                  ? "text-blue-700 dark:text-white"
-                  : "text-gray-900 dark:text-gray-400 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              }`}
-            >
-              MyPosts
-            </Link>
+            {currentUser && (
+              <Link
+                to="/posts"
+                onClick={handleLinkClick}
+                className={`block py-2 px-3 rounded md:bg-transparent md:p-0 ${
+                  location.pathname === "/posts"
+                    ? "text-blue-700 dark:text-white"
+                    : "text-gray-900 dark:text-gray-400 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                }`}
+              >
+                Posts
+              </Link>
+            )}
+            {currentUser && (
+              <Link
+                to="/feed"
+                onClick={handleLinkClick}
+                className={`block py-2 px-3 rounded md:bg-transparent md:p-0 ${
+                  location.pathname === "/feed"
+                    ? "text-blue-700 dark:text-white"
+                    : "text-gray-900 dark:text-gray-400 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                }`}
+              >
+                Feed
+              </Link>
+            )}
+            {currentUser && (
+              <Link
+                to="/user-posts"
+                onClick={handleLinkClick}
+                className={`block py-2 px-3 rounded md:bg-transparent md:p-0 ${
+                  location.pathname === "/user-posts"
+                    ? "text-blue-700 dark:text-white"
+                    : "text-gray-900 dark:text-gray-400 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                }`}
+              >
+                MyPosts
+              </Link>
+            )}
+
             <Link
               to="/about"
               onClick={handleLinkClick}
