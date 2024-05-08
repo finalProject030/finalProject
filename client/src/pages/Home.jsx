@@ -26,7 +26,7 @@ const Home = () => {
 
       {/* Content */}
       <div className="relative z-20 text-center flex flex-col justify-center items-center mt-8">
-        <h1 className="text-4xl font-extrabold mb-6">Welcome to Our Website</h1>
+        <h1 className="text-4xl font-extrabold mb-6">Welcome!</h1>
         <p className="text-lg text-center mb-8 mx-4">
           Discover amazing content, connect with our community, and stay up to
           date with the latest trends.

@@ -12,6 +12,7 @@ import Chatbot from "./components/Chatbot";
 import UserPosts from "./components/UserPosts/UserPosts";
 import Footer from "./components/Footer";
 import Feed from "./pages/Feed";
+import PostPage from "./pages/PostPage";
 
 export default function App() {
   return (
@@ -31,6 +32,8 @@ export default function App() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/user-posts" element={<UserPosts />} />
+          {/* Add route for displaying individual post */}
+          <Route path="/post/:postId" element={<PostPage />} />
         </Route>
       </Routes>
       <Footer />

@@ -4,6 +4,8 @@ import { HiDotsVertical } from "react-icons/hi";
 import PostFilters from "../PostFilters";
 import PostItem from "../PostItem";
 import { urlServer } from "../../variables";
+import PostPage from "../../pages/PostPage";
+import LoadingSpinner from "../../components/LoadingSpinner"; // Import the LoadingSpinner component
 
 const UserPosts = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -12,6 +14,7 @@ const UserPosts = () => {
   const [visibilityFilter, setVisibilityFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [dropdownOpen, setDropdownOpen] = useState(null); // State to manage dropdown visibility
+  const [selectedPost, setSelectedPost] = useState(null);
   const dropdownRef = useRef(null); // Define dropdownRef using useRef
 
   useEffect(() => {
@@ -150,24 +153,31 @@ const UserPosts = () => {
           </div>
           {/* Posts Section */}
           <div className="col-span-1 md:col-span-4">
-            {loading && <p className="text-center">Loading...</p>}
-            {error && (
-              <p className="text-center text-red-500">Error: {error}</p>
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                {error && (
+                  <p className="text-center text-red-500">Error: {error}</p>
+                )}
+                {applyFilter().map((post) => (
+                  <PostItem
+                    key={post._id}
+                    post={post}
+                    dropdownOpen={dropdownOpen}
+                    setDropdownOpen={setDropdownOpen}
+                    toggleVisibility={toggleVisibility}
+                    handleDeletePost={handleDeletePost}
+                    copyPost={copyPost}
+                  />
+                ))}
+              </>
             )}
-            {applyFilter().map((post) => (
-              <PostItem
-                key={post._id}
-                post={post}
-                dropdownOpen={dropdownOpen}
-                setDropdownOpen={setDropdownOpen}
-                toggleVisibility={toggleVisibility}
-                handleDeletePost={handleDeletePost}
-                copyPost={copyPost}
-              />
-            ))}
           </div>
         </div>
       </div>
+      {/* Render selected post page if a post is selected */}
+      {selectedPost && <PostPage post={selectedPost._id} />}
     </>
   );
 };

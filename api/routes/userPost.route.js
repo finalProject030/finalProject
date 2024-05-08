@@ -31,6 +31,41 @@ router.get("/:userId", verifyToken, async (req, res, next) => {
   }
 });
 
+// Define the route handler to update a post
+router.put("/:postId", verifyToken, async (req, res, next) => {
+  try {
+    // Get the postId from the request params
+    const postId = req.params.postId;
+
+    // Get the updated post data from the request body
+    const { title, content } = req.body;
+
+    // Find the post and update its title and content
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { title, content },
+      { new: true }
+    );
+
+    // Check if the post was not found
+    if (!updatedPost) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+    // Send success response with the updated post
+    res.status(200).json({
+      success: true,
+      message: "Post updated successfully",
+      post: updatedPost,
+    });
+  } catch (error) {
+    // Pass any errors to the error handling middleware
+    next(error);
+  }
+});
+
 // Route handler to update the visibility of a post
 router.patch("/:postId/visibility", verifyToken, async (req, res, next) => {
   try {
@@ -66,7 +101,6 @@ router.patch("/:postId/visibility", verifyToken, async (req, res, next) => {
   }
 });
 
-// Route handler to delete a post
 // Route handler to delete a post
 router.delete("/:postId", verifyToken, async (req, res, next) => {
   try {
@@ -267,6 +301,35 @@ router.post("/:postId/dislike", verifyToken, async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Like removed successfully",
+      post: post,
+    });
+  } catch (error) {
+    // Pass any errors to the error handling middleware
+    next(error);
+  }
+});
+
+// Define the route handler to get a post by its ID
+router.get("/post/:postId", verifyToken, async (req, res, next) => {
+  try {
+    // Get the postId from the request params
+    const postId = req.params.postId;
+
+    // Query the database for the post with the given ID
+    const post = await Post.findById(postId);
+
+    // Check if the post exists
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    // Send the post data as a response
+    res.status(200).json({
+      success: true,
+      message: "Post retrieved successfully",
       post: post,
     });
   } catch (error) {

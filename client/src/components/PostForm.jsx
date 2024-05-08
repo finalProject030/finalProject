@@ -9,8 +9,6 @@ import { urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
 import LinkedInPage from "./LinkedInPage";
 
-
-
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
@@ -33,7 +31,7 @@ export default function PostCreationForm() {
     try {
       const valueToSend = generateJsonInstructions();
       console.log(valueToSend);
-      const response = await fetch(`${urlServer}/api/gemini`, {
+      const response = await fetch(`/api/gemini`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -157,7 +155,7 @@ export default function PostCreationForm() {
   };
 
   const savePost = (title, content) => {
-    fetch(`${urlServer}/api/post`, {
+    fetch(`/api/post`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
