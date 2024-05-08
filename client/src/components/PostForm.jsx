@@ -7,6 +7,9 @@ import Swal from "sweetalert2";
 import copy from "copy-to-clipboard";
 import { urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
+import LinkedInPage from "./LinkedInPage";
+
+
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
@@ -444,6 +447,7 @@ export default function PostCreationForm() {
         <div>
           <button>Back Home</button>
 
+          {/* <LinkedInPage/> */}
           <p>
             <br></br>
             <br></br>
