@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { LuAlignJustify } from "react-icons/lu";
+import logo from "../../assets/logo.png";
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
@@ -24,9 +25,17 @@ export default function Header() {
           to="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
+          <img 
+          src={logo} 
+          alt="STACK TEXTPRO" 
+          style={{
+            width:"25px",
+            height:"25px"
+          }}/>
+          
           <h1 className="font-bold text-2xl flex-wrap">
-            <span className="text-slate-500">Stack</span>
-            <span className="text-slate-700">TextPro</span>
+            <span className="text-slate-500">STACK</span>
+            <span className="text-slate-700">  TEXTPRO</span>
           </h1>
         </Link>
         <button
