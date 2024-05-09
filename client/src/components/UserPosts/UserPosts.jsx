@@ -24,8 +24,8 @@ const UserPosts = () => {
 
   const fetchUserPosts = async (userId) => {
     try {
-      const res = await fetch(`/api/post/${userId}`, {
-        // const res = await fetch(`${urlServer}/api/post/${userId}`, {
+      // const res = await fetch(`/api/post/${userId}`, {
+      const res = await fetch(`${urlServer}/api/post/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
