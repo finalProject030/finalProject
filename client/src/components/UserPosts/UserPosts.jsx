@@ -15,7 +15,6 @@ const UserPosts = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [dropdownOpen, setDropdownOpen] = useState(null); // State to manage dropdown visibility
   const [selectedPost, setSelectedPost] = useState(null);
-  const dropdownRef = useRef(null); // Define dropdownRef using useRef
 
   useEffect(() => {
     if (currentUser) {
@@ -25,7 +24,8 @@ const UserPosts = () => {
 
   const fetchUserPosts = async (userId) => {
     try {
-      const res = await fetch(`${urlServer}/api/post/${userId}`, {
+      const res = await fetch(`/api/post/${userId}`, {
+        // const res = await fetch(`${urlServer}/api/post/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
