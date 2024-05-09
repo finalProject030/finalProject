@@ -54,6 +54,7 @@ const Feed = () => {
               userLiked,
               profilePictureURL,
               userName,
+              loading: false, // Add loading state for each post
             };
           })
         );
@@ -72,6 +73,16 @@ const Feed = () => {
 
   const handleLikePost = async (postId) => {
     try {
+      // Find the index of the post being liked
+      const postIndex = publicPosts.findIndex((post) => post._id === postId);
+
+      // Set loading state to true for the liked post
+      setPublicPosts((prevPosts) => [
+        ...prevPosts.slice(0, postIndex),
+        { ...prevPosts[postIndex], loading: true },
+        ...prevPosts.slice(postIndex + 1),
+      ]);
+
       const response = await fetch(`${urlServer}/api/post/${postId}/like`, {
         method: "POST",
         headers: {
@@ -86,7 +97,12 @@ const Feed = () => {
         setPublicPosts((prevPosts) =>
           prevPosts.map((post) =>
             post._id === postId
-              ? { ...post, likes: data.post.likes, userLiked: true }
+              ? {
+                  ...post,
+                  likes: data.post.likes,
+                  userLiked: true,
+                  loading: false,
+                }
               : post
           )
         );
@@ -100,6 +116,16 @@ const Feed = () => {
 
   const handleDislikePost = async (postId) => {
     try {
+      // Find the index of the post being disliked
+      const postIndex = publicPosts.findIndex((post) => post._id === postId);
+
+      // Set loading state to true for the disliked post
+      setPublicPosts((prevPosts) => [
+        ...prevPosts.slice(0, postIndex),
+        { ...prevPosts[postIndex], loading: true },
+        ...prevPosts.slice(postIndex + 1),
+      ]);
+
       const response = await fetch(`${urlServer}/api/post/${postId}/dislike`, {
         method: "POST",
         headers: {
@@ -114,7 +140,12 @@ const Feed = () => {
         setPublicPosts((prevPosts) =>
           prevPosts.map((post) =>
             post._id === postId
-              ? { ...post, likes: data.post.likes, userLiked: false }
+              ? {
+                  ...post,
+                  likes: data.post.likes,
+                  userLiked: false,
+                  loading: false,
+                }
               : post
           )
         );
@@ -183,7 +214,14 @@ const Feed = () => {
                   <p className="text-gray-700 mr-4 lg:mb-0 lg:mr-0">
                     {post.likes.length} Likes
                   </p>
-                  {post.userLiked ? (
+                  {post.loading ? (
+                    <button
+                      className="flex ml-3 items-center bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105 mb-2 lg:mb-0"
+                      disabled
+                    >
+                      Loading...
+                    </button>
+                  ) : post.userLiked ? (
                     <button
                       onClick={() => handleDislikePost(post._id)}
                       className="flex ml-3 items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105 mb-2 lg:mb-0"
