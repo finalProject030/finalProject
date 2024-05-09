@@ -52,7 +52,7 @@ import {
 
 
 export default function LinkedInPage(props) {
-  
+  const encodedText = encodeURIComponent(props.text);
   //%23 change # to '%23'
 
   return (
@@ -62,7 +62,7 @@ export default function LinkedInPage(props) {
         // summary="lmodsfjsjfkjdsfksdb"
         url="https://main--eclectic-boba-3095b3.netlify.app/"
       > */}
-          <a href={'https://www.linkedin.com/shareArticle?mini=true&text=' + props.text}
+          <a href={'https://www.linkedin.com/shareArticle?mini=true&text=' + encodedText}
           target="_blank">
           <LinkedinIcon />
           </a>
