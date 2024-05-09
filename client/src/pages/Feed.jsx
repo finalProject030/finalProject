@@ -36,8 +36,8 @@ const Feed = () => {
               (like) => like.user === currentUserId
             );
             const userResponse = await fetch(
-              // `${urlServer}/api/user/${post.authorId}`,
-              `/api/user/${post.author}`,
+              `${urlServer}/api/user/${post.author}`,
+              // `/api/user/${post.author}`,
 
               {
                 method: "GET",
