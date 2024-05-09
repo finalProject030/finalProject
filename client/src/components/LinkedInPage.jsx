@@ -51,41 +51,23 @@ import {
 
 
 
-
-
-
-
-
-export default function LinkedInPage() {
-  const { linkedInLogin } = useLinkedIn({
-    clientId: '86vhj2q7ukf83q',
-    redirectUri: `${window.location.origin}/linkedin`, // for Next.js, you can use `${typeof window === 'object' && window.location.origin}/linkedin`
-    onSuccess: (code) => {
-      console.log(code);
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+export default function LinkedInPage(props) {
+  
+  //%23 change # to '%23'
 
   return (
     <div>
-    {/* <img
-      onClick={linkedInLogin}
-      src={linkedin}
-      alt="Share Post in LinkedIn"
-      style={{ maxWidth: '180px', cursor: 'pointer' }}
-    /> */}
-
-
-    
-    <LinkedinShareButton
-        // title="bla"
-        summary="lmodsfjsjfkjdsfksdb"
+    {/* <LinkedinShareButton
+        text="Share"
+        // summary="lmodsfjsjfkjdsfksdb"
         url="https://main--eclectic-boba-3095b3.netlify.app/"
-      >
-        <LinkedinIcon />
-      </LinkedinShareButton>
+      > */}
+          <a href={'https://www.linkedin.com/shareArticle?mini=true&text=' + props.text}
+          target="_blank">
+          <LinkedinIcon />
+          </a>
+        
+      {/* </LinkedinShareButton> */}
       </div>
   );
 }

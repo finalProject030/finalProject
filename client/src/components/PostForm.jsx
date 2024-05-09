@@ -29,6 +29,9 @@ export default function PostCreationForm() {
   const [geminiResponse, setGeminiResponse] = useState("");
   const { currentUser, error } = useSelector((state) => state.user);
   const [finish, setFinish] = useState(false);
+  const [title, setTitle] = useState("");
+
+  const [content, setContent] = useState("");
 
   // Function to send message to Gemini
   async function sendMessageToServer() {
@@ -271,6 +274,7 @@ export default function PostCreationForm() {
   };
 
   const getInfo = (geminiResponse1) => {
+    console.log("im gminie response:\n\n" + geminiResponse1)
     let i, j;
     let title = "";
     let content = "";
@@ -296,6 +300,8 @@ export default function PostCreationForm() {
       } else title = title.substring(9, i);
     } else if (title.includes("Headline")) title = title.substring(8, i);
     content = geminiResponse1.slice(i);
+    setContent(content);
+    setTitle(title);
     return [title, content];
   };
 
@@ -450,7 +456,9 @@ export default function PostCreationForm() {
         <div>
           <button>Back Home</button>
 
-          <LinkedInPage/>
+          <LinkedInPage text={geminiResponse}/>
+          
+      
           <p>
             <br></br>
             <br></br>
