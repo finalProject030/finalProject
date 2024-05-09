@@ -211,7 +211,7 @@ const Feed = () => {
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <p className="text-gray-700 mr-4 lg:mb-0 lg:mr-0">
+                  <p className="text-gray-400 mr-4 lg:mb-0 lg:mr-0">
                     {post.likes.length} Likes
                   </p>
                   {post.loading ? (
