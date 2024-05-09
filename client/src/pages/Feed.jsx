@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { BiLike, BiDislike } from "react-icons/bi";
 import { urlServer } from "../variables";
 import LoadingSpinner from "../components/LoadingSpinner"; // Import the LoadingSpinner component
+import { format, formatDistanceToNow } from "date-fns";
 
 const Feed = () => {
   const [publicPosts, setPublicPosts] = useState([]);
@@ -25,18 +26,37 @@ const Feed = () => {
         },
       });
       const data = await response.json();
+      console.log(data);
 
       if (data.success) {
         const currentUserId = currentUser._id;
-        const postsWithUserLiked = data.posts.map((post) => {
-          const userLiked = post.likes.some(
-            (like) => like.user === currentUserId
-          );
-          return {
-            ...post,
-            userLiked,
-          };
-        });
+        const postsWithUserLiked = await Promise.all(
+          data.posts.map(async (post) => {
+            const userLiked = post.likes.some(
+              (like) => like.user === currentUserId
+            );
+            const userResponse = await fetch(
+              // `${urlServer}/api/user/${post.authorId}`,
+              `/api/user/${post.author}`,
+
+              {
+                method: "GET",
+                headers: {
+                  authorization: localStorage.getItem("token"),
+                },
+              }
+            );
+            const userData = await userResponse.json();
+            const profilePictureURL = userData.avatar; // The avatar URL is stored in the `avatar` field of user data
+            const userName = userData.username;
+            return {
+              ...post,
+              userLiked,
+              profilePictureURL,
+              userName,
+            };
+          })
+        );
 
         setPublicPosts(postsWithUserLiked);
         setLoading(false);
@@ -128,40 +148,59 @@ const Feed = () => {
         {loading && <LoadingSpinner />}
         {error && <p className="text-red-500">Error: {error}</p>}
 
-        <div className="mt-8 flex flex-wrap ">
+        <div className="mt-8 grid gap-8">
           {publicPosts.map((post) => (
             <div
               key={post._id}
-              className="bg-white rounded-lg shadow-lg p-6 mb-4 flex flex-col justify-between items-start md:items-center transition duration-300 hover:shadow-xl"
+              className="p-6 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700"
             >
-              <div className="mb-4 md:mb-0 md:pr-8 flex-grow">
-                <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-                {post.content.split("\n").map((paragraph, index) => (
-                  <p key={index} className="text-base">
-                    {paragraph}
-                  </p>
-                ))}
-                {/* Apply word-wrap to content */}
+              <div className="flex justify-between items-center mb-5 text-gray-500">
+                <span className="text-sm">
+                  {format(new Date(post.createdAt), "MMMM d, yyyy")} (
+                  {formatDistanceToNow(new Date(post.createdAt))} ago)
+                </span>
               </div>
-              <div className="flex items-center">
-                <p className="text-gray-700 mr-4">{post.likes.length} Likes</p>
-                {post.userLiked ? (
-                  <button
-                    onClick={() => handleDislikePost(post._id)}
-                    className="flex items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105"
-                  >
-                    <BiDislike className="mr-2" />
-                    Dislike
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleLikePost(post._id)}
-                    className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105"
-                  >
-                    <BiLike className="mr-2" />
-                    Like
-                  </button>
-                )}
+              <h2 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                <a>{post.title}</a>
+              </h2>
+              <div className="mb-5 font-light text-gray-500 dark:text-gray-400">
+                {post.content.split("\n").map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
+              </div>
+              <div className="flex flex-col lg:flex-row items-center lg:justify-between mb-3">
+                <div className="flex items-center mb-2 lg:mb-0">
+                  <img
+                    className="w-7 h-7 rounded-full mr-2"
+                    src={post.profilePictureURL}
+                    alt="Profile"
+                  />
+                  <span className="font-medium dark:text-white">
+                    {post.userName}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <p className="text-gray-700 mr-4 lg:mb-0 lg:mr-0">
+                    {post.likes.length} Likes
+                  </p>
+                  {post.userLiked ? (
+                    <button
+                      onClick={() => handleDislikePost(post._id)}
+                      className="flex ml-3 items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105 mb-2 lg:mb-0"
+                    >
+                      <BiDislike className="mr-2" />
+                      Dislike
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleLikePost(post._id)}
+                      className="flex ml-3 items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105 mb-2 lg:mb-0"
+                    >
+                      <BiLike className="mr-2" />
+                      Like
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

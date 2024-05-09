@@ -186,6 +186,7 @@ router.post("/", async (req, res, next) => {
   try {
     // console.log("im here!! ");
     // Extract post data from request body
+    console.log(req.body);
     const { title, content, author } = req.body;
 
     // Create a new post document

@@ -62,3 +62,24 @@ export const getUserListings = async (req, res, next) => {
     return next(errorHandler(401, "You can only view your own listings!"));
   }
 };
+
+// Controller function to fetch user data by ID
+export const getUserById = async (req, res) => {
+  const userId = req.params.id; // Get the user ID from the request parameters
+
+  try {
+    // Find the user by ID in the database
+    const user = await User.findById(userId);
+
+    if (user) {
+      // If user is found, send the user data in the response
+      res.status(200).json(user);
+    } else {
+      // If user is not found, send a 404 Not Found response
+      res.status(404).json({ success: false, message: "User not found" });
+    }
+  } catch (error) {
+    // If an error occurs during database operation, send a 500 Internal Server Error response
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
