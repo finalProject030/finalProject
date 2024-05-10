@@ -17,8 +17,8 @@ import {
   signOutUserStart,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import { urlServer } from "../variables";
+import { getDownloadURL, ref, getStorage } from "firebase/storage";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -30,6 +30,8 @@ export default function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
+  const [publicPosts, setPublicPosts] = useState([]);
+
   const dispatch = useDispatch();
 
   // firebase storage
@@ -43,6 +45,46 @@ export default function Profile() {
       handleFileUpload(file);
     }
   }, [file]);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchPublicPosts();
+    }
+  }, [currentUser]);
+
+  const fetchPublicPosts = async () => {
+    try {
+      const response = await fetch(`${urlServer}/api/post/public/postslikes`, {
+        method: "GET",
+        headers: {
+          authorization: localStorage.getItem("token"),
+        },
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        const currentUserId = currentUser._id;
+        const postsWithUserLiked = data.posts.map((post) => {
+          const userLiked = post.likes.some(
+            (like) => like.user === currentUserId
+          );
+          return {
+            ...post,
+            userLiked,
+          };
+        });
+
+        setPublicPosts(postsWithUserLiked);
+        setLoading(false);
+      } else {
+        setError(data.message);
+        setLoading(false);
+      }
+    } catch (error) {
+      setError("Error fetching public posts.");
+      setLoading(false);
+    }
+  };
 
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
@@ -140,6 +182,19 @@ export default function Profile() {
       dispatch(deleteUserSuccess(data));
     } catch (error) {
       dispatch(deleteUserFailure(data.message));
+    }
+  };
+
+  // Function to get profile picture URL
+  const getProfilePictureURL = async (userId) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `profile_pictures/${userId}.jpg`);
+    try {
+      const url = await getDownloadURL(storageRef);
+      return url;
+    } catch (error) {
+      console.error("Error getting profile picture URL:", error);
+      return null;
     }
   };
 
