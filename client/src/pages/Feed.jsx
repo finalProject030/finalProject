@@ -224,18 +224,16 @@ const Feed = () => {
                   ) : post.userLiked ? (
                     <button
                       onClick={() => handleDislikePost(post._id)}
-                      className="flex ml-3 items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105 mb-2 lg:mb-0"
+                      className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                     >
-                      <BiDislike className="mr-2" />
-                      Dislike
+                      <BiDislike className="" />
                     </button>
                   ) : (
                     <button
                       onClick={() => handleLikePost(post._id)}
-                      className="flex ml-3 items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105 mb-2 lg:mb-0"
+                      className="text-white bg-gradient-to-r mt-4 from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                     >
-                      <BiLike className="mr-2" />
-                      Like
+                      <BiLike className="" />
                     </button>
                   )}
                 </div>

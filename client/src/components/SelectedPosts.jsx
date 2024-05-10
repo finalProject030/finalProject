@@ -55,21 +55,24 @@ export default function SelectedPosts() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="bg-cover bg-no-repeat bg-center flex flex-col my-20 justify-center items-center space-y-6 w-full px-4">
       {step === "selectedPosts" && (
         <>
           <h2 className="text-2xl font-bold mb-4">Selected Posts Component:</h2>
           {Object.entries(selectedItems).map(([questionId, item]) => (
             <div
               key={questionId}
-              className="mb-8 bg-gray-100 rounded-lg p-4 border border-gray-300"
+              className="mb-8 bg-gray-100 overflow-auto rounded-lg p-4 border border-gray-300 break-words w-full md:w-auto"
             >
               <h3 className="text-xl font-semibold mb-2">
                 Question ID: {questionId}
               </h3>
               <div className="mb-4">
                 <h4 className="text-lg font-semibold mb-2">Question Body:</h4>
-                <div dangerouslySetInnerHTML={{ __html: item.body }} />
+                <div
+                  className="text-wrap"
+                  dangerouslySetInnerHTML={{ __html: item.body }}
+                />
               </div>
               <div>
                 <h4 className="text-lg font-semibold mb-2">
@@ -82,16 +85,18 @@ export default function SelectedPosts() {
                       .map((acceptedAnswer, index) => (
                         <li
                           key={acceptedAnswer.answer_id}
-                          className="mb-2 bg-gray-200 rounded p-2"
+                          className="mb-2 bg-gray-200 rounded p-2 break-words overflow-auto"
                         >
-                          <strong className="text-green-600">Accepted:</strong>{" "}
+                          <strong className="text-green-600 break-words">
+                            Accepted:
+                          </strong>{" "}
                           Yes
                           <br />
-                          <strong className="text-lg font-semibold">
+                          <strong className="text-lg font-semibold break-words">
                             Answer {index + 1}:
                           </strong>
                           <div
-                            className="ml-4"
+                            className="ml-4 word-wrap break-word text-wrap break-words"
                             dangerouslySetInnerHTML={{
                               __html: acceptedAnswer.body,
                             }}
@@ -102,7 +107,7 @@ export default function SelectedPosts() {
               </div>
               <button
                 onClick={() => unselectItem(questionId)}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                className="mt-4 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
               >
                 Unselect
               </button>
@@ -110,14 +115,14 @@ export default function SelectedPosts() {
           ))}
           <button
             onClick={moveToPostsPage}
-            className="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="mt-4 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
           >
             Move back
           </button>
           {Object.keys(selectedItems).length > 0 && (
             <button
               onClick={moveToFormPage}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="text-white bg-gradient-to-r mt-4 from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
             >
               Move to the next step
             </button>
