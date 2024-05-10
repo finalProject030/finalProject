@@ -18,7 +18,6 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { urlServer } from "../variables";
-import { getDownloadURL, ref, getStorage } from "firebase/storage";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -31,6 +30,8 @@ export default function Profile() {
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
   const [publicPosts, setPublicPosts] = useState([]);
+  const [error1, setError] = useState(null);
+  const [loading1, setLoading] = useState(null);
 
   const dispatch = useDispatch();
 
