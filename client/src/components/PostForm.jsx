@@ -11,6 +11,7 @@ import PuffLoader from "react-spinners/PuffLoader";
 import LinkedInSharePost from "./SharePost/LinkedInSharePost";
 import FacebookSharePost from "./SharePost/FacebookSharePost";
 import XSharePost from "./SharePost/XSharePost";
+import RedditSharePost from "./SharePost/RedditSharePost";
 
 
 
@@ -461,6 +462,7 @@ export default function PostCreationForm() {
           <LinkedInSharePost text={geminiResponse}/>
           <FacebookSharePost text={geminiResponse}/>
           <XSharePost text={geminiResponse}/>
+          <RedditSharePost text={geminiResponse}/>
 
           <p>
             <br></br>
