@@ -6,11 +6,9 @@ import { useRecoilState } from "recoil";
 import { recoilSelectedPosts, recoilSelectedStep } from "../recoil/state";
 import SelectedPosts from "../components/SelectedPosts";
 import Toolbar from "../components/Toolbar";
-import axios from 'axios';
-import Swal from 'sweetalert2'
-
-
-
+import axios from "axios";
+import Swal from "sweetalert2";
+import { BsSearch } from "react-icons/bs";
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -20,9 +18,6 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
     />
   );
 };
-
-
-
 
 const Posts = () => {
   const [tagged, setTagged] = useState(""); // Default tag
@@ -38,7 +33,6 @@ const Posts = () => {
   const [showTheNextStep, setShowTheNextStep] = useState(false);
   const [questionsData, setQuestionsData] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
-
 
   const handleToggleComponent = () => {
     setShowTheNextStep(true);
@@ -88,7 +82,7 @@ const Posts = () => {
           title: "You reach the limit of the content.",
           icon: "warning",
           confirmButtonColor: "#3085d6",
-          confirmButtonText: "Confirm"
+          confirmButtonText: "Confirm",
         });
         return;
       }
@@ -103,8 +97,7 @@ const Posts = () => {
             api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
           // filter=!nNPvSNPI3D
 
-          axios.get(api)
-          .then((response) => {
+          axios.get(api).then((response) => {
             setQuestionsData(response.data);
             if (questionsData.items) {
               // Show 10 questions
@@ -120,12 +113,9 @@ const Posts = () => {
               } else questions.push(...randomQuestions);
             }
           });
-
-
         } catch (error) {
           console.error("Error fetching data:", error);
         }
-
       } else {
         console.log(addNumber + "ds");
         if (questionsData.items) {
@@ -143,6 +133,11 @@ const Posts = () => {
     }
   };
 
+  const toggleFilters = () => {
+    const filtersBody = document.getElementById("accordion-collapse-body-4");
+    filtersBody.classList.toggle("hidden");
+  };
+
   const fetchAnswers = async (questions) => {
     if (questions.length > 0) {
       try {
@@ -154,8 +149,7 @@ const Posts = () => {
           else
             api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
           let data;
-          await axios.get(api)
-          .then((response) => {
+          await axios.get(api).then((response) => {
             data = response.data.items;
           });
           return { questionId: question.question_id, answers: data };
@@ -172,14 +166,12 @@ const Posts = () => {
     }
   };
 
-
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
       ...prev,
       [questionId]: !prev[questionId],
     }));
   };
-
 
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
@@ -188,11 +180,9 @@ const Posts = () => {
     }));
   };
 
-
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
-
 
   const handleFormSubmit = (e) => {
     setQuestions([]);
@@ -204,7 +194,6 @@ const Posts = () => {
     e.preventDefault();
     setaddNumber(1);
   };
-
 
   const handleChange = (questionId) => {
     console.log(checkedItems);
@@ -229,7 +218,7 @@ const Posts = () => {
             title: "You can only select up to 4 items.",
             icon: "warning",
             confirmButtonColor: "#3085d6",
-            confirmButtonText: "Confirm"
+            confirmButtonText: "Confirm",
           });
           return updatedItems; // Exit early if max limit reached
         }
@@ -238,27 +227,22 @@ const Posts = () => {
     });
   };
 
-
   useEffect(() => {
     // This block will run after the component has rendered and whenever checkedItems has been updated
     setSelectedItems(checkedItems);
   }, [checkedItems]);
 
-
   useEffect(() => {
     // This block will run whenever selectedItems has been updated
   }, [selectedItems]);
-
 
   useEffect(() => {
     fetchQuestions();
   }, [questionsData]);
 
-
   useEffect(() => {
     // pageNumber++;
   }, [pageNumber]);
-
 
   useEffect(() => {
     if (addNumber === 1) {
@@ -267,58 +251,128 @@ const Posts = () => {
     }
   }, [addNumber]);
 
-
-
-
   return (
-    <div className="flex">
-      {" "}
-      {/* Set the height of the parent container */}
+    <div className="flex flex-col  mt-6 mb-4">
       <Toolbar currentStep={step} />
       {step === "posts" ? (
-        <div className="container mx-auto p-4">
-          <h1 className="text-3xl font-bold mb-4">
-            Stack Overflow Questions Tagged with {tagged}
-          </h1>
-          <form className="mb-4" onSubmit={handleFormSubmit}>
-            <label className="mr-2">
-              Enter Subject:
-              <input
-                type="text"
-                value={tagged}
-                onChange={handleTagChange}
-                className="border p-2"
-              />
-            </label>
-            <button type="submit" className="bg-blue-500 text-white p-2">
-              Search
-            </button>
-            {Object.keys(checkedItems).length > 0 && (
-              <button
-                type="button"
-                className="bg-blue-500 text-white p-2 m-5"
-                onClick={handleToggleComponent}
-              >
-                Move to the next step
-              </button>
-            )}
-            <div>
-              <h1>
-                {" "}
-                Filters <LuFilter />{" "}
-              </h1>
-              <Select
-                defaultValue={filterQuestionsList[0]}
-                options={filterQuestionsList}
-                onChange={(e) => setSort(e.value)}
-              />
-              <Select
-                defaultValue={orderQuestionsList[0]}
-                options={orderQuestionsList}
-                onChange={(e) => setOrder(e.value)}
-              />
+        <div className="container mx-auto px-4">
+          <div>
+            <h1 className="text-center text-3xl font-bold mb-4 mt-8">
+              Stack Overflow Questions Tagged with {tagged}
+            </h1>
+            <div className="mb-4">
+              <p className="text-center text-gray-200 dark:text-gray-300">
+                Welcome to the Stack Overflow Question Explorer!
+              </p>
+              <p className="text-left rtl:text-right text-gray-200 dark:text-gray-300">
+                Enter the subject you're interested in, and we'll show you the
+                10 most popular questions and their answers from Stack Overflow.
+              </p>
+              <p className="text-left rtl:text-right text-gray-200 dark:text-gray-300">
+                After reviewing the questions, you can select up to 4 of them to
+                create a professional post for publishing on your blog or other
+                digital platforms.
+              </p>
             </div>
-          </form>
+          </div>
+          <div>
+            <form
+              className="flex flex-col mb-4 max-w-screen-lg "
+              onSubmit={handleFormSubmit}
+            >
+              <label className="mb-2 text-lg font-semibold">
+                Enter Subject:
+              </label>
+              <div className="flex items-center">
+                <div className="relative flex-grow">
+                  <input
+                    type="text"
+                    value={tagged}
+                    onChange={handleTagChange}
+                    className="w-full border rounded-l px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200 ease-in-out"
+                    placeholder="Search"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute top-0 right-0  text-black rounded-r px-4 py-3 transition duration-300 ease-in-out focus:outline-none"
+                  >
+                    <BsSearch />
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div
+              id="accordion-collapse"
+              data-accordion="collapse"
+              className="mb-10 flex flex-col max-w-screen-lg "
+            >
+              <h2 id="accordion-collapse-heading-4">
+                <button
+                  type="button"
+                  className="flex items-center  justify-between w-full p-5 font-medium rtl:text-right text-gray-500 bg-gray-100 border  border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-400 dark:border-gray-300 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-200 gap-3 mb-4"
+                  data-accordion-target="#accordion-collapse-body-4"
+                  aria-expanded="false"
+                  aria-controls="accordion-collapse-body-4"
+                  onClick={toggleFilters}
+                >
+                  <span>Filters</span>
+                  <svg
+                    data-accordion-icon
+                    className="w-3 h-3 rotate-180 shrink-0"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 5 5 1 1 5"
+                    />
+                  </svg>
+                </button>
+              </h2>
+              <div
+                id="accordion-collapse-body-4"
+                className="hidden"
+                aria-labelledby="accordion-collapse-heading-4"
+              >
+                <div className="p-5  text-gray-500 bg-gray-100 border  border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-400 dark:border-gray-300 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-200 gap-3">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block">Sort By:</label>
+                      <Select
+                        defaultValue={filterQuestionsList[0]}
+                        options={filterQuestionsList}
+                        onChange={(e) => setSort(e.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block">Order:</label>
+                      <Select
+                        defaultValue={orderQuestionsList[0]}
+                        options={orderQuestionsList}
+                        onChange={(e) => setOrder(e.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {Object.keys(checkedItems).length > 0 && (
+                <button
+                  type="button"
+                  className="text-white bg-gradient-to-r mt-4 from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                  onClick={handleToggleComponent}
+                >
+                  Move to the next step
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-4">
             {questions.map((question) => (
               <div
@@ -373,13 +427,13 @@ const Posts = () => {
           {search && questions.length >= 10 && (
             <div className="nextPageLink">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="mt-4 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                 type="button"
                 onClick={() => {
                   fetchQuestions();
                 }}
               >
-                Show 10 more results
+                Display 10 additional results{" "}
               </button>
             </div>
           )}
