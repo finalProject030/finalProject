@@ -6,11 +6,8 @@ import { useRecoilState } from "recoil";
 import { recoilSelectedPosts, recoilSelectedStep } from "../recoil/state";
 import SelectedPosts from "../components/SelectedPosts";
 import Toolbar from "../components/Toolbar";
-import axios from 'axios';
-import Swal from 'sweetalert2'
-
-
-
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -20,9 +17,6 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
     />
   );
 };
-
-
-
 
 const Posts = () => {
   const [tagged, setTagged] = useState(""); // Default tag
@@ -38,7 +32,6 @@ const Posts = () => {
   const [showTheNextStep, setShowTheNextStep] = useState(false);
   const [questionsData, setQuestionsData] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
-
 
   const handleToggleComponent = () => {
     setShowTheNextStep(true);
@@ -88,7 +81,7 @@ const Posts = () => {
           title: "You reach the limit of the content.",
           icon: "warning",
           confirmButtonColor: "#3085d6",
-          confirmButtonText: "Confirm"
+          confirmButtonText: "Confirm",
         });
         return;
       }
@@ -103,8 +96,7 @@ const Posts = () => {
             api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
           // filter=!nNPvSNPI3D
 
-          axios.get(api)
-          .then((response) => {
+          axios.get(api).then((response) => {
             setQuestionsData(response.data);
             if (questionsData.items) {
               // Show 10 questions
@@ -120,12 +112,9 @@ const Posts = () => {
               } else questions.push(...randomQuestions);
             }
           });
-
-
         } catch (error) {
           console.error("Error fetching data:", error);
         }
-
       } else {
         console.log(addNumber + "ds");
         if (questionsData.items) {
@@ -154,8 +143,7 @@ const Posts = () => {
           else
             api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
           let data;
-          await axios.get(api)
-          .then((response) => {
+          await axios.get(api).then((response) => {
             data = response.data.items;
           });
           return { questionId: question.question_id, answers: data };
@@ -172,14 +160,12 @@ const Posts = () => {
     }
   };
 
-
   const toggleQuestion = (questionId) => {
     setExpandedQuestions((prev) => ({
       ...prev,
       [questionId]: !prev[questionId],
     }));
   };
-
 
   const toggleAnswers = (questionId) => {
     setExpandedAnswers((prev) => ({
@@ -188,11 +174,9 @@ const Posts = () => {
     }));
   };
 
-
   const handleTagChange = (e) => {
     setTagged(e.target.value);
   };
-
 
   const handleFormSubmit = (e) => {
     setQuestions([]);
@@ -204,7 +188,6 @@ const Posts = () => {
     e.preventDefault();
     setaddNumber(1);
   };
-
 
   const handleChange = (questionId) => {
     console.log(checkedItems);
@@ -229,7 +212,7 @@ const Posts = () => {
             title: "You can only select up to 4 items.",
             icon: "warning",
             confirmButtonColor: "#3085d6",
-            confirmButtonText: "Confirm"
+            confirmButtonText: "Confirm",
           });
           return updatedItems; // Exit early if max limit reached
         }
@@ -238,27 +221,22 @@ const Posts = () => {
     });
   };
 
-
   useEffect(() => {
     // This block will run after the component has rendered and whenever checkedItems has been updated
     setSelectedItems(checkedItems);
   }, [checkedItems]);
 
-
   useEffect(() => {
     // This block will run whenever selectedItems has been updated
   }, [selectedItems]);
-
 
   useEffect(() => {
     fetchQuestions();
   }, [questionsData]);
 
-
   useEffect(() => {
     // pageNumber++;
   }, [pageNumber]);
-
 
   useEffect(() => {
     if (addNumber === 1) {
@@ -267,12 +245,8 @@ const Posts = () => {
     }
   }, [addNumber]);
 
-
-
-
   return (
-    <div className="flex">
-      {" "}
+    <div className="flex flex-col mt-6 my-9">
       {/* Set the height of the parent container */}
       <Toolbar currentStep={step} />
       {step === "posts" ? (
