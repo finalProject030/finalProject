@@ -53,15 +53,11 @@ export default function FacebookSharePost(props) {
   const encodedText = encodeURIComponent(props.text);
 
   return (
-    <div>
-    <FacebookShareButton
-        hashtag="moshekadosh"	
-        text="Share"
-        url="https://main--eclectic-boba-3095b3.netlify.app/"
-      >
-          <FacebookIcon />
-      </FacebookShareButton	>
-      </div>
-      
+    <a href={'https://www.facebook.com/share_channel?mini=true&text=blabla' + encodedText}
+    target="_blank">
+      <button>
+      <FacebookIcon />
+      </button>
+    </a>
   );
 }
