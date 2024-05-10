@@ -8,7 +8,9 @@ import copy from "copy-to-clipboard";
 import { urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
 // import LinkedInPage from "./LinkedInPage";
-import LinkedInPage from "./LinkedInPage";
+import LinkedInSharePost from "./SharePost/LinkedInSharePost";
+import FacebookSharePost from "./SharePost/FacebookSharePost";
+import XSharePost from "./SharePost/XSharePost";
 
 
 
@@ -456,9 +458,10 @@ export default function PostCreationForm() {
         <div>
           <button>Back Home</button>
 
-          <LinkedInPage text={geminiResponse}/>
-          
-      
+          <LinkedInSharePost text={geminiResponse}/>
+          <FacebookSharePost text={geminiResponse}/>
+          <XSharePost text={geminiResponse}/>
+
           <p>
             <br></br>
             <br></br>

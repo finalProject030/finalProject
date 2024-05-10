@@ -10,9 +10,6 @@ import TwitterIcon from "../../assets/Twitter.png";
 import SocialAIIcon from "../../assets/SocialAi.png";
 import { Link } from "react-router-dom";
 import "./About.css"; // Import CSS file for animations
-import LinkedInPage from "../components/LinkedInPage";
-
-
 
 
 const About = () => {
@@ -169,14 +166,6 @@ const About = () => {
           Sign In
         </Link>
       </div>
-
-      <LinkedInPage/>
-
-
-
-
-
-
     </div>
   );
 };
