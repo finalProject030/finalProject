@@ -281,7 +281,7 @@ const Posts = () => {
               onSubmit={handleFormSubmit}
             >
               <label className="mb-2 text-lg font-semibold">
-                Enter Subject:
+                Enter Subject:*
               </label>
               <div className="flex items-center">
                 <div className="relative flex-grow">

@@ -28,6 +28,7 @@ export default function OAuth() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              authorization: localStorage.getItem("token"),
             },
             body: JSON.stringify({
               name: result.user.displayName,

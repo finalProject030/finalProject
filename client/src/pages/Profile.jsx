@@ -186,19 +186,6 @@ export default function Profile() {
     }
   };
 
-  // Function to get profile picture URL
-  const getProfilePictureURL = async (userId) => {
-    const storage = getStorage();
-    const storageRef = ref(storage, `profile_pictures/${userId}.jpg`);
-    try {
-      const url = await getDownloadURL(storageRef);
-      return url;
-    } catch (error) {
-      console.error("Error getting profile picture URL:", error);
-      return null;
-    }
-  };
-
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
