@@ -13,10 +13,6 @@ import FacebookSharePost from "./SharePost/FacebookSharePost";
 import XSharePost from "./SharePost/XSharePost";
 import RedditSharePost from "./SharePost/RedditSharePost";
 
-
-
-
-
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
@@ -42,7 +38,7 @@ export default function PostCreationForm() {
     try {
       const valueToSend = generateJsonInstructions();
       console.log(valueToSend);
-      const response = await fetch(`/api/gemini`, {
+      const response = await fetch(`${urlServer}/api/gemini`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -166,7 +162,7 @@ export default function PostCreationForm() {
   };
 
   const savePost = (title, content) => {
-    fetch(`/api/post`, {
+    fetch(`${urlServer}/api/post`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -277,7 +273,7 @@ export default function PostCreationForm() {
   };
 
   const getInfo = (geminiResponse1) => {
-    console.log("im gminie response:\n\n" + geminiResponse1)
+    console.log("im gminie response:\n\n" + geminiResponse1);
     let i, j;
     let title = "";
     let content = "";
@@ -459,10 +455,10 @@ export default function PostCreationForm() {
         <div>
           <button>Back Home</button>
 
-          <LinkedInSharePost text={geminiResponse}/>
-          <FacebookSharePost text={geminiResponse}/>
-          <XSharePost text={geminiResponse}/>
-          <RedditSharePost text={geminiResponse}/>
+          <LinkedInSharePost text={geminiResponse} />
+          <FacebookSharePost text={geminiResponse} />
+          <XSharePost text={geminiResponse} />
+          <RedditSharePost text={geminiResponse} />
 
           <p>
             <br></br>

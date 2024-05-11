@@ -24,11 +24,11 @@ export default function OAuth() {
 
         if (result && result.user) {
           // User successfully signed in
-          const res = await fetch(`{/api/auth/google`, {
+          const res = await fetch(`{${urlServer}/api/auth/google`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              authorization: localStorage.getItem("token"),
+              // authorization: localStorage.getItem("token"),
             },
             body: JSON.stringify({
               name: result.user.displayName,
