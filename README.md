@@ -28,6 +28,7 @@ A site for creation automatic of professional content, Based on StackOverflow.co
 
 <img src="https://github.com/finalProject030/finalProject/assets/126160304/2f4382e6-756e-4e2e-8696-14a581c05a88" height="30" width="30">&nbsp;&nbsp;&nbsp;MongoDB is the data base. <br><br><br><br>
 
+<img src="https://github.com/finalProject030/finalProject/assets/126160304/1783b2d4-a3dd-4a7b-994e-6e31e846cd9d" height="30" width="30">&nbsp;&nbsp;&nbsp;MongoDB is the data base. <br><br><br><br>
 
  
 ## *🚀 Forking and Running the Project*:
