@@ -26,9 +26,9 @@ A site for creation automatic of professional content, Based on StackOverflow.co
 
 <img src="https://github.com/finalProject030/finalProject/assets/126160304/9eb4b3c2-8676-49cb-8756-8c15677ae3a6" height="30" width="30">&nbsp;&nbsp;&nbsp;Custom VSCode settings have been set up for a consistent development environment.<br><br>
 
-<img src="https://github.com/finalProject030/finalProject/assets/126160304/2f4382e6-756e-4e2e-8696-14a581c05a88" height="30" width="30">&nbsp;&nbsp;&nbsp;MongoDB is the data base. <br><br><br><br>
+<img src="https://github.com/finalProject030/finalProject/assets/126160304/2f4382e6-756e-4e2e-8696-14a581c05a88" height="30" width="30">&nbsp;&nbsp;&nbsp;MongoDB is the data base. <br><br>
 
-<img src="https://github.com/finalProject030/finalProject/assets/126160304/1783b2d4-a3dd-4a7b-994e-6e31e846cd9d" height="30" width="30">&nbsp;&nbsp;&nbsp;MongoDB is the data base. <br><br><br><br>
+<img src="https://github.com/finalProject030/finalProject/assets/126160304/1783b2d4-a3dd-4a7b-994e-6e31e846cd9d" height="30" width="30">&nbsp;&nbsp;&nbsp;Firebase is the user authentication. <br><br><br><br>
 
  
 ## *🚀 Forking and Running the Project*:
@@ -50,8 +50,9 @@ The first one contain the mongoDB api key and the JWT secret- its should be loca
 The second one sould be located inside the client folder and it should contain the VITE_FIREBASE_API_KEY <br><br><br><br>
 
 ## *Logo*:
-<img src="https://github.com/finalProject030/finalProject/assets/126160304/f5e27809-5b9c-4a86-97d3-8535afed1f26" height="150" width="200">
+<img src="https://github.com/finalProject030/finalProject/assets/126160304/8d609636-8f48-47c6-99fc-825cd9b47d9e" height="50" width="300">
 <br><br><br><br>
+
 
 
 
