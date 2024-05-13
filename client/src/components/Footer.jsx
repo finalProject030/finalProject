@@ -1,4 +1,6 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { scrollToTop } from "../variables";
 
 const Footer = () => {
   return (
@@ -11,9 +13,13 @@ const Footer = () => {
             </h2>
             <ul className="text-gray-500 dark:text-gray-400 font-medium">
               <li className="mb-4">
-                <a href="#" className=" hover:underline">
+                <Link
+                  to="/about"
+                  className="hover:underline"
+                  onClick={scrollToTop}
+                >
                   About
-                </a>
+                </Link>
               </li>
               <li className="mb-4">
                 <a href="#" className="hover:underline">
@@ -48,7 +54,10 @@ const Footer = () => {
                 </a>
               </li>
               <li className="mb-4">
-                <a href="#" className="hover:underline">
+                <a
+                  href="https://www.facebook.com/profile.php?id=61559832923214"
+                  className="hover:underline"
+                >
                   Facebook
                 </a>
               </li>

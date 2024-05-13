@@ -1,6 +1,7 @@
 import React from "react";
 import backgroundVideo from "../../backgroundVideo1.mp4";
 import { Link } from "react-router-dom";
+import { scrollToTop } from "../variables";
 
 const Home = () => {
   return (
@@ -14,6 +15,7 @@ const Home = () => {
           autoPlay
           loop
           muted
+          playsInline
           className="w-full h-full object-cover"
           id="video"
         >
@@ -31,7 +33,7 @@ const Home = () => {
           Discover amazing content, connect with our community, and stay up to
           date with the latest trends.
         </p>
-        <Link to="/about">
+        <Link to="/about" onClick={scrollToTop}>
           <button className="bg-white text-blue-600 hover:bg-blue-100 hover:text-blue-600 font-semibold py-3 px-8 mb-8 rounded-full transition duration-300">
             Learn More
           </button>

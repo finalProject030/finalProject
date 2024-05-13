@@ -19,23 +19,24 @@ export default function Header() {
   };
 
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900">
+    <nav id="topPage" className="bg-white border-gray-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <Link
           to="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
-          <img 
-          src={logo} 
-          alt="STACK TEXTPRO" 
-          style={{
-            width:"25px",
-            height:"25px"
-          }}/>
-          
+          <img
+            src={logo}
+            alt="STACK TEXTPRO"
+            style={{
+              width: "25px",
+              height: "25px",
+            }}
+          />
+
           <h1 className="font-bold text-2xl flex-wrap">
             <span className="text-slate-500">STACK</span>
-            <span className="text-slate-700">  TEXTPRO</span>
+            <span className="text-slate-700"> TEXTPRO</span>
           </h1>
         </Link>
         <button

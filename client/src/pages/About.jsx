@@ -10,7 +10,7 @@ import TwitterIcon from "../../assets/Twitter.png";
 import SocialAIIcon from "../../assets/SocialAi.png";
 import { Link } from "react-router-dom";
 import "./About.css"; // Import CSS file for animations
-
+import { scrollToTop } from "../variables";
 
 const About = () => {
   return (
@@ -155,6 +155,7 @@ const About = () => {
         <Link
           to="/sign-up"
           className="inline-block bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out mr-4"
+          onClick={scrollToTop}
         >
           Sign Up Now
         </Link>
@@ -162,6 +163,7 @@ const About = () => {
         <Link
           to="/sign-in"
           className="inline-block bg-gray-600 text-white py-3 px-8 rounded-lg hover:bg-gray-700 transition duration-300 ease-in-out"
+          onClick={scrollToTop}
         >
           Sign In
         </Link>

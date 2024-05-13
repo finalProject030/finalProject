@@ -3,10 +3,7 @@ import React from "react";
 const Review = ({ imageSrc, title, content }) => {
   return (
     <div className="flex flex-col lg:flex-row items-stretch mb-8 md:flex-1">
-      <a
-        href="#"
-        className="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-full hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-      >
+      <a className="flex flex-col items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row md:max-w-full hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
         <div className="w-48 md:w-72">
           {/* Set fixed width and maximum height for the image container */}
           <img
