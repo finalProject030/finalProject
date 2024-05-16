@@ -38,6 +38,7 @@ export default function OAuth() {
           });
           const data = await res.json();
           dispatch(signInSuccess(data));
+          localStorage.setItem("token", data.token);
           navigate("/");
         } else {
           // No user signed in, or sign-in failed
