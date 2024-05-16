@@ -14,13 +14,14 @@ import { urlServer } from "../variables";
 export default function OAuth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const googleAuthProvider = new GoogleAuthProvider();
 
   useEffect(() => {
     // Handle the redirect result when the component mounts
     const handleRedirectResult = async () => {
       try {
         const auth = getAuth(app);
-        const result = await getRedirectResult(auth);
+        const result = await getRedirectResult(auth, googleAuthProvider);
 
         console.log(auth);
 
