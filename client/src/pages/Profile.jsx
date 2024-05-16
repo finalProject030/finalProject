@@ -18,6 +18,7 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { urlServer } from "../variables";
+import { signOut, getAuth } from "firebase/auth";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -168,6 +169,8 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     try {
+      const auth = getAuth();
+      signOut(auth);
       dispatch(signOutUserStart());
       localStorage.removeItem("token");
       const res = await fetch(`${urlServer}/api/auth/signout`, {
