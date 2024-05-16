@@ -21,7 +21,8 @@ export default function OAuth() {
       try {
         const auth = getAuth(app);
         const result = await getRedirectResult(auth);
-        console.log(result);
+
+        console.log(auth);
 
         if (result && result.user) {
           // User successfully signed in
