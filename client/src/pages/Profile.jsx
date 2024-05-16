@@ -170,7 +170,7 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       const auth = getAuth();
-      signOut(auth);
+      await signOut(auth);
       dispatch(signOutUserStart());
       localStorage.removeItem("token");
       const res = await fetch(`${urlServer}/api/auth/signout`, {
