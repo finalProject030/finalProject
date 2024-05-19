@@ -8,6 +8,7 @@ import copy from "copy-to-clipboard";
 import { urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
 import SocialMediaShare from "./SocialMediaShare";
+import 'line-awesome/dist/line-awesome/css/line-awesome.min.css';
 
 
 
@@ -230,15 +231,16 @@ export default function PostCreationForm() {
   const showGeminiResponse = (geminiResponseString) => {
     const [title, content] = getInfo(geminiResponseString);
     const htmlContent = content.replace(/\n/g, "<br>");
-
+    // const socialMedia = SocialIcon;
     Swal.fire({
       title: title,
       html: htmlContent,
       showDenyButton: true,
       showCancelButton: true,
-      confirmButtonText: "Copy to clipboard",
-      denyButtonText: "Generate new Post",
-      cancelButtonText: "Save Post",
+      confirmButtonText: "<i class='las la-copy'></i> Copy to clipboard",
+      denyButtonText: "<i class='las la-magic'></i> Generate new Post",
+      cancelButtonText: "<i class='las la-save'></i> Save Post",
+      footer: "<SocialIcon />", // Use the SocialIcon component directly within JSX
       showLoaderOnDeny: true,
       showCloseButton: true,
       allowEnterKey: false,
