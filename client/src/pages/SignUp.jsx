@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { urlServer } from "../variables";
 import Facebook from "../components/Facebook";
+import passwordValidator from "password-validator";
 
 export default function signUp() {
   const [formData, setFormData] = useState({});
@@ -19,6 +20,25 @@ export default function signUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const schema = new passwordValidator();
+    schema
+      .is()
+      .min(8)
+      .has()
+      .uppercase()
+      .has()
+      .lowercase()
+      .has()
+      .digits()
+      .oneOf(["Passw0rd", "Password123"]);
+
+    if (!schema.validate(formData.password)) {
+      setError(
+        "Password is not strong enough. It should contain at least 8 characters, including uppercase and lowercase letters, numbers, and special symbols. Avoid using common passwords like 'Passw0rd' or 'Password123'."
+      );
+      return;
+    }
 
     try {
       setLoading(true);
