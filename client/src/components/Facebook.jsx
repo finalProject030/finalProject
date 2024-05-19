@@ -10,19 +10,19 @@ const Facebook = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Handle the redirect result when the component mounts
-    const handleRedirectResult = async () => {
-      try {
-        const auth = getAuth(app);
-        // You don't need to handle redirect result here if you're using popup authentication
-      } catch (error) {
-        console.error("Error handling redirect result:", error);
-      }
-    };
+  //   useEffect(() => {
+  //     // Handle the redirect result when the component mounts
+  //     const handleRedirectResult = async () => {
+  //       try {
+  //         const auth = getAuth(app);
+  //         // You don't need to handle redirect result here if you're using popup authentication
+  //       } catch (error) {
+  //         console.error("Error handling redirect result:", error);
+  //       }
+  //     };
 
-    handleRedirectResult(); // Call the function to handle redirect result
-  }, []); // Run this effect only once when the component mounts
+  //     handleRedirectResult(); // Call the function to handle redirect result
+  //   }, []); // Run this effect only once when the component mounts
 
   const handleFacebookClick = async () => {
     const provider = new FacebookAuthProvider();
