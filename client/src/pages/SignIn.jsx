@@ -76,11 +76,16 @@ export default function SignIn() {
           <OAuth />
           <Facebook />
         </form>
-        <div className="flex gap-2 mt-5">
-          <p>Don't have an account?</p>
-          <Link to={"/sign-up"}>
-            <span className="text-blue-700">Sign up</span>
+        <div className="flex justify-between items-center mt-5">
+          <Link to={"/forgot-password"}>
+            <span className="text-blue-700">Forgot Password?</span>
           </Link>
+          <div className="flex gap-2">
+            <p>Don't have an account?</p>
+            <Link to={"/sign-up"}>
+              <span className="text-blue-700">Sign up</span>
+            </Link>
+          </div>
         </div>
         {error && <p className="text-red-500 mt-5">{error}</p>}
       </div>

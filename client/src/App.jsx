@@ -13,6 +13,7 @@ import UserPosts from "./components/UserPosts/UserPosts";
 import Footer from "./components/Footer";
 import Feed from "./pages/Feed";
 import PostPage from "./pages/PostPage";
+import ForgotPassword from "./components/ForgotPassword";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<Chatbot message="8+10?" />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
