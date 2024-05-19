@@ -8,6 +8,7 @@ import {
 } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
 import { urlServer } from "../variables";
+import Facebook from "../components/Facebook";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -73,6 +74,7 @@ export default function SignIn() {
             {loading ? "Loading..." : "Sign In"}
           </button>
           <OAuth />
+          <Facebook />
         </form>
         <div className="flex gap-2 mt-5">
           <p>Don't have an account?</p>

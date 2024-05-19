@@ -81,6 +81,43 @@ export const google = async (req, res, next) => {
   }
 };
 
+export const facebook = async (req, res, next) => {
+  try {
+    const { name, email, photo } = req.body;
+
+    // Check if the user already exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // If the user doesn't exist, create a new user
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      user = new User({
+        username:
+          name.split(" ").join("").toLowerCase() +
+          Math.random().toString(36).slice(-4),
+        email,
+        password: hashedPassword,
+        avatar: photo,
+      });
+      await user.save();
+    }
+
+    // Sign a JWT token for the user
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+    // Send the user data along with the token in the response
+    const { password: pass, ...rest } = user._doc;
+    rest["token"] = token;
+
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const signOut = async (req, res, next) => {
   try {
     // res.clearCookie("access_token");

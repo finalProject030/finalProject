@@ -22,8 +22,6 @@ export default function OAuth() {
         const auth = getAuth(app);
         const result = await getRedirectResult(auth);
 
-        console.log(auth);
-
         if (result && result.user) {
           // User successfully signed in
           const res = await fetch(`${urlServer}/api/auth/google`, {
