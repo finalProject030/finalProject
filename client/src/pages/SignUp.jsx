@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 import { urlServer } from "../variables";
+import Facebook from "../components/Facebook";
 
 export default function signUp() {
   const [formData, setFormData] = useState({});
@@ -74,6 +75,7 @@ export default function signUp() {
           {loading ? "Loading..." : "Sign Up"}
         </button>
         <OAuth />
+        <Facebook />
       </form>
       <div className=" flex gap-2 mt-5">
         <p>Have an account?</p>
