@@ -33,7 +33,7 @@ const Facebook = () => {
       const user = result.user;
 
       // Call your backend API with user data
-      const res = await fetch(`http://localhost:3000/api/auth/facebook`, {
+      const res = await fetch(`${urlServer}/api/auth/facebook`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
