@@ -20,7 +20,7 @@ export default function OAuth() {
     const auth = getAuth(app);
 
     try {
-      const result = await signInWithRedirect(auth, provider);
+      const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
       // Call your backend API with user data
