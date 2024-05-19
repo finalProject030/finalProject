@@ -9,6 +9,7 @@ import { urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
 import SocialMediaShare from "./SocialMediaShare";
 import 'line-awesome/dist/line-awesome/css/line-awesome.min.css';
+import { createRoot } from 'react-dom/client';
 
 
 
@@ -240,7 +241,17 @@ export default function PostCreationForm() {
       confirmButtonText: "<i class='las la-copy'></i> Copy to clipboard",
       denyButtonText: "<i class='las la-magic'></i> Generate new Post",
       cancelButtonText: "<i class='las la-save'></i> Save Post",
-      footer: "<SocialIcon />", // Use the SocialIcon component directly within JSX
+      
+      footer: '<div id="swal-footer"></div>',
+      didOpen: () => {
+        const footerElement = document.getElementById('swal-footer');
+        if (footerElement) {
+          const root = createRoot(footerElement);
+          root.render(
+            <SocialMediaShare text={geminiResponse} title={title} content={content} />
+          );
+        }
+      },
       showLoaderOnDeny: true,
       showCloseButton: true,
       allowEnterKey: false,
