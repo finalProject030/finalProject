@@ -1,8 +1,8 @@
 import {
   GoogleAuthProvider,
+  FacebookAuthProvider,
   getAuth,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
 } from "firebase/auth";
 import { app } from "../firebase";
 import { useDispatch } from "react-redux";
@@ -15,52 +15,34 @@ export default function OAuth() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Handle the redirect result when the component mounts
-    const handleRedirectResult = async () => {
-      try {
-        const auth = getAuth(app);
-        const result = await getRedirectResult(auth);
-
-        if (result && result.user) {
-          // User successfully signed in
-          const res = await fetch(`${urlServer}/api/auth/google`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              authorization: localStorage.getItem("token"),
-            },
-            body: JSON.stringify({
-              name: result.user.displayName,
-              email: result.user.email,
-              photo: result.user.photoURL,
-            }),
-          });
-          const data = await res.json();
-          dispatch(signInSuccess(data));
-          localStorage.setItem("token", data.token);
-          navigate("/");
-        } else {
-          // No user signed in, or sign-in failed
-          console.log("Sign-in failed or no user signed in");
-        }
-      } catch (error) {
-        console.error("Error handling redirect result:", error);
-      }
-    };
-
-    handleRedirectResult(); // Call the function to handle redirect result
-  }, []); // Run this effect only once when the component mounts
-
   const handleGoogleClick = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const auth = getAuth(app);
 
-      // Initiate sign-in with redirect
-      await signInWithRedirect(auth, provider);
+    try {
+      const result = await signInWithRedirect(auth, provider);
+      const user = result.user;
+
+      // Call your backend API with user data
+      const res = await fetch(`${urlServer}/api/auth/google`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL,
+        }),
+      });
+      const data = await res.json();
+      dispatch(signInSuccess(data));
+      localStorage.setItem("token", data.token);
+      navigate("/");
     } catch (error) {
-      console.log("could not sign in with google", error);
+      console.error("Error signing in with Google:", error);
+      // Handle errors gracefully and provide user feedback
     }
   };
 
