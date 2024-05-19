@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinner"; // Import the LoadingSpinner component
+import { urlServer } from "../variables";
 
 export default function OAuth() {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ export default function OAuth() {
       const result = await signInWithPopup(auth, provider);
       console.log(result);
 
-      const res = await fetch("http://localhost:3000/api/auth/google", {
+      const res = await fetch(`${urlServer}/api/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
