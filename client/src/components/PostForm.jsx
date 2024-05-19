@@ -241,7 +241,6 @@ export default function PostCreationForm() {
       confirmButtonText: "<i class='las la-copy'></i> Copy to clipboard",
       denyButtonText: "<i class='las la-magic'></i> Generate new Post",
       cancelButtonText: "<i class='las la-save'></i> Save Post",
-      
       footer: '<div id="swal-footer"></div>',
       didOpen: () => {
         const footerElement = document.getElementById('swal-footer');
