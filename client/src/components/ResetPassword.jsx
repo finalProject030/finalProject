@@ -1,25 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import LoadingSpinner from "./LoadingSpinner";
+import { urlServer } from "../variables";
 
 const ResetPassword = () => {
   const { token } = useParams();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    console.log("Submitting password reset");
 
     try {
-      const res = await fetch(`http://localhost:3000/api/auth/resetPassword`, {
+      const res = await fetch(`${urlServer}/api/auth/resetPassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, newPassword: password }),
       });
+
+      console.log("Fetch response status:", res.status);
+
       const data = await res.json();
+      console.log("Fetch response data:", data);
 
       if (res.ok) {
         setMessage("Password has been reset successfully");
@@ -29,10 +32,9 @@ const ResetPassword = () => {
         );
       }
     } catch (error) {
+      console.error("Error during fetch:", error);
       setMessage("An error occurred. Please try again later.");
     }
-
-    setLoading(false);
   };
 
   return (
@@ -61,11 +63,8 @@ const ResetPassword = () => {
           <button
             type="submit"
             className="bg-blue-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
-            disabled={
-              loading || password !== confirmPassword || password.length < 8
-            }
           >
-            {loading ? <LoadingSpinner /> : "Reset Password"}
+            Reset Password
           </button>
         </form>
         {message && <p className="text-blue-700 mt-5">{message}</p>}
