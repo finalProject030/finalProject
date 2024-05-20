@@ -247,7 +247,7 @@ export default function PostCreationForm() {
         if (footerElement) {
           const root = createRoot(footerElement);
           root.render(
-            <SocialMediaShare text={geminiResponse} title={title} content={content} />
+            <SocialMediaShare text={geminiResponseString} title={title} content={content} />
           );
         }
       },
@@ -255,7 +255,6 @@ export default function PostCreationForm() {
       showCloseButton: true,
       allowEnterKey: false,
       allowOutsideClick: false,
-
       preDeny: async () => {
         await sendMessageToServer();
       },
