@@ -16,22 +16,26 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      // Call your API to send a password reset email
-      // Example:
-      // const res = await fetch(`${urlServer}/api/auth/forgot-password`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ email }),
-      // });
-      // const data = await res.json();
+      const res = await fetch(
+        `http://localhost:3000/api/auth/requestPasswordReset`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
+      const data = await res.json();
 
-      // Simulating API call with setTimeout
-      setTimeout(() => {
+      if (res.ok) {
         setMessage("Password reset instructions sent to your email.");
-        setLoading(false);
-      }, 2000);
+      } else {
+        setMessage(
+          data.message || "An error occurred. Please try again later."
+        );
+      }
     } catch (error) {
       setMessage("An error occurred. Please try again later.");
+    } finally {
       setLoading(false);
     }
   };

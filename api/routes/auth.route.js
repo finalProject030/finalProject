@@ -1,8 +1,9 @@
 import express from "express";
 import {
   facebook,
-  forgotPassword,
   google,
+  requestPasswordReset,
+  resetPassword,
   signOut,
   signin,
   signup,
@@ -14,7 +15,8 @@ router.post("/signup", signup);
 router.post("/signin", signin);
 router.post("/google", google);
 router.post("/facebook", facebook);
-router.post("/forgotPassword", forgotPassword);
+router.post("/requestPasswordReset", requestPasswordReset);
+router.post("/resetPassword", resetPassword);
 router.get("/signout", signOut);
 
 export default router;

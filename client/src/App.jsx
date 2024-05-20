@@ -14,6 +14,7 @@ import Footer from "./components/Footer";
 import Feed from "./pages/Feed";
 import PostPage from "./pages/PostPage";
 import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<Chatbot message="8+10?" />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-
+        <Route path="/reset/:token" element={<ResetPassword />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/about" element={<About />} />
@@ -34,7 +35,6 @@ export default function App() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/user-posts" element={<UserPosts />} />
-          {/* Add route for displaying individual post */}
           <Route path="/post/:postId" element={<PostPage />} />
         </Route>
       </Routes>

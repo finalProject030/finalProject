@@ -2,6 +2,8 @@ import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
 
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -125,4 +127,73 @@ export const signOut = async (req, res, next) => {
   }
 };
 
-export const forgotPassword = (req, res, next) => {};
+export const requestPasswordReset = async (req, res, next) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return next(errorHandler(404, "User not found!"));
+    }
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "finalproject030@gmail.com",
+        pass: process.env.EMAIL_TEST_APP_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      to: user.email,
+      from: "finalproject030@gmail.com",
+      subject: "Password Reset",
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        http://localhost:5173/reset/${resetToken}\n\n
+        If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    };
+
+    transporter.sendMail(mailOptions, (error, response) => {
+      if (error) {
+        return next(error);
+      }
+      res.status(200).json("Password reset email sent");
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return next(
+        errorHandler(400, "Password reset token is invalid or has expired.")
+      );
+    }
+
+    user.password = bcryptjs.hashSync(newPassword, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json("Password has been reset successfully");
+  } catch (error) {
+    next(error);
+  }
+};
