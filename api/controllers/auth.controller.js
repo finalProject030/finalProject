@@ -156,7 +156,7 @@ export const requestPasswordReset = async (req, res, next) => {
       subject: "Password Reset",
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
         Please click on the following link, or paste this into your browser to complete the process:\n\n
-        http://localhost:5173/reset/${resetToken}\n\n
+        https://final-project-client-two.vercel.app/reset/${resetToken}\n\n
         If you did not request this, please ignore this email and your password will remain unchanged.\n`,
     };
 

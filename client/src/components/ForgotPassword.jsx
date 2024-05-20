@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { urlServer } from "../variables";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -16,14 +17,11 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/auth/requestPasswordReset`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const res = await fetch(`${urlServer}/api/auth/requestPasswordReset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
       const data = await res.json();
 
       if (res.ok) {
