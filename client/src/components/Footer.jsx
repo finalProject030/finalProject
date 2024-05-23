@@ -1,8 +1,32 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { scrollToTop } from "../variables";
 
 const Footer = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleClick = (event) => {
+    event.preventDefault();
+    if (location.pathname === "/") {
+      document
+        .getElementById("contactUs")
+        .scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/", { state: { scrollToContact: true } });
+    }
+  };
+
+  useEffect(() => {
+    if (location.state?.scrollToContact) {
+      document
+        .getElementById("contactUs")
+        .scrollIntoView({ behavior: "smooth" });
+      // Clear the state after scrolling
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
   return (
     <footer className="bg-white dark:bg-gray-900">
       <div className="mx-auto w-full max-w-screen-xl">
@@ -52,15 +76,7 @@ const Footer = () => {
                 </a>
               </li>
               <li className="mb-4">
-                <Link
-                  to="/"
-                  className="hover:underline"
-                  onClick={() =>
-                    document
-                      .getElementById("contact-form")
-                      .scrollIntoView({ behavior: "smooth" })
-                  }
-                >
+                <Link to="/" className="hover:underline" onClick={handleClick}>
                   Contact Us
                 </Link>
               </li>
