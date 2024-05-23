@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
-import { globalJsonData } from "../recoil/state";
+// import { globalJsonData } from "../recoil/state";
 import { useRecoilState } from "recoil";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
@@ -8,17 +8,15 @@ import copy from "copy-to-clipboard";
 import { urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
 import SocialMediaShare from "./SocialMediaShare";
-import 'line-awesome/dist/line-awesome/css/line-awesome.min.css';
-import { createRoot } from 'react-dom/client';
-
-
-
+import "line-awesome/dist/line-awesome/css/line-awesome.min.css";
+import { createRoot } from "react-dom/client";
+import Rights from "./Rights";
 
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
-  const [maxEmojis, setMaxEmojis] = useState(5);
-  const [minEmojis, setMinEmojis] = useState(1);
+  // const [maxEmojis, setMaxEmojis] = useState(5);
+  // const [minEmojis, setMinEmojis] = useState(1);
   const [wordCount, setWordCount] = useState(100);
   const [paragraphCount, setParagraphCount] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -30,12 +28,21 @@ export default function PostCreationForm() {
   const { currentUser, error } = useSelector((state) => state.user);
   const [finish, setFinish] = useState(false);
   const [title, setTitle] = useState("");
+  const [freeText, setFreeText] = useState("");
+  const maxChars = 150;
 
   const [content, setContent] = useState("");
 
+  const handleInputChange = (e) => {
+    const text = e.target.value;
+    if (text.length <= maxChars) {
+      setFreeText(text);
+    }
+  };
+
   // Function to send message to Gemini
   async function sendMessageToServer() {
-    console.log("API GEMINI");
+    // console.log("API GEMINI");
     try {
       const valueToSend = generateJsonInstructions();
       console.log(valueToSend);
@@ -72,13 +79,13 @@ export default function PostCreationForm() {
       "- Include a catchy headline that grabs attention.",
       "- Write a brief introduction to the topic to provide context.",
       `- Keep the post concise at around ${wordCount} words.`,
-      // `- Use exactly ${wordCount} words in your post to ensure it's concise and engaging.`,
       `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
       emojis === "yes"
-        ? `- Use emojis to add visual appeal. (Maximum: ${maxEmojis}, Minimum: ${minEmojis}).`
+        ? `- Use emojis to add visual appeal!`
         : "- Avoid using emojis to maintain a professional tone.",
       "- Incorporate relevant hashtags to increase visibility.",
       "- End with a call to action, such as asking for comments or opinions.",
+      `Plese pay carfull attention to this: ${freeText}`,
       "Below is the question and its accepted answer for reference:",
     ];
 
@@ -122,10 +129,10 @@ export default function PostCreationForm() {
     generateJsonInstructions();
   }, []);
 
-  function stripHtmlTags(html) {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent || "";
-  }
+  // function stripHtmlTags(html) {
+  //   const doc = new DOMParser().parseFromString(html, "text/html");
+  //   return doc.body.textContent || "";
+  // }
 
   // Function to handle form submission
   const handleFormSubmit = async (event) => {
@@ -163,6 +170,7 @@ export default function PostCreationForm() {
   };
 
   const savePost = (title, content) => {
+    setStep("posts");
     fetch(`${urlServer}/api/post`, {
       method: "POST",
       headers: {
@@ -187,7 +195,6 @@ export default function PostCreationForm() {
           showLoaderOnConfirm: true,
           cancelButtonText: "OK",
           showCancelButton: true,
-
           preConfirm: async () => {
             try {
               const response = await fetch(`${urlServer}/api/post`, {
@@ -204,19 +211,20 @@ export default function PostCreationForm() {
 
               if (!response.ok) {
                 return Swal.showValidationMessage(`
-                Error saving the post
-              `);
+                  Error saving the post
+                `);
               }
               return response.json();
             } catch (error) {
               Swal.showValidationMessage(`
-              Request failed: ${error}
-            `);
+                Request failed: ${error}
+              `);
             }
           },
           allowOutsideClick: () => !Swal.isLoading(),
         }).then((result) => {
           if (result.isConfirmed) {
+            // Display confirmation modal after saving post
             Swal.fire({
               icon: "success",
               text: "The Post Saved Successfully!",
@@ -226,35 +234,38 @@ export default function PostCreationForm() {
       }
     });
     setSelectedItems([]);
-    // setStep("posts");
   };
 
   const showGeminiResponse = (geminiResponseString) => {
     const [title, content] = getInfo(geminiResponseString);
     const htmlContent = content.replace(/\n/g, "<br>");
-    // const socialMedia = SocialIcon;
+
     Swal.fire({
       title: title,
       html: htmlContent,
       showDenyButton: true,
       showCancelButton: true,
-      confirmButtonText: "<i class='las la-copy'></i> Copy to clipboard",
-      denyButtonText: "<i class='las la-magic'></i> Generate new Post",
-      cancelButtonText: "<i class='las la-save'></i> Save Post",
+      confirmButtonText: "<i className='las la-copy'></i> Copy to clipboard",
+      denyButtonText: "<i className='las la-magic'></i> Generate new Post",
+      cancelButtonText: "<i className='las la-save'></i> Save Post",
       footer: '<div id="swal-footer"></div>',
       didOpen: () => {
-        const footerElement = document.getElementById('swal-footer');
+        const footerElement = document.getElementById("swal-footer");
         if (footerElement) {
           const root = createRoot(footerElement);
           root.render(
-            <SocialMediaShare text={geminiResponseString} title={title} content={content} />
+            <SocialMediaShare
+              text={geminiResponseString}
+              title={title}
+              content={content}
+            />
           );
         }
       },
       showLoaderOnDeny: true,
       showCloseButton: true,
       allowEnterKey: false,
-      allowOutsideClick: false,
+      allowOutsideClick: false, // Set allowOutsideClick to false
       preDeny: async () => {
         await sendMessageToServer();
       },
@@ -263,20 +274,13 @@ export default function PostCreationForm() {
         return false;
       },
     }).then((result) => {
-      // if (
-      //   result.isConfirmed ||
-      //   result.isDenied ||
-      //   result["dismiss"] === "close"
-      // ){
-      //   setSelectedItems([]);
-      //   return;}
-      if (result.isConfirmed || result.isDenied) return;
-      else if (result["dismiss"] === "close") {
+      if (result.dismiss === Swal.DismissReason.close) {
         setSelectedItems([]);
         setFinish(true);
+      } else if (result.isConfirmed || result.isDenied) {
+        // Handle other button clicks if needed
         return;
-      } else {
-        // dismiss: cancel
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
         savePost(title, content);
       }
     });
@@ -343,12 +347,11 @@ export default function PostCreationForm() {
                       onChange={(e) => setEmojis(e.target.value)}
                       className="p-2 border rounded-md w-full"
                     >
-                      <option value="yes">Yes, a lot</option>
-                      <option value="few">Yes, but a few</option>
+                      <option value="yes">Yes</option>
                       <option value="no">No</option>
                     </select>
                   </div>
-                  {emojis === "yes" && (
+                  {/* {emojis === "yes" && (
                     <>
                       <div className="mb-4">
                         <label
@@ -385,8 +388,8 @@ export default function PostCreationForm() {
                         />
                       </div>
                     </>
-                  )}
-                  <div className="mb-4">
+                  )} */}
+                  {/* <div className="mb-4">
                     <label
                       htmlFor="wordCount"
                       className="block font-semibold mb-1"
@@ -400,56 +403,83 @@ export default function PostCreationForm() {
                       onChange={(e) => setWordCount(parseInt(e.target.value))}
                       className="p-2 border rounded-md w-full"
                     />
-                  </div>
-                  <div className="mb-4">
+                  </div> */}
+
+                  <label
+                    htmlFor="wordCount"
+                    className="block mb-2  font-semibold    text-gray-900 dark:text-white"
+                  >
+                    Desired word count:
+                  </label>
+                  <input
+                    type="number"
+                    id="wordCount"
+                    aria-describedby="helper-text-explanation"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    value={wordCount}
+                    onChange={(e) => setWordCount(parseInt(e.target.value))}
+                    required
+                  />
+                  <div className="my-4">
                     <label
                       htmlFor="paragraphCount"
-                      className="block font-semibold mb-1"
+                      className="block mb-2 font-semibold  text-gray-900 dark:text-white"
                     >
                       Desired paragraph count:
                     </label>
                     <input
                       type="number"
                       id="paragraphCount"
+                      aria-describedby="helper-text-explanation"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       value={paragraphCount}
                       onChange={(e) =>
                         setParagraphCount(parseInt(e.target.value))
                       }
-                      className="p-2 border rounded-md w-full"
+                      required
                     />
                   </div>
                   <div className="mb-4">
                     <label
-                      // htmlFor="paragraphCount"
-                      className="block font-semibold mb-1"
+                      htmlFor="freeText"
+                      className="block mb-2  font-semibold  text-gray-900 dark:text-white"
                     >
-                      Free text you want to display:
+                      Your message:
                     </label>
-                    <input type="text" />
+                    <textarea
+                      id="freeText"
+                      type="text"
+                      value={freeText}
+                      onChange={handleInputChange}
+                      rows="4"
+                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Write your additional rules here..."
+                    ></textarea>
+                    <div className="text-right text-sm text-gray-500">
+                      {maxChars - freeText.length} characters remaining
+                    </div>
                   </div>
                 </div>
                 {/* )}  */}
 
                 <button
                   type="submit"
-                  className={`px-4 py-2 rounded-md hover:bg-blue-600 ${
-                    handleSubmit || loading // Disable the button if handleSubmit or loading is true
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-500 text-white hover:bg-blue-600"
-                  }`}
-                  // onClick={sendMessageToServer}
-                  disabled={handleSubmit || loading} // Disable the button if handleSubmit or loading is true
+                  className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                  disabled={loading || loading}
                 >
                   Create My Post
                 </button>
               </form>
 
-              <button
-                onClick={moveToSelectedPostsPage}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Previous Step
-              </button>
+              <div className="flex justify-center w-full ">
+                <button
+                  type="button"
+                  onClick={moveToSelectedPostsPage}
+                  className="mt-10 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
+                >
+                  Previous Step
+                </button>
+              </div>
             </div>
           )}
 
@@ -462,27 +492,11 @@ export default function PostCreationForm() {
       )}
 
       {geminiResponse != "" && finish && (
-        <div>
-          <button>Back Home</button>
-          <SocialMediaShare text={geminiResponse} title={title} content={content} />
-
-          <p>
-            <br></br>
-            <br></br>
-            <br></br>
-            All rights reserved &copy; STACK TEXTPRO.<br></br>
-            This includes but is not limited to the rights of reproduction,
-            distribution, adaptation, and public display of all content,
-            materials, and intellectual property owned or created by STACK
-            TEXTPRO. <br></br>
-            No part of our proprietary information, including text, graphics,
-            logos, images, audio, or video content, may be reproduced,
-            distributed, transmitted, or otherwise utilized without the express
-            written permission of STACK TEXTPRO.<br></br>
-            Any unauthorized use or reproduction of our intellectual property
-            will be subject to legal action.<br></br>
-          </p>
-        </div>
+        <Rights
+          geminiResponse={geminiResponse}
+          title={title}
+          content={content}
+        />
       )}
     </div>
   );
