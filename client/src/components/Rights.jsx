@@ -1,11 +1,9 @@
 import React from "react";
-import SocialMediaShare from "./SocialMediaShare";
 
 const Rights = ({ geminiResponse, title, content }) => {
   return (
     <div className="h-full">
       <button>Back Home</button>
-      <SocialMediaShare text={geminiResponse} title={title} content={content} />
 
       <p>
         <br></br>
