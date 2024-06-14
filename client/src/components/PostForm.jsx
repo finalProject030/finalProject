@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
 // import { globalJsonData } from "../recoil/state";
-import { useRecoilState } from "recoil";
+import { constSelector, useRecoilState } from "recoil";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import copy from "copy-to-clipboard";
@@ -238,7 +238,7 @@ export default function PostCreationForm() {
 
   const showGeminiResponse = (geminiResponseString) => {
     const [title, content] = getInfo(geminiResponseString);
-    const htmlContent = content.replace(/\n/g, "<br>");
+    let htmlContent = fix(content).replace(/\n/g, '<br>');
 
     Swal.fire({
       title: title,
@@ -317,6 +317,30 @@ export default function PostCreationForm() {
     setTitle(title);
     return [title, content];
   };
+
+  const fix = (content) => {
+    // There is a code in the response
+    if (content.includes("```")) {
+      
+      let first = content.indexOf("```");
+      let f = content.substring(0, first);
+      let str = content.substring(first , content.length);
+      console.log("im str first" + str);
+      str = str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      console.log("Fixed string: " + str);
+      return f + str;
+    }
+  };
+
+
+
+
+
+
+
+
+
+
 
   return (
     <div>
