@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { LuAlignJustify } from "react-icons/lu";
-import logo from "../../assets/logo.png";
+import logo3 from "../../assets/logo3.png";
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
@@ -26,7 +26,7 @@ export default function Header() {
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
           <img
-            src={logo}
+            src={logo3}
             alt="STACK TEXTPRO"
             style={{
               width: "25px",
