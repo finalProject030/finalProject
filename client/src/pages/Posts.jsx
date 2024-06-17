@@ -90,8 +90,11 @@ const Posts = () => {
       if (questionsData === "") {
         try {
           let api = "";
-          console.log("API called");
+          console.log("API1 called");
           if (sort !== "relevance")
+            // This is the correct API address
+            // api = `https://api.stackexchange.com/2.3/search/excerpts?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow`;
+
             api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
           else
             api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
@@ -101,11 +104,7 @@ const Posts = () => {
             setQuestionsData(response.data);
             if (questionsData.items) {
               // Show 10 questions
-              const randomQuestions = data.items.slice(
-                (addNumber - 1) * 10,
-                addNumber * 10
-              );
-
+              const randomQuestions = data.items.slice( (addNumber - 1) * 10, addNumber * 10);
               fetchAnswers(randomQuestions);
 
               if (questions.length === 0) {
@@ -144,6 +143,9 @@ const Posts = () => {
         let api = "";
         const answersPromises = questions.map(async (question) => {
           console.log("API answers");
+          // This is the correct API
+          // api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow`;
+
           if (sort !== "relevance")
             api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
           else

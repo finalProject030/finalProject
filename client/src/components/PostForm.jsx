@@ -15,8 +15,6 @@ import Rights from "./Rights";
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
-  // const [maxEmojis, setMaxEmojis] = useState(5);
-  // const [minEmojis, setMinEmojis] = useState(1);
   const [wordCount, setWordCount] = useState(100);
   const [paragraphCount, setParagraphCount] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -30,7 +28,6 @@ export default function PostCreationForm() {
   const [title, setTitle] = useState("");
   const [freeText, setFreeText] = useState("");
   const maxChars = 150;
-
   const [content, setContent] = useState("");
 
   const handleInputChange = (e) => {
@@ -170,7 +167,7 @@ export default function PostCreationForm() {
   };
 
   const savePost = (title, content) => {
-    setStep("posts");
+    // setStep("posts");
     fetch(`${urlServer}/api/post`, {
       method: "POST",
       headers: {
@@ -224,7 +221,6 @@ export default function PostCreationForm() {
           allowOutsideClick: () => !Swal.isLoading(),
         }).then((result) => {
           if (result.isConfirmed) {
-            // Display confirmation modal after saving post
             Swal.fire({
               icon: "success",
               text: "The Post Saved Successfully!",
@@ -234,6 +230,7 @@ export default function PostCreationForm() {
       }
     });
     setSelectedItems([]);
+    setFinish(true);
   };
 
   const showGeminiResponse = (geminiResponseString) => {
@@ -278,10 +275,9 @@ export default function PostCreationForm() {
         setSelectedItems([]);
         setFinish(true);
       } else if (result.isConfirmed || result.isDenied) {
-        // Handle other button clicks if needed
-        return;
+          return;
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-        savePost(title, content);
+          savePost(title, content);
       }
     });
   };
@@ -330,6 +326,7 @@ export default function PostCreationForm() {
       console.log("Fixed string: " + str);
       return f + str;
     }
+    return content;
   };
 
 
