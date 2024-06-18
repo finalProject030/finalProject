@@ -6,6 +6,7 @@ import {
   globalJsonData,
 } from "../recoil/state";
 import PostCreationForm from "../components/PostForm";
+import { scrollToTop } from "../variables";
 
 export default function SelectedPosts() {
   const [selectedItems, setSelectedItems] = useRecoilState(recoilSelectedPosts);
@@ -15,6 +16,7 @@ export default function SelectedPosts() {
   useEffect(() => {
     // Build the global JSON when selectedItems change
     buildGlobalJson();
+    scrollToTop();
   }, [selectedItems]);
 
   const moveToPostsPage = () => {

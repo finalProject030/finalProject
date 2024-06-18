@@ -5,7 +5,7 @@ import { constSelector, useRecoilState } from "recoil";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import copy from "copy-to-clipboard";
-import { urlServer } from "../variables";
+import { scrollToTop, urlServer } from "../variables";
 import PuffLoader from "react-spinners/PuffLoader";
 import SocialMediaShare from "./SocialMediaShare";
 import "line-awesome/dist/line-awesome/css/line-awesome.min.css";
@@ -124,6 +124,7 @@ export default function PostCreationForm() {
   //When load the page call the generateJsonInstructions function.
   useEffect(() => {
     generateJsonInstructions();
+    scrollToTop();
   }, []);
 
   // function stripHtmlTags(html) {
