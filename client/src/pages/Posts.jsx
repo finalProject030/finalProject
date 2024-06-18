@@ -290,7 +290,8 @@ const Posts = () => {
         <div className="container mx-auto px-4">
           <div>
             <h1 className="text-center text-3xl font-bold mb-4 mt-8">
-              Stack Overflow Questions Tagged with {tagged}
+              Interesting Questions and Answers from Stack Overflow
+              {/* Stack Overflow Questions Tagged with {tagged} */}
             </h1>
             <div className="mb-4">
               <p className="text-center text-gray-200 dark:text-gray-300">
