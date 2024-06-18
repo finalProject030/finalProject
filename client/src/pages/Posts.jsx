@@ -14,12 +14,14 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
     <pre
       dangerouslySetInnerHTML={{ __html: htmlCode }}
-      className="max-w-full overflow-x-auto"/>);};
+      className="max-w-full overflow-x-auto"
+    />
+  );
+};
 
 // Global variable for the question id
 let uniqueQuestionsId = [];
 let search1 = false;
-
 
 const Posts = () => {
   const [tagged, setTagged] = useState(""); // Default tag
@@ -36,9 +38,18 @@ const Posts = () => {
   const [questionsData, setQuestionsData] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
 
+  const moveToHomePage = () => {
+    setStep("posts");
+    setCheckedItems([]);
+  };
+  useEffect(() => {
+    moveToHomePage();
+  }, []);
+
   const handleToggleComponent = () => {
     setShowTheNextStep(true);
-    setStep("selectedPosts");};
+    setStep("selectedPosts");
+  };
 
   const [sort, setSort] = useState("votes");
   const [order, setOrder] = useState("desc");
@@ -59,116 +70,110 @@ const Posts = () => {
     { value: "asc", label: "To date" },
   ];
 
-
   useEffect(() => {
+    const fetchQuestions = async () => {
+      if (tagged != "") {
+        if (
+          addNumber == 10 &&
+          questionsData != undefined &&
+          questionsData.has_more
+        ) {
+          let n = pageNumber + 1;
+          setPageNumber(n);
+          setaddNumber(0);
+          return;
+        }
 
-  const fetchQuestions = async () => {
-    if (tagged != "") {
-      if (addNumber == 10 && questionsData != undefined && questionsData.has_more) {
-        let n = pageNumber + 1;
-        setPageNumber(n);
-        setaddNumber(0);
-        return;
-      }
+        //26 dont give
+        if (pageNumber >= 26) {
+          Swal.fire({
+            title: "You reach the limit of the content.",
+            icon: "warning",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: "Confirm",
+          });
+          return;
+        }
 
-      //26 dont give
-      if (pageNumber >= 26) {
-        Swal.fire({
-          title: "You reach the limit of the content.",
-          icon: "warning",
-          confirmButtonColor: "#3085d6",
-          confirmButtonText: "Confirm",
-        });
-        return;
-      }
-
-      if (questionsData === "") {
-        try {
-          let api = "";
-          api = `https://api.stackexchange.com/2.3/search/excerpts?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow`;
-          const response = await axios.get(api);
-            const data = response.data; 
+        if (questionsData === "") {
+          try {
+            let api = "";
+            api = `https://api.stackexchange.com/2.3/search/excerpts?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow`;
+            const response = await axios.get(api);
+            const data = response.data;
             if (data.items) {
               setQuestionsData(data);
               let i = addNumber * 10;
               let randomQuestions = [];
-              while(randomQuestions.length < 10){
+              while (randomQuestions.length < 10) {
                 if (i >= data.items.length) {
-                  break; 
-              }
-              if(!uniqueQuestionsId.includes(data.items[i].question_id) ){
+                  break;
+                }
+                if (!uniqueQuestionsId.includes(data.items[i].question_id)) {
                   api = `https://api.stackexchange.com/2.3/questions/${data.items[i].question_id}?site=stackoverflow&filter=!nNPvSNPI7A`;
                   const questionData = await questionForAnswer(api);
                   randomQuestions.push(questionData.items[0]);
                   uniqueQuestionsId.push(questionData.items[0].question_id);
-            }
+                }
                 i++;
-            }
-            if (questions.length === 0)
-              setQuestions(randomQuestions);
-            else 
-              questions.push(...randomQuestions);
+              }
+              if (questions.length === 0) setQuestions(randomQuestions);
+              else questions.push(...randomQuestions);
 
+              fetchAnswers(randomQuestions);
+            }
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        } else {
+          if (questionsData.items) {
+            let i = addNumber * 10;
+            let randomQuestions = [];
+            while (randomQuestions.length < 10) {
+              if (i >= questionsData.items.length) {
+                break;
+              }
+              if (
+                !uniqueQuestionsId.includes(questionsData.items[i].question_id)
+              ) {
+                // Its an answer
+                // if(questionsData.items[i].item_type === "answer"){
+                let api1 = `https://api.stackexchange.com/2.3/questions/${questionsData.items[i].question_id}?site=stackoverflow&filter=!nNPvSNPI7A`;
+                const questionData1 = await questionForAnswer(api1);
+                randomQuestions.push(questionData1.items[0]);
+                uniqueQuestionsId.push(questionData1.items[0].question_id);
+                // }
+
+                // else{
+                //   uniqueQuestionsId.push(questionsData.items[i].question_id);
+                //   randomQuestions.push(questionsData.items[i]);
+
+                // }
+              }
+              i++;
+            }
+            questions.push(...randomQuestions);
             fetchAnswers(randomQuestions);
-            }
-        } 
-        catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      } 
-
-
-      else {
-        if (questionsData.items) {
-          let i = addNumber * 10;
-          let randomQuestions = [];
-          while(randomQuestions.length < 10){
-            if (i >= questionsData.items.length) {
-              break; 
           }
-          if(!uniqueQuestionsId.includes(questionsData.items[i].question_id) ){
-                
-            // Its an answer
-            // if(questionsData.items[i].item_type === "answer"){
-              let api1 = `https://api.stackexchange.com/2.3/questions/${questionsData.items[i].question_id}?site=stackoverflow&filter=!nNPvSNPI7A`;
-              const questionData1 = await questionForAnswer(api1);
-              randomQuestions.push(questionData1.items[0]);
-              uniqueQuestionsId.push(questionData1.items[0].question_id);
-            // }
-
-            // else{
-            //   uniqueQuestionsId.push(questionsData.items[i].question_id);
-            //   randomQuestions.push(questionsData.items[i]);
-
-            // }
-          }
-            i++;
         }
-        questions.push(...randomQuestions);
-        fetchAnswers(randomQuestions);
-        }
+        setaddNumber(addNumber + 1);
+        search1 = true;
       }
-      setaddNumber(addNumber + 1);
-      search1 = true;
+    };
+    if (search) {
+      fetchQuestions();
+      setSearch(false);
+    }
+  }, [search]);
+
+  const questionForAnswer = async (api) => {
+    try {
+      const response = await axios.get(api);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching question data:", error);
     }
   };
-  if (search) {
-    fetchQuestions(); 
-    setSearch(false); 
-  }
-}, [search]);
-
-
-
-const questionForAnswer = async (api) => {
-  try {
-    const response = await axios.get(api);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching question data:", error);
-  }
-};
-
 
   const toggleFilters = () => {
     const filtersBody = document.getElementById("accordion-collapse-body-4");
@@ -277,8 +282,6 @@ const questionForAnswer = async (api) => {
   useEffect(() => {
     // pageNumber++;
   }, [pageNumber]);
-
-  
 
   return (
     <div className="flex flex-col  mt-6 mb-4">

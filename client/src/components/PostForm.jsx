@@ -235,7 +235,7 @@ export default function PostCreationForm() {
 
   const showGeminiResponse = (geminiResponseString) => {
     const [title, content] = getInfo(geminiResponseString);
-    let htmlContent = fix(content).replace(/\n/g, '<br>');
+    let htmlContent = fix(content).replace(/\n/g, "<br>");
 
     Swal.fire({
       title: title,
@@ -275,9 +275,9 @@ export default function PostCreationForm() {
         setSelectedItems([]);
         setFinish(true);
       } else if (result.isConfirmed || result.isDenied) {
-          return;
+        return;
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-          savePost(title, content);
+        savePost(title, content);
       }
     });
   };
@@ -317,27 +317,16 @@ export default function PostCreationForm() {
   const fix = (content) => {
     // There is a code in the response
     if (content.includes("```")) {
-      
       let first = content.indexOf("```");
       let f = content.substring(0, first);
-      let str = content.substring(first , content.length);
+      let str = content.substring(first, content.length);
       console.log("im str first" + str);
-      str = str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      str = str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       console.log("Fixed string: " + str);
       return f + str;
     }
     return content;
   };
-
-
-
-
-
-
-
-
-
-
 
   return (
     <div>
