@@ -14,10 +14,12 @@ const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
     <pre
       dangerouslySetInnerHTML={{ __html: htmlCode }}
-      className="max-w-full overflow-x-auto"
-    />
-  );
-};
+      className="max-w-full overflow-x-auto"/>);};
+
+// Global variable for the question id
+let uniqueQuestionsId = [];
+let search1 = false;
+
 
 const Posts = () => {
   const [tagged, setTagged] = useState(""); // Default tag
@@ -26,7 +28,7 @@ const Posts = () => {
   const [answers, setAnswers] = useState({});
   const [expandedAnswers, setExpandedAnswers] = useState({});
   const [selectedItems, setSelectedItems] = useState({});
-  const [addNumber, setaddNumber] = useState(1);
+  const [addNumber, setaddNumber] = useState(0);
   const [search, setSearch] = useState(false);
   const [checkedItems, setCheckedItems] = useRecoilState(recoilSelectedPosts);
   const [step, setStep] = useRecoilState(recoilSelectedStep);
@@ -36,9 +38,7 @@ const Posts = () => {
 
   const handleToggleComponent = () => {
     setShowTheNextStep(true);
-    setStep("selectedPosts");
-  };
-  // const [checkedItems, setCheckedItems] = useState({});
+    setStep("selectedPosts");};
 
   const [sort, setSort] = useState("votes");
   const [order, setOrder] = useState("desc");
@@ -59,20 +59,15 @@ const Posts = () => {
     { value: "asc", label: "To date" },
   ];
 
-  const fetchQuestions = () => {
-    setaddNumber(addNumber + 1);
 
-    // there is no input field
+  useEffect(() => {
+
+  const fetchQuestions = async () => {
     if (tagged != "") {
-      if (
-        addNumber == 10 &&
-        questionsData != undefined &&
-        questionsData.has_more
-      ) {
+      if (addNumber == 10 && questionsData != undefined && questionsData.has_more) {
         let n = pageNumber + 1;
         setPageNumber(n);
-        console.log(pageNumber);
-        setaddNumber(1);
+        setaddNumber(0);
         return;
       }
 
@@ -90,47 +85,90 @@ const Posts = () => {
       if (questionsData === "") {
         try {
           let api = "";
-          console.log("API1 called");
-          if (sort !== "relevance")
-            // This is the correct API address
-            // api = `https://api.stackexchange.com/2.3/search/excerpts?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow`;
-
-            api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-          else
-            api = `https://api.stackexchange.com/2.3/search/advanced?page=${pageNumber}&pagesize=100&order=desc&sort=votes&q=${tagged}&site=stackoverflow&filter=!nNPvSNPI7A`;
-          // filter=!nNPvSNPI3D
-
-          axios.get(api).then((response) => {
-            setQuestionsData(response.data);
-            if (questionsData.items) {
-              // Show 10 questions
-              const randomQuestions = data.items.slice( (addNumber - 1) * 10, addNumber * 10);
-              fetchAnswers(randomQuestions);
-
-              if (questions.length === 0) {
-                setQuestions(randomQuestions);
-              } else questions.push(...randomQuestions);
+          api = `https://api.stackexchange.com/2.3/search/excerpts?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow`;
+          const response = await axios.get(api);
+            const data = response.data; 
+            if (data.items) {
+              setQuestionsData(data);
+              let i = addNumber * 10;
+              let randomQuestions = [];
+              while(randomQuestions.length < 10){
+                if (i >= data.items.length) {
+                  break; 
+              }
+              if(!uniqueQuestionsId.includes(data.items[i].question_id) ){
+                  api = `https://api.stackexchange.com/2.3/questions/${data.items[i].question_id}?site=stackoverflow&filter=!nNPvSNPI7A`;
+                  const questionData = await questionForAnswer(api);
+                  randomQuestions.push(questionData.items[0]);
+                  uniqueQuestionsId.push(questionData.items[0].question_id);
             }
-          });
-        } catch (error) {
+                i++;
+            }
+            if (questions.length === 0)
+              setQuestions(randomQuestions);
+            else 
+              questions.push(...randomQuestions);
+
+            fetchAnswers(randomQuestions);
+            }
+        } 
+        catch (error) {
           console.error("Error fetching data:", error);
         }
-      } else {
-        console.log(addNumber + "ds");
+      } 
+
+
+      else {
         if (questionsData.items) {
-          // Show 10 questions
-          const randomQuestions = questionsData.items.slice(
-            (addNumber - 1) * 10,
-            addNumber * 10
-          );
-          fetchAnswers(randomQuestions);
-          if (questions.length === 0) {
-            setQuestions(randomQuestions);
-          } else questions.push(...randomQuestions);
+          let i = addNumber * 10;
+          let randomQuestions = [];
+          while(randomQuestions.length < 10){
+            if (i >= questionsData.items.length) {
+              break; 
+          }
+          if(!uniqueQuestionsId.includes(questionsData.items[i].question_id) ){
+                
+            // Its an answer
+            // if(questionsData.items[i].item_type === "answer"){
+              let api1 = `https://api.stackexchange.com/2.3/questions/${questionsData.items[i].question_id}?site=stackoverflow&filter=!nNPvSNPI7A`;
+              const questionData1 = await questionForAnswer(api1);
+              randomQuestions.push(questionData1.items[0]);
+              uniqueQuestionsId.push(questionData1.items[0].question_id);
+            // }
+
+            // else{
+            //   uniqueQuestionsId.push(questionsData.items[i].question_id);
+            //   randomQuestions.push(questionsData.items[i]);
+
+            // }
+          }
+            i++;
+        }
+        questions.push(...randomQuestions);
+        fetchAnswers(randomQuestions);
         }
       }
+      setaddNumber(addNumber + 1);
+      search1 = true;
     }
   };
+  if (search) {
+    fetchQuestions(); 
+    setSearch(false); 
+  }
+}, [search]);
+
+
+
+const questionForAnswer = async (api) => {
+  try {
+    const response = await axios.get(api);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching question data:", error);
+  }
+};
+
 
   const toggleFilters = () => {
     const filtersBody = document.getElementById("accordion-collapse-body-4");
@@ -142,14 +180,7 @@ const Posts = () => {
       try {
         let api = "";
         const answersPromises = questions.map(async (question) => {
-          console.log("API answers");
-          // This is the correct API
-          // api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow`;
-
-          if (sort !== "relevance")
-            api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-          else
-            api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
+          api = `https://api.stackexchange.com/2.3/questions/${question.question_id}/answers?order=desc&sort=votes&pagesize=5&site=stackoverflow&filter=!6WPIomnMOOD*e`;
           let data;
           await axios.get(api).then((response) => {
             data = response.data.items;
@@ -183,22 +214,27 @@ const Posts = () => {
   };
 
   const handleTagChange = (e) => {
+    setQuestionsData("");
     setTagged(e.target.value);
+    setaddNumber(0);
+    uniqueQuestionsId = [];
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
+    setQuestionsData("");
+    setaddNumber(0);
+    uniqueQuestionsId = [];
+    e.preventDefault();
     setQuestions([]);
     setExpandedQuestions({});
     setAnswers({});
     setExpandedAnswers({});
     setSelectedItems({});
     setSearch(true);
-    e.preventDefault();
-    setaddNumber(1);
+    search1 = false;
   };
 
   const handleChange = (questionId) => {
-    console.log(checkedItems);
     setCheckedItems((prev) => {
       const updatedItems = { ...prev };
 
@@ -239,19 +275,10 @@ const Posts = () => {
   }, [selectedItems]);
 
   useEffect(() => {
-    fetchQuestions();
-  }, [questionsData]);
-
-  useEffect(() => {
     // pageNumber++;
   }, [pageNumber]);
 
-  useEffect(() => {
-    if (addNumber === 1) {
-      if (questionsData != "") setQuestionsData("");
-      else fetchQuestions();
-    }
-  }, [addNumber]);
+  
 
   return (
     <div className="flex flex-col  mt-6 mb-4">
@@ -432,13 +459,14 @@ const Posts = () => {
             ))}
           </div>
 
-          {search && questions.length >= 10 && (
+          {search1 && questions.length >= 10 && (
             <div className="nextPageLink">
               <button
                 className="mt-4 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                 type="button"
                 onClick={() => {
-                  fetchQuestions();
+                  setSearch(true);
+                  // fetchQuestions();
                 }}
               >
                 Display 10 additional results{" "}
