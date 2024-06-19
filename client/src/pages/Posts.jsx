@@ -9,6 +9,7 @@ import Toolbar from "../components/Toolbar";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { BsSearch } from "react-icons/bs";
+import PuffLoader from "react-spinners/PuffLoader";
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -37,6 +38,7 @@ const Posts = () => {
   const [showTheNextStep, setShowTheNextStep] = useState(false);
   const [questionsData, setQuestionsData] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const moveToHomePage = () => {
     setStep("posts");
@@ -72,6 +74,8 @@ const Posts = () => {
 
   useEffect(() => {
     const fetchQuestions = async () => {
+      setLoading(true);
+
       if (tagged != "") {
         if (
           addNumber == 10 &&
@@ -123,6 +127,8 @@ const Posts = () => {
               fetchAnswers(randomQuestions);
             }
           } catch (error) {
+            setLoading(false);
+
             console.error("Error fetching data:", error);
           }
         } else {
@@ -169,6 +175,7 @@ const Posts = () => {
   const questionForAnswer = async (api) => {
     try {
       const response = await axios.get(api);
+      await setLoading(false);
       return response.data;
     } catch (error) {
       console.error("Error fetching question data:", error);
@@ -310,7 +317,7 @@ const Posts = () => {
           </div>
           <div>
             <form
-              className="flex flex-col mb-4 max-w-screen-lg "
+              className="flex flex-col mb-4 max-w-screen-lg"
               onSubmit={handleFormSubmit}
             >
               <label className="mb-2 text-lg font-semibold">
@@ -322,12 +329,20 @@ const Posts = () => {
                     type="text"
                     value={tagged}
                     onChange={handleTagChange}
-                    className="w-full border rounded-l px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 transition duration-200 ease-in-out"
+                    disabled={loading}
+                    className={`w-full border rounded-l px-3 py-2 transition duration-200 ease-in-out ${
+                      loading
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : "focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
+                    }`}
                     placeholder="Search"
                   />
                   <button
                     type="submit"
-                    className="absolute top-0 right-0  text-black rounded-r px-4 py-3 transition duration-300 ease-in-out focus:outline-none"
+                    disabled={loading}
+                    className={`absolute top-0 right-0 text-black rounded-r px-4 py-3 transition duration-300 ease-in-out focus:outline-none ${
+                      loading ? "bg-gray-200 cursor-not-allowed" : ""
+                    }`}
                   >
                     <BsSearch />
                   </button>
@@ -412,68 +427,77 @@ const Posts = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            {questions.map((question) => (
-              <div
-                key={question.question_id}
-                className="bg-white p-4 border rounded-md shadow-md"
-              >
-                <a
-                  href={question.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline font-bold text-lg mb-2 block"
+          {loading ? (
+            <div className="flex justify-center items-center m-5 ">
+              <PuffLoader color="#36d7b7" loading />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {questions.map((question) => (
+                <div
+                  key={question.question_id}
+                  className="bg-white p-4 border rounded-md shadow-md"
                 >
-                  <HTMLCodeDisplay htmlCode={question.title} />
-                </a>
+                  <a
+                    href={question.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline font-bold text-lg mb-2 block"
+                  >
+                    <HTMLCodeDisplay htmlCode={question.title} />
+                  </a>
 
-                <button
-                  onClick={() => toggleQuestion(question.question_id)}
-                  className="text-blue-500 hover:underline mb-2 block"
-                >
-                  {expandedQuestions[question.question_id]
-                    ? "Close the Question"
-                    : "Show me the full Question"}
-                </button>
-                {expandedQuestions[question.question_id] && (
-                  <HTMLCodeDisplay htmlCode={question.body} />
-                )}
-                <button
-                  onClick={() => toggleAnswers(question.question_id)}
-                  className="text-blue-500 hover:underline mb-2 block"
-                >
-                  {expandedAnswers[question.question_id]
-                    ? "Close the Answers"
-                    : "Show me The Answers"}
-                </button>
-                {expandedAnswers[question.question_id] &&
-                  answers[question.question_id] &&
-                  answers[question.question_id].map((answer) => (
-                    <HTMLCodeDisplay
-                      key={answer.answer_id}
-                      htmlCode={answer.body}
-                    />
-                  ))}
-                <Checkbox
-                  checked={Boolean(checkedItems[question.question_id])}
-                  onChange={() => handleChange(question.question_id)}
-                  inputProps={{ "aria-label": "controlled" }}
-                />
-              </div>
-            ))}
-          </div>
+                  <button
+                    onClick={() => toggleQuestion(question.question_id)}
+                    className="text-blue-500 hover:underline mb-2 block"
+                  >
+                    {expandedQuestions[question.question_id]
+                      ? "Close the Question"
+                      : "Show me the full Question"}
+                  </button>
+                  {expandedQuestions[question.question_id] && (
+                    <HTMLCodeDisplay htmlCode={question.body} />
+                  )}
+                  <button
+                    onClick={() => toggleAnswers(question.question_id)}
+                    className="text-blue-500 hover:underline mb-2 block"
+                  >
+                    {expandedAnswers[question.question_id]
+                      ? "Close the Answers"
+                      : "Show me The Answers"}
+                  </button>
+                  {expandedAnswers[question.question_id] &&
+                    answers[question.question_id] &&
+                    answers[question.question_id].map((answer) => (
+                      <HTMLCodeDisplay
+                        key={answer.answer_id}
+                        htmlCode={answer.body}
+                      />
+                    ))}
+                  <Checkbox
+                    checked={Boolean(checkedItems[question.question_id])}
+                    onChange={() => handleChange(question.question_id)}
+                    inputProps={{ "aria-label": "controlled" }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {search1 && questions.length >= 10 && (
             <div className="nextPageLink">
               <button
-                className="mt-4 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                className={`mt-4 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 transition duration-300 ease-in-out ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : ""
+                }`}
                 type="button"
                 onClick={() => {
                   setSearch(true);
                   // fetchQuestions();
                 }}
+                disabled={loading}
               >
-                Display 10 additional results{" "}
+                Display 10 additional results
               </button>
             </div>
           )}
