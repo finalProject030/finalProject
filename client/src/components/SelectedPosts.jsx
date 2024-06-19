@@ -20,6 +20,7 @@ export default function SelectedPosts() {
   }, [selectedItems]);
 
   const moveToPostsPage = () => {
+    scrollToTop();
     setStep("posts");
   };
 
