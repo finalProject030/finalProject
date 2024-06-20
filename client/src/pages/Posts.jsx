@@ -443,8 +443,11 @@ const Posts = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline font-bold text-lg mb-2 block"
+                    dangerouslySetInnerHTML={{ __html: question.title }}
+
                   >
-                    <HTMLCodeDisplay htmlCode={question.title} />
+                    {/* <HTMLCodeDisplay htmlCode={question.title} /> */}
+
                   </a>
 
                   <button
@@ -456,7 +459,10 @@ const Posts = () => {
                       : "Show me the full Question"}
                   </button>
                   {expandedQuestions[question.question_id] && (
-                    <HTMLCodeDisplay htmlCode={question.body} />
+                    <div
+                    dangerouslySetInnerHTML={{ __html: question.body }}
+                    />
+                    // <HTMLCodeDisplay htmlCode={question.body} />
                   )}
                   <button
                     onClick={() => toggleAnswers(question.question_id)}
@@ -469,9 +475,20 @@ const Posts = () => {
                   {expandedAnswers[question.question_id] &&
                     answers[question.question_id] &&
                     answers[question.question_id].map((answer) => (
-                      <HTMLCodeDisplay
-                        key={answer.answer_id}
-                        htmlCode={answer.body}
+                      // <HTMLCodeDisplay
+                      //   key={answer.answer_id}
+                      //   htmlCode={answer.body}
+                      // />
+                      <div
+                      style={{
+                        marginBottom: '20px',
+                        padding: '15px',
+                        border: '1px solid #ccc',
+                        borderRadius: '5px',
+                        backgroundColor: '#f9f9f9',
+                      }}
+                      key={answer.answer_id}
+                      dangerouslySetInnerHTML={{ __html: answer.body }}
                       />
                     ))}
                   <Checkbox

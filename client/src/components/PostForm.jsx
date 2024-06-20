@@ -46,7 +46,10 @@ export default function PostCreationForm() {
   async function sendMessageToServer() {
     if(summary == "")
       summary = await summerizeQuestionAnswer();
+
     console.log(summary);
+    // return;
+
     // return;
     // console.log("API GEMINI");
     try {
@@ -88,7 +91,6 @@ export default function PostCreationForm() {
           (answer) => answer.is_accepted
         );
         let message = `Hi i want you to summarize this:\nQuestion ID: ${questionId}\n\nQuestion Body: ${item.body}\n\n`;
-
         if (acceptedAnswers.length > 0) {
           message += "Accepted Answers:\n";
           message += acceptedAnswers
@@ -102,6 +104,7 @@ export default function PostCreationForm() {
         return message;
       }
     );
+    
     
     const sum = [];
     let i = 1;
@@ -247,6 +250,7 @@ export default function PostCreationForm() {
 
   const moveToSelectedPostsPage = () => {
     setStep("selectedPosts");
+    summary = "";
   };
 
   const savePost = (title, content) => {
@@ -355,12 +359,14 @@ export default function PostCreationForm() {
       },
     }).then((result) => {
       if (result.dismiss === Swal.DismissReason.close) {
+        summary = "";
         setSelectedItems([]);
         setFinish(true);
       } else if (result.isConfirmed || result.isDenied) {
         return;
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         savePost(title, content);
+        summary = "";
       }
     });
   };
