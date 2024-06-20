@@ -12,6 +12,9 @@ import "line-awesome/dist/line-awesome/css/line-awesome.min.css";
 import { createRoot } from "react-dom/client";
 import Rights from "./Rights";
 
+let summary = "";
+
+
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
@@ -30,6 +33,8 @@ export default function PostCreationForm() {
   const maxChars = 150;
   const [content, setContent] = useState("");
 
+
+
   const handleInputChange = (e) => {
     const text = e.target.value;
     if (text.length <= maxChars) {
@@ -37,11 +42,15 @@ export default function PostCreationForm() {
     }
   };
 
-  // Function to send message to Gemini
+  // Function send message to Gemini
   async function sendMessageToServer() {
+    if(summary == "")
+      summary = await summerizeQuestionAnswer();
+    console.log(summary);
+    // return;
     // console.log("API GEMINI");
     try {
-      const valueToSend = generateJsonInstructions();
+      const valueToSend = generateJsonInstructions(summary);
       console.log(valueToSend);
       const response = await fetch(`${urlServer}/api/gemini`, {
         method: "POST",
@@ -68,32 +77,17 @@ export default function PostCreationForm() {
     }
   }
 
-  // Function to generate JSON instructions
-  const generateJsonInstructions = () => {
-    // Initial set of instructions
-    let instructions = [
-      "Hi, I want you to create a post for LinkedIn by following exactly these instructions:",
-      "- Include a catchy headline that grabs attention.",
-      "- Write a brief introduction to the topic to provide context.",
-      `- Keep the post concise at around ${wordCount} words.`,
-      `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
-      emojis === "yes"
-        ? `- Use emojis to add visual appeal!`
-        : "- Avoid using emojis to maintain a professional tone.",
-      "- Incorporate relevant hashtags to increase visibility.",
-      "- End with a call to action, such as asking for comments or opinions.",
-      `Plese pay carfull attention to this: ${freeText}`,
-      "Below is the question and its accepted answer for reference:",
-    ];
 
-    // Additional instructions based on selected posts
+  // Function to summerize each question and answer
+  const summerizeQuestionAnswer = async () => {
+
     const selectedPostsMessage = Object.entries(selectedItems).map(
       ([questionId, item]) => {
         if (item.answers === undefined) return;
         const acceptedAnswers = item.answers.filter(
           (answer) => answer.is_accepted
         );
-        let message = `\nQuestion ID: ${questionId}\n\nQuestion Body: ${item.body}\n\n`;
+        let message = `Hi i want you to summarize this:\nQuestion ID: ${questionId}\n\nQuestion Body: ${item.body}\n\n`;
 
         if (acceptedAnswers.length > 0) {
           message += "Accepted Answers:\n";
@@ -108,15 +102,102 @@ export default function PostCreationForm() {
         return message;
       }
     );
+    
+    const sum = [];
+    let i = 1;
+    
+    for (const selectedPost of selectedPostsMessage) {
+      if (selectedPost) {
+          try {
+              const response = await fetch(`${urlServer}/api/gemini`, {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ message: selectedPost }),
+              });
+
+              if (!response.ok) {
+                  throw new Error("Failed to send message to Gemini");
+              }
+
+              const data = await response.json();
+              const geminiResponseString = `${data.message}`;
+              sum.push(`Post Number ${i}:\n${geminiResponseString}`);
+              i++;
+          } catch (error) {
+              console.error(error);
+          }
+      }
+  }
+
+  return sum;
+};
+
+
+
+
+
+
+
+  // Function to generate JSON instructions
+  const generateJsonInstructions = (summary) => {
+    if (summary == undefined)
+      return "";
+  
+
+    // Initial set of instructions
+    let instructions = [
+      "Hi, I want you to create a post for LinkedIn by following exactly these instructions:",
+      "- Include a catchy headline that grabs attention.",
+      "- Write a brief introduction to the topic to provide context.",
+      `- Keep the post concise at around ${wordCount} words.`,
+      `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
+      emojis === "yes"
+        ? `- Use emojis to add visual appeal!`
+        : "- Avoid using emojis to maintain a professional tone.",
+      "- Incorporate relevant hashtags to increase visibility.",
+      "- End with a call to action, such as asking for comments or opinions.",
+      `Plese pay carfull attention to this: ${freeText}`,
+      // "Below is the question and its accepted answer for reference:",
+      "Below is the information that you will use to create the post:",
+
+    ];
+    summary.forEach((sum) => instructions += "\n" + sum);
+
+    // Additional instructions based on selected posts
+    // const selectedPostsMessage = Object.entries(selectedItems).map(
+    //   ([questionId, item]) => {
+    //     if (item.answers === undefined) return;
+    //     const acceptedAnswers = item.answers.filter(
+    //       (answer) => answer.is_accepted
+    //     );
+    //     let message = `\nQuestion ID: ${questionId}\n\nQuestion Body: ${item.body}\n\n`;
+
+    //     if (acceptedAnswers.length > 0) {
+    //       message += "Accepted Answers:\n";
+    //       message += acceptedAnswers
+    //         .map((acceptedAnswer, index) => {
+    //           return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
+    //         })
+    //         .join("");
+    //     } else {
+    //       message += "No accepted answers found.\n\n";
+    //     }
+    //     return message;
+    //   }
+    // );
+    
 
     // Combine initial instructions and selected posts message
-    instructions = instructions.concat(selectedPostsMessage);
+    // instructions = instructions.concat(selectedPostsMessage);
 
     // Set the JSON instructions state
-    setJsonInstructions(instructions.join("\n"));
+    setJsonInstructions(instructions);
+    console.log(instructions);
 
     // Construct the message to send
-    const message = `${instructions.join("\n")}`;
+    const message = `${instructions}`;
     setMessageToSend(message);
     return message;
   };
@@ -138,23 +219,24 @@ export default function PostCreationForm() {
     setLoading(true);
     setHandleSubmit(true);
     try {
-      await generateJsonInstructions(); // Generate JSON instructions
-      const selectedPostsMessage = Object.entries(selectedItems).map(
-        ([questionId, item]) => {
-          return `Question ID: ${questionId}\n\nQuestion Body: ${
-            item.body
-          }\n\nAccepted Answers:\n${item.answers
-            .filter((answer) => answer.is_accepted)
-            .map((acceptedAnswer, index) => {
-              return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
-            })
-            .join("")}`;
-        }
-      );
-      const message = `${jsonInstructions}\n\nSelected Posts:\n${selectedPostsMessage.join(
-        "\n\n"
-      )}`;
-      setMessageToSend(message);
+      // generateJsonInstructions(); // Generate JSON instructions
+      // const selectedPostsMessage = Object.entries(selectedItems).map(
+      //   ([questionId, item]) => {
+      //     return `Question ID: ${questionId}\n\nQuestion Body: ${
+      //       item.body
+      //     }\n\nAccepted Answers:\n${item.answers
+      //       .filter((answer) => answer.is_accepted)
+      //       .map((acceptedAnswer, index) => {
+      //         return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
+      //       })
+      //       .join("")}`;
+      //   }
+      // );
+      // const message = `${jsonInstructions}\n\nSelected Posts:\n${selectedPostsMessage.join(
+      //   "\n\n"
+      // )}`;
+      // console.log(message);
+      // setMessageToSend(message);
       await sendMessageToServer(); // Send message to Gemini
     } catch (error) {
       console.error("Error handling form submission:", error);
@@ -284,7 +366,7 @@ export default function PostCreationForm() {
   };
 
   const getInfo = (geminiResponse1) => {
-    console.log("im gminie response:\n\n" + geminiResponse1);
+    // console.log("im gminie response:\n\n" + geminiResponse1);
     let i, j;
     let title = "";
     let content = "";
@@ -321,9 +403,9 @@ export default function PostCreationForm() {
       let first = content.indexOf("```");
       let f = content.substring(0, first);
       let str = content.substring(first, content.length);
-      console.log("im str first" + str);
+      // console.log("im str first" + str);
       str = str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      console.log("Fixed string: " + str);
+      // console.log("Fixed string: " + str);
       return f + str;
     }
     return content;
