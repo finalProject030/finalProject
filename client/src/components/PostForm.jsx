@@ -14,7 +14,6 @@ import Rights from "./Rights";
 
 let summary = "";
 
-
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
@@ -33,8 +32,6 @@ export default function PostCreationForm() {
   const maxChars = 150;
   const [content, setContent] = useState("");
 
-
-
   const handleInputChange = (e) => {
     const text = e.target.value;
     if (text.length <= maxChars) {
@@ -44,8 +41,7 @@ export default function PostCreationForm() {
 
   // Function send message to Gemini
   async function sendMessageToServer() {
-    if(summary == "")
-      summary = await summerizeQuestionAnswer();
+    if (summary == "") summary = await summerizeQuestionAnswer();
 
     console.log(summary);
     // return;
@@ -80,10 +76,8 @@ export default function PostCreationForm() {
     }
   }
 
-
   // Function to summerize each question and answer
   const summerizeQuestionAnswer = async () => {
-
     const selectedPostsMessage = Object.entries(selectedItems).map(
       ([questionId, item]) => {
         if (item.answers === undefined) return;
@@ -104,50 +98,41 @@ export default function PostCreationForm() {
         return message;
       }
     );
-    
-    
+
     const sum = [];
     let i = 1;
-    
+
     for (const selectedPost of selectedPostsMessage) {
       if (selectedPost) {
-          try {
-              const response = await fetch(`${urlServer}/api/gemini`, {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ message: selectedPost }),
-              });
+        try {
+          const response = await fetch(`${urlServer}/api/gemini`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: selectedPost }),
+          });
 
-              if (!response.ok) {
-                  throw new Error("Failed to send message to Gemini");
-              }
-
-              const data = await response.json();
-              const geminiResponseString = `${data.message}`;
-              sum.push(`Post Number ${i}:\n${geminiResponseString}`);
-              i++;
-          } catch (error) {
-              console.error(error);
+          if (!response.ok) {
+            throw new Error("Failed to send message to Gemini");
           }
+
+          const data = await response.json();
+          const geminiResponseString = `${data.message}`;
+          sum.push(`Post Number ${i}:\n${geminiResponseString}`);
+          i++;
+        } catch (error) {
+          console.error(error);
+        }
       }
-  }
+    }
 
-  return sum;
-};
-
-
-
-
-
-
+    return sum;
+  };
 
   // Function to generate JSON instructions
   const generateJsonInstructions = (summary) => {
-    if (summary == undefined)
-      return "";
-  
+    if (summary == undefined) return "";
 
     // Initial set of instructions
     let instructions = [
@@ -164,9 +149,8 @@ export default function PostCreationForm() {
       `Plese pay carfull attention to this: ${freeText}`,
       // "Below is the question and its accepted answer for reference:",
       "Below is the information that you will use to create the post:",
-
     ];
-    summary.forEach((sum) => instructions += "\n" + sum);
+    summary.forEach((sum) => (instructions += "\n" + sum));
 
     // Additional instructions based on selected posts
     // const selectedPostsMessage = Object.entries(selectedItems).map(
@@ -190,7 +174,6 @@ export default function PostCreationForm() {
     //     return message;
     //   }
     // );
-    
 
     // Combine initial instructions and selected posts message
     // instructions = instructions.concat(selectedPostsMessage);
@@ -444,7 +427,7 @@ export default function PostCreationForm() {
                       id="emojis"
                       value={emojis}
                       onChange={(e) => setEmojis(e.target.value)}
-                      className="p-2 border rounded-md w-full"
+                      className="p-2 border rounded-md w-full dark:bg-gray-700 dark:text-white"
                     >
                       <option value="yes">Yes</option>
                       <option value="no">No</option>
@@ -506,7 +489,7 @@ export default function PostCreationForm() {
 
                   <label
                     htmlFor="wordCount"
-                    className="block mb-2  font-semibold    text-gray-900 dark:text-white"
+                    className="block mb-2  font-semibold    text-gray-900 dark:text-black"
                   >
                     Desired word count:
                   </label>
@@ -522,7 +505,7 @@ export default function PostCreationForm() {
                   <div className="my-4">
                     <label
                       htmlFor="paragraphCount"
-                      className="block mb-2 font-semibold  text-gray-900 dark:text-white"
+                      className="block mb-2 font-semibold  text-gray-900 dark:text-black"
                     >
                       Desired paragraph count:
                     </label>
@@ -541,7 +524,7 @@ export default function PostCreationForm() {
                   <div className="mb-4">
                     <label
                       htmlFor="freeText"
-                      className="block mb-2  font-semibold  text-gray-900 dark:text-white"
+                      className="block mb-2  font-semibold  text-gray-900 dark:text-black"
                     >
                       Your message:
                     </label>

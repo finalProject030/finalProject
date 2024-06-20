@@ -76,7 +76,7 @@ const Posts = () => {
     const fetchQuestions = async () => {
       setLoading(true);
 
-      if (tagged != "") {
+      if (tagged !== "") {
         if (
           addNumber == 10 &&
           questionsData != undefined &&
@@ -100,6 +100,8 @@ const Posts = () => {
         }
 
         if (questionsData === "") {
+          console.log("ffff");
+
           try {
             let api = "";
             api = `https://api.stackexchange.com/2.3/search/excerpts?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow`;
@@ -107,6 +109,7 @@ const Posts = () => {
             const data = response.data;
             if (data.items) {
               setQuestionsData(data);
+
               let i = addNumber * 10;
               let randomQuestions = [];
               while (randomQuestions.length < 10) {
@@ -123,8 +126,8 @@ const Posts = () => {
               }
               if (questions.length === 0) setQuestions(randomQuestions);
               else questions.push(...randomQuestions);
-
-              fetchAnswers(randomQuestions);
+              await fetchAnswers(randomQuestions);
+              console.log("hi");
             }
           } catch (error) {
             setLoading(false);
@@ -148,22 +151,29 @@ const Posts = () => {
                 const questionData1 = await questionForAnswer(api1);
                 randomQuestions.push(questionData1.items[0]);
                 uniqueQuestionsId.push(questionData1.items[0].question_id);
-                // }
-
-                // else{
-                //   uniqueQuestionsId.push(questionsData.items[i].question_id);
-                //   randomQuestions.push(questionsData.items[i]);
-
-                // }
               }
               i++;
             }
             questions.push(...randomQuestions);
             fetchAnswers(randomQuestions);
+            setLoading(false);
           }
         }
         setaddNumber(addNumber + 1);
         search1 = true;
+        setLoading(false);
+      }
+
+      if (tagged === "") {
+        setLoading(false);
+
+        Swal.fire({
+          title: "You must search for something",
+          icon: "warning",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "Confirm",
+        });
+        return;
       }
     };
     if (search) {
@@ -208,6 +218,12 @@ const Posts = () => {
       } catch (error) {
         console.error("Error fetching answers data:", error);
       }
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "An error occurred while fetching this kind of data. Please try again later.",
+      });
     }
   };
 
@@ -437,6 +453,7 @@ const Posts = () => {
                 <div
                   key={question.question_id}
                   className="bg-white p-4 border rounded-md shadow-md"
+                  style={{ maxHeight: "500px", overflowY: "auto" }}
                 >
                   <a
                     href={question.link}
@@ -444,11 +461,7 @@ const Posts = () => {
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline font-bold text-lg mb-2 block"
                     dangerouslySetInnerHTML={{ __html: question.title }}
-
-                  >
-                    {/* <HTMLCodeDisplay htmlCode={question.title} /> */}
-
-                  </a>
+                  />
 
                   <button
                     onClick={() => toggleQuestion(question.question_id)}
@@ -460,10 +473,11 @@ const Posts = () => {
                   </button>
                   {expandedQuestions[question.question_id] && (
                     <div
-                    dangerouslySetInnerHTML={{ __html: question.body }}
+                      style={{ maxHeight: "300px", overflowY: "auto" }}
+                      dangerouslySetInnerHTML={{ __html: question.body }}
                     />
-                    // <HTMLCodeDisplay htmlCode={question.body} />
                   )}
+
                   <button
                     onClick={() => toggleAnswers(question.question_id)}
                     className="text-blue-500 hover:underline mb-2 block"
@@ -475,20 +489,18 @@ const Posts = () => {
                   {expandedAnswers[question.question_id] &&
                     answers[question.question_id] &&
                     answers[question.question_id].map((answer) => (
-                      // <HTMLCodeDisplay
-                      //   key={answer.answer_id}
-                      //   htmlCode={answer.body}
-                      // />
                       <div
-                      style={{
-                        marginBottom: '20px',
-                        padding: '15px',
-                        border: '1px solid #ccc',
-                        borderRadius: '5px',
-                        backgroundColor: '#f9f9f9',
-                      }}
-                      key={answer.answer_id}
-                      dangerouslySetInnerHTML={{ __html: answer.body }}
+                        style={{
+                          maxHeight: "300px",
+                          overflowY: "auto",
+                          marginBottom: "20px",
+                          padding: "15px",
+                          border: "1px solid #ccc",
+                          borderRadius: "5px",
+                          backgroundColor: "#f9f9f9",
+                        }}
+                        key={answer.answer_id}
+                        dangerouslySetInnerHTML={{ __html: answer.body }}
                       />
                     ))}
                   <Checkbox
