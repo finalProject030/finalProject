@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { HiDotsVertical } from "react-icons/hi";
 import PostDropdown from "./PostDropDown";
+import SocialMediaShare from "./SocialMediaShare";
 
 // Define formatDate function
 const formatDate = (dateString) => {
@@ -68,6 +69,7 @@ const PostItem = ({
           {post.isPublic ? "Make Private" : "Make Public"}
         </button>
       </div>
+      <SocialMediaShare text={post.content} title={post.title} content={""} />
     </div>
   );
 };

@@ -5,10 +5,12 @@ import PostFilters from "../PostFilters";
 import PostItem from "../PostItem";
 import { urlServer } from "../../variables";
 import PostPage from "../../pages/PostPage";
-import LoadingSpinner from "../../components/LoadingSpinner"; // Import the LoadingSpinner component
+import PuffLoader from "react-spinners/PuffLoader";
+import SocialMediaShare from "../SocialMediaShare";
 
 const UserPosts = () => {
-  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const { currentUser, error } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [filter, setFilter] = useState("");
   const [visibilityFilter, setVisibilityFilter] = useState("all");
@@ -25,6 +27,7 @@ const UserPosts = () => {
   const fetchUserPosts = async (userId) => {
     try {
       // const res = await fetch(`/api/post/${userId}`, {
+      setLoading(true);
       const res = await fetch(`${urlServer}/api/post/${userId}`, {
         method: "GET",
         headers: {
@@ -35,48 +38,60 @@ const UserPosts = () => {
       const data = await res.json();
       if (data.success) {
         setPosts(data.posts);
+        setLoading(false);
       }
     } catch (error) {
+      setLoading(false);
+
       console.log(error);
     }
   };
 
   const handleDeletePost = async (postId) => {
-    try {
-      const res = await fetch(`${urlServer}/api/post/${postId}`, {
-        method: "DELETE",
-        headers: {
-          authorization: localStorage.getItem("token"),
-        },
-      });
-      const data = await res.json();
-      if (data.success) {
-        setPosts(posts.filter((post) => post._id !== postId));
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      try {
+        const res = await fetch(`${urlServer}/api/post/${postId}`, {
+          method: "DELETE",
+          headers: {
+            authorization: localStorage.getItem("token"),
+          },
+        });
+        const data = await res.json();
+        if (data.success) {
+          setPosts(posts.filter((post) => post._id !== postId));
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
   };
 
   const toggleVisibility = async (postId, isPublic) => {
-    try {
-      const res = await fetch(`${urlServer}/api/post/${postId}/visibility`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: localStorage.getItem("token"),
-        },
-        body: JSON.stringify({ isPublic: !isPublic }), // Toggle visibility
-      });
-      const data = await res.json();
-      if (data.success) {
-        setPosts(posts.map((post) => (post._id === postId ? data.post : post)));
+    const message = isPublic
+      ? "Are you sure you want to make it private?"
+      : "Are you sure you want to make it public?";
+
+    if (window.confirm(message)) {
+      try {
+        const res = await fetch(`${urlServer}/api/post/${postId}/visibility`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: localStorage.getItem("token"),
+          },
+          body: JSON.stringify({ isPublic: !isPublic }), // Toggle visibility
+        });
+        const data = await res.json();
+        if (data.success) {
+          setPosts(
+            posts.map((post) => (post._id === postId ? data.post : post))
+          );
+        }
+      } catch (error) {
+        console.log(error);
       }
-    } catch (error) {
-      console.log(error);
     }
   };
-
   const copyPost = (title, content) => {
     // Combine title and content with a line break
     const textToCopy = `${title}\n${content}`;
@@ -154,7 +169,7 @@ const UserPosts = () => {
           {/* Posts Section */}
           <div className="col-span-1 md:col-span-4">
             {loading ? (
-              <LoadingSpinner />
+              <PuffLoader />
             ) : (
               <>
                 {error && (

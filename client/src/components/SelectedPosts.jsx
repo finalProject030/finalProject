@@ -20,6 +20,7 @@ export default function SelectedPosts() {
   }, [selectedItems]);
 
   const moveToPostsPage = () => {
+    scrollToTop();
     setStep("posts");
   };
 
@@ -64,7 +65,7 @@ export default function SelectedPosts() {
           {Object.entries(selectedItems).map(([questionId, item]) => (
             <div
               key={questionId}
-              className="mb-8 bg-gray-100 overflow-auto rounded-lg p-4 border border-gray-300 break-words w-full md:w-auto"
+              className="mb-8 bg-gray-100 overflow-auto rounded-lg p-4 border border-gray-300 break-words w-full "
             >
               <h3 className="text-xl font-semibold mb-2">
                 Question ID: {questionId}
