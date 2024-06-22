@@ -473,7 +473,7 @@ const Posts = () => {
                   </button>
                   {expandedQuestions[question.question_id] && (
                     <div
-                      style={{ maxHeight: "300px", overflowY: "auto" }}
+                      className="max-h-[300px] overflow-y-auto mb-5 p-4 border border-gray-300 rounded-md bg-gray-200"
                       dangerouslySetInnerHTML={{ __html: question.body }}
                     />
                   )}
