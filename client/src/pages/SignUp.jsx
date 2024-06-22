@@ -96,10 +96,10 @@ export default function SignUp() {
           id="confirmPassword"
           onChange={handleChange}
         />
-        <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+        <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray">
           Password requirements:
         </h2>
-        <ul className="max-w-md space-y-1 text-gray-500 list-inside dark:text-gray-400">
+        <ul className="max-w-md space-y-1 text-gray-500 list-inside dark:text-gray-700">
           <li className="flex items-center">
             <svg
               className={`w-3.5 h-3.5 me-2 ${
