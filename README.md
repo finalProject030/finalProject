@@ -50,7 +50,7 @@ The first one contain the mongoDB api key and the JWT secret- its should be loca
 The second one sould be located inside the client folder and it should contain the VITE_FIREBASE_API_KEY <br><br><br><br>
 
 ## *Logo*:
-<img src="https://github.com/finalProject030/finalProject/assets/126160304/8d609636-8f48-47c6-99fc-825cd9b47d9e" height="50" width="300">
+<img src="https://github.com/user-attachments/assets/bb6a661d-e17e-47e4-9e9d-cade81e8af05" height="100" width="100">
 <br><br><br><br>
 
 
