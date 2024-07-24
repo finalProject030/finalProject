@@ -69,25 +69,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}!`);
 });
-
-// app.get('/posts', async (req, res) => {
-//   console.log("im here!!!!");
-// const { sort, order, questionId } = req.query;
-// let api;
-
-// console.log(req.query);
-
-// if (sort !== "relevance") {
-//   api = `https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=${order}&sort=${sort}&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-// } else {
-//   api = `https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&title=react&site=stackoverflow&filter=!6WPIomnMOOD*e`;
-// }
-
-// try {
-//   const response = await axios.get(api);
-//   res.json(response.data);
-// } catch (error) {
-//   console.error("Error fetching data from Stack Exchange API:", error);
-//   res.status(500).json({ error: "Internal server error" });
-// }
-// });

@@ -10,6 +10,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { BsSearch } from "react-icons/bs";
 import PuffLoader from "react-spinners/PuffLoader";
+import ReactHtmlParser from "html-react-parser";
+
 
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
@@ -472,10 +474,11 @@ const Posts = () => {
                       : "Show me the full Question"}
                   </button>
                   {expandedQuestions[question.question_id] && (
-                    <div
-                      className="max-h-[300px] overflow-y-auto mb-5 p-4 border border-gray-300 rounded-md bg-gray-200"
-                      dangerouslySetInnerHTML={{ __html: question.body }}
-                    />
+                    <div className="max-h-[300px] overflow-y-auto mb-5 p-4 border border-gray-300 rounded-md bg-gray-200">
+                        {ReactHtmlParser(question.body)}
+                      </div>
+                      // dangerouslySetInnerHTML={{ __html: question.body }}
+                    // />
                   )}
 
                   <button
