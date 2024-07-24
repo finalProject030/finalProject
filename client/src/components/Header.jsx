@@ -19,7 +19,10 @@ export default function Header() {
   };
 
   return (
-    <nav id="topPage" className="bg-white border-gray-200 dark:bg-gray-900">
+    <nav
+      id="topPage"
+      className="relative z-20 bg-white border-gray-200 dark:bg-gray-900"
+    >
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <Link
           to="/"
