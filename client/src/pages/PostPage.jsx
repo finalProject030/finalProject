@@ -1,46 +1,93 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { urlServer } from "../variables";
-import { format, formatDistanceToNow } from "date-fns";
 import PuffLoader from "react-spinners/PuffLoader";
+import { format, formatDistanceToNow } from "date-fns";
 
 const PostPage = () => {
-  const { postId } = useParams(); // Get postId from URL params
+  const { postId } = useParams();
   const [post, setPost] = useState(null);
-  const [editing, setEditing] = useState(false); // State to track editing mode
-  const [editedContent, setEditedContent] = useState(""); // State to store edited content
-  const [editedTitle, setEditedTitle] = useState(""); // State to store edited title
+  const [editing, setEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState("");
+  const [editedTitle, setEditedTitle] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageFileSelected, setImageFileSelected] = useState(false);
+  const [previousImage, setPreviousImage] = useState(""); // New state for previous image
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await fetch(`${urlServer}/api/post/post/${postId}`, {
-          method: "GET",
-          headers: {
-            authorization: localStorage.getItem("token"),
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch post");
-        }
-        const postData = await response.json();
-        setPost(postData);
-        // Initialize edited title with the original post title
-        setEditedTitle(postData.post.title);
-      } catch (error) {
-        console.error("Error fetching post:", error);
+  const [imageUploadProgress, setImageUploadProgress] = useState(null);
+  const [imageUploadError, setImageUploadError] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [publishError, setPublishError] = useState(null);
+
+  const fetchPost = async () => {
+    try {
+      const response = await fetch(`${urlServer}/api/post/post/${postId}`, {
+        method: "GET",
+        headers: {
+          authorization: localStorage.getItem("token"),
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch post");
       }
-    };
-
+      const postData = await response.json();
+      setPost(postData);
+      setEditedTitle(postData.post.title);
+      setEditedContent(postData.post.content);
+      setImagePreview(postData.post.image);
+      setImageFile(postData.post.image);
+      setPreviousImage(postData.post.image); // Save previous image URL
+    } catch (error) {
+      console.error("Error fetching post:", error);
+    }
+  };
+  useEffect(() => {
     fetchPost();
   }, [postId]);
 
+  const handleUploadImage = () => {
+    if (!imageFile) return;
+
+    const storage = getStorage();
+    const fileName = new Date().getTime() + "-" + imageFile.name;
+    const storageRef = ref(storage, `images/${fileName}`);
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    setUploadingImage(true);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImageUploadProgress(progress);
+      },
+      (error) => {
+        console.error("Error uploading image:", error);
+        setImageUploadError(error.message);
+        setUploadingImage(false);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImagePreview(downloadURL);
+          setImageFile(downloadURL);
+          setUploadingImage(false);
+        });
+      }
+    );
+  };
+
   const handleEditButtonClick = () => {
-    // Toggle editing mode
     setEditing(!editing);
-    // Initialize edited content with the original post content
-    setEditedContent(post.post.content);
   };
 
   const handleSaveButtonClick = async () => {
@@ -48,11 +95,22 @@ const PostPage = () => {
       const confirmed = window.confirm(
         "Are you sure you want to save the changes?"
       );
-      if (!confirmed) return; // If the user cancels, do nothing
+      if (!confirmed) return;
 
-      // Update both title and content
+      if (imageFile && typeof imageFile === "object") {
+        await new Promise((resolve) => {
+          handleUploadImage();
+          const interval = setInterval(() => {
+            if (imageUploadProgress === 100) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 1000);
+        });
+      }
+
       const response = await fetch(`${urlServer}/api/post/${postId}`, {
-        method: "PUT", // Change method to PATCH
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           authorization: localStorage.getItem("token"),
@@ -60,15 +118,16 @@ const PostPage = () => {
         body: JSON.stringify({
           title: editedTitle,
           content: editedContent,
+          image:
+            typeof imageFile === "string" ? imageFile : imageFile?.name || "",
         }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to update post");
       }
-      // Disable editing mode after saving
+
       setEditing(false);
-      // Fetch updated post data
       const updatedPostResponse = await fetch(
         `${urlServer}/api/post/post/${postId}`,
         {
@@ -85,6 +144,15 @@ const PostPage = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setImageFileSelected(true);
+    }
+  };
+
   const toggleVisibility = async (postId, isPublic) => {
     const confirmationMessage = isPublic
       ? "Are you sure you want to make this post private?"
@@ -92,7 +160,6 @@ const PostPage = () => {
 
     if (window.confirm(confirmationMessage)) {
       try {
-        // Update post visibility
         const response = await fetch(
           `${urlServer}/api/post/${postId}/visibility`,
           {
@@ -109,7 +176,6 @@ const PostPage = () => {
           throw new Error("Failed to update post visibility");
         }
 
-        // Fetch updated post data
         const updatedPostResponse = await fetch(
           `${urlServer}/api/post/post/${postId}`,
           {
@@ -128,35 +194,53 @@ const PostPage = () => {
   };
 
   const handleDeleteButtonClick = async () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
+    if (window.confirm("Are you sure you want to delete the image?")) {
+      setImageFile(previousImage); // Restore previous image
       try {
-        // Delete post
         const response = await fetch(`${urlServer}/api/post/${postId}`, {
-          method: "DELETE",
+          method: "PUT",
           headers: {
+            "Content-Type": "application/json",
             authorization: localStorage.getItem("token"),
           },
+          body: JSON.stringify({
+            ...post.post,
+            image: "", // Clear image URL
+          }),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to delete post");
+          throw new Error("Failed to update post");
         }
 
-        // Redirect to the home page after deletion
-        history.push("/");
+        const updatedPostResponse = await fetch(
+          `${urlServer}/api/post/post/${postId}`,
+          {
+            method: "GET",
+            headers: {
+              authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+        const updatedPostData = await updatedPostResponse.json();
+        setPost(updatedPostData);
+        setPreviousImage(updatedPostData.post.image); // Update previous image URL
+        fetchPost();
       } catch (error) {
-        console.error("Error deleting post:", error);
+        console.error("Error updating post:", error);
       }
     }
   };
 
   if (!post) {
     return (
-      <div className="col-span-1 md:col-span-4 flex justify-center h-dvh		items-center	">
+      <div className="col-span-1 md:col-span-4 flex justify-center h-dvh items-center">
         <PuffLoader />
       </div>
     );
   }
+
+  const hasImage = imagePreview || post.post.image;
 
   return (
     <div className="container mx-auto my-20 px-4">
@@ -170,74 +254,102 @@ const PostPage = () => {
                 className="block w-full p-2.5 mb-2 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 type="text"
                 value={editedTitle}
-                onChange={(e) => setEditedTitle(e.target.value)}
+                onChange={(e) => {
+                  setEditedTitle(e.target.value);
+                  setFormData({ ...formData, title: e.target.value });
+                }}
               />
             ) : (
               post.post.title
             )}
           </h2>
+          {hasImage && (
+            <img
+              src={imagePreview || post.post.image}
+              alt="post cover"
+              className="h-[260px] w-full object-cover group-hover:h-[200px] transition-all duration-300 z-20"
+            />
+          )}
+          {editing && (
+            <div className="mt-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              />
+              {imageUploadProgress !== null && (
+                <div className="mt-2 text-gray-600 dark:text-gray-400">
+                  Upload Progress: {imageUploadProgress}%
+                </div>
+              )}
+              {imageUploadError && (
+                <div className="mt-2 text-red-500 dark:text-red-400">
+                  Error: {imageUploadError}
+                </div>
+              )}
+              <button
+                onClick={handleUploadImage}
+                disabled={uploadingImage || !imageFileSelected}
+                className={`mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+                  uploadingImage ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Upload Image
+              </button>
+              <button
+                onClick={handleDeleteButtonClick}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Delete Image
+              </button>
+            </div>
+          )}
           <p className="text-gray-600 dark:text-gray-400 mb-2">
             {format(new Date(post.post.createdAt), "MMMM d, yyyy")} (
             {formatDistanceToNow(new Date(post.post.createdAt))} ago)
           </p>
-
           {editing ? (
             <textarea
-              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none overflow-auto"
+              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              rows={20} // Adjust this value as needed
-              placeholder="Enter your content here..."
+              onChange={(e) => {
+                setEditedContent(e.target.value);
+                setFormData({ ...formData, content: e.target.value });
+              }}
             />
           ) : (
-            post.post.content.split("\n").map((paragraph, index) => (
-              <p key={index} className="text-gray-800 dark:text-white mb-2">
-                {paragraph}
-              </p>
-            ))
+            <p className="text-gray-800 dark:text-gray-300">
+              {post.post.content}
+            </p>
           )}
-          <div className="flex flex-wrap items-center justify-between mt-4">
-            <div>
+          <div className="mt-4 flex justify-between">
+            {editing ? (
               <button
-                onClick={() =>
-                  toggleVisibility(post.post._id, post.post.isPublic)
-                }
-                className={`${
-                  post.post.isPublic
-                    ? "text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                    : "text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                } hover:bg-opacity-75 text-white font-semibold py-2 px-2 rounded mr-2`}
+                onClick={handleSaveButtonClick}
+                className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+                  uploadingImage ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={uploadingImage}
               >
-                {post.post.isPublic ? "Make Private" : "Make Public"}
+                Save
               </button>
-
+            ) : (
               <button
-                onClick={handleDeleteButtonClick}
-                className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                onClick={handleEditButtonClick}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
               >
-                Delete
+                Edit
               </button>
-            </div>
-            <div className="flex items-center mt-2 lg:mt-0">
-              <p className="text-gray-600 dark:text-gray-400 mr-3">
-                Likes: {post.post.likes.length}
-              </p>
-              {editing ? (
-                <button
-                  onClick={handleSaveButtonClick}
-                  className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
-                >
-                  Save
-                </button>
-              ) : (
-                <button
-                  onClick={handleEditButtonClick}
-                  className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 "
-                >
-                  Edit
-                </button>
-              )}
-            </div>
+            )}
+            <button
+              onClick={() => toggleVisibility(postId, post.post.isPublic)}
+              className={`px-4 py-2 ${
+                post.post.isPublic ? "bg-red-500" : "bg-blue-500"
+              } text-white rounded hover:bg-opacity-80`}
+            >
+              {post.post.isPublic ? "Make Private" : "Make Public"}
+            </button>
           </div>
         </div>
       </div>
