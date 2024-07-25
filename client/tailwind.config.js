@@ -8,6 +8,7 @@ export default {
       },
       colors: {
         "regal-blue": "#243c5a",
+        gray: "#D1D5DB", // Example of a custom gray color
       },
       backgroundImage: {
         "custom-gradient":
