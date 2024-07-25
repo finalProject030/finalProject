@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { urlServer } from "../variables";
 import { format, formatDistanceToNow } from "date-fns";
+import PuffLoader from "react-spinners/PuffLoader";
 
 const PostPage = () => {
   const { postId } = useParams(); // Get postId from URL params
@@ -150,7 +151,11 @@ const PostPage = () => {
   };
 
   if (!post) {
-    return <LoadingSpinner />;
+    return (
+      <div className="col-span-1 md:col-span-4 flex justify-center h-dvh		items-center	">
+        <PuffLoader />
+      </div>
+    );
   }
 
   return (
