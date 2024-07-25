@@ -95,14 +95,14 @@ const PostFilters = ({
       <div className="block md:hidden w-full">
         <button
           onClick={() => setFilterOpen((prev) => !prev)}
-          className="bg-gradient-to-r from-blue-500 to-blue-700 container     text-white p-3 rounded-lg mb-4 shadow-lg hover:bg-gradient-to-l hover:from-blue-600 hover:to-blue-800 transition duration-300 ease-in-out transform hover:scale-10"
+          className="bg-gradient-to-r from-gray-300 to-white container     text-black font-bold border-4 border-gray p-3 rounded-lg mb-4 shadow-lg hover:bg-gradient-to-l hover:from-gray-100 hover:to-gray-400 transition duration-300 ease-in-out transform hover:scale-10"
         >
           Filters
         </button>
 
         {filterOpen && (
           <div className="p-4 bg-white rounded-lg shadow-lg mb-4">
-            <h2 className="text-2xl  mb-4">Filters</h2>
+            <h2 className="text-2xl font-bold mb-4">Filters</h2>
             <input
               type="text"
               value={filter}
@@ -111,7 +111,7 @@ const PostFilters = ({
               className="w-full p-2 mb-4 border rounded-lg"
             />
             <div className="mb-4">
-              <label className="block mb-2 text-xl">Visibility</label>
+              <label className="block mb-2 text-xl font-bold">Visibility</label>
               <select
                 value={visibilityFilter}
                 onChange={(e) => setVisibilityFilter(e.target.value)}
@@ -123,7 +123,7 @@ const PostFilters = ({
               </select>
             </div>
             <div>
-              <label className="block mb-2">Sort By</label>
+              <label className="block mb-2 text-xl font-bold">Sort By</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
