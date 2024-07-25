@@ -10,6 +10,46 @@ const Feed = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  const Modal = ({ imageSrc, onClose }) => {
+    if (!imageSrc) return null; // Don't render if there's no image
+
+    return (
+      <div
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        onClick={onClose}
+      >
+        <div
+          className="relative bg-white p-4 rounded-lg max-h-[80vh] overflow-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          >
+            &times;
+          </button>
+          <img
+            src={imageSrc}
+            alt="Preview"
+            className="max-w-full max-h-[80vh] object-contain"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const openModal = (imageSrc) => {
+    setModalImage(imageSrc);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalImage(null);
+  };
 
   useEffect(() => {
     if (currentUser) {
@@ -37,8 +77,6 @@ const Feed = () => {
             );
             const userResponse = await fetch(
               `${urlServer}/api/user/${post.author}`,
-              // `/api/user/${post.author}`,
-
               {
                 method: "GET",
                 headers: {
@@ -47,14 +85,14 @@ const Feed = () => {
               }
             );
             const userData = await userResponse.json();
-            const profilePictureURL = userData.avatar; // The avatar URL is stored in the `avatar` field of user data
+            const profilePictureURL = userData.avatar;
             const userName = userData.username;
             return {
               ...post,
               userLiked,
               profilePictureURL,
               userName,
-              loading: false, // Add loading state for each post
+              loading: false,
             };
           })
         );
@@ -73,10 +111,8 @@ const Feed = () => {
 
   const handleLikePost = async (postId) => {
     try {
-      // Find the index of the post being liked
       const postIndex = publicPosts.findIndex((post) => post._id === postId);
 
-      // Set loading state to true for the liked post
       setPublicPosts((prevPosts) => [
         ...prevPosts.slice(0, postIndex),
         { ...prevPosts[postIndex], loading: true },
@@ -110,16 +146,14 @@ const Feed = () => {
         setError(data.message);
       }
     } catch (error) {
-      setError("Error liking/disliking the post.");
+      setError("Error liking the post.");
     }
   };
 
   const handleDislikePost = async (postId) => {
     try {
-      // Find the index of the post being disliked
       const postIndex = publicPosts.findIndex((post) => post._id === postId);
 
-      // Set loading state to true for the disliked post
       setPublicPosts((prevPosts) => [
         ...prevPosts.slice(0, postIndex),
         { ...prevPosts[postIndex], loading: true },
@@ -159,28 +193,8 @@ const Feed = () => {
 
   return (
     <>
-      {/* Wave shape */}
-      {/* <div className="left-0 w-full -mb-1">
-        <svg
-          className="fill-current text-white dark:text-gray-800"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 320"
-        >
-          <path
-            fillOpacity="1"
-            d="M0,64L48,85.3C96,107,192,149,288,170.7C384,192,480,192,576,165.3C672,139,768,85,864,64C960,43,1056,53,1152,74.7C1248,96,1344,128,1392,144L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
-          ></path>
-        </svg>
-      </div> */}
       <div className="container my-20 mx-auto bg-gray-100 rounded-lg border border-gray-200 px-4 py-8 min-h-screen">
-        <h2 className="text-4xl share-tech md:text-7xl font-bold mb-4 flex justify-center items-center">
-          Public Posts
-        </h2>
-        <div className="flex justify-center	 mx-auto	">
-          {loading && <PuffLoader />}
-        </div>
-        {error && <p className="text-red-500">Error: {error}</p>}
-
+        {/* Header, loader, error message, etc. */}
         <div className="mt-8 grid gap-8">
           {publicPosts.map((post) => (
             <div
@@ -196,11 +210,20 @@ const Feed = () => {
               <h2 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                 <a>{post.title}</a>
               </h2>
+              {post.image && (
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-48 object-cover rounded-lg mb-4 cursor-pointer"
+                  onClick={() => openModal(post.image)}
+                />
+              )}
               <div className="mb-5 font-light text-gray-500 dark:text-gray-400">
                 {post.content.split("\n").map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
               </div>
+
               <div className="flex flex-col lg:flex-row items-center lg:justify-between mb-3">
                 <div className="flex items-center mb-2 lg:mb-0">
                   <img
@@ -243,6 +266,8 @@ const Feed = () => {
             </div>
           ))}
         </div>
+
+        {modalOpen && <Modal imageSrc={modalImage} onClose={closeModal} />}
       </div>
     </>
   );
