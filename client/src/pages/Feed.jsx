@@ -225,16 +225,19 @@ const Feed = () => {
               </div>
 
               <div className="flex flex-col lg:flex-row items-center lg:justify-between mb-3">
-                <div className="flex items-center mb-2 lg:mb-0">
-                  <img
-                    className="w-7 h-7 rounded-full mr-2"
-                    src={post.profilePictureURL}
-                    alt="Profile"
-                  />
-                  <span className="font-medium dark:text-white">
-                    {post.userName}
-                  </span>
-                </div>
+                {post.profilePictureURL && (
+                  <div className="flex items-center mb-2 lg:mb-0">
+                    <img
+                      className="w-7 h-7 rounded-full mr-2"
+                      src={post.profilePictureURL}
+                      alt="Profile"
+                    />
+                    <span className="font-medium dark:text-white">
+                      {post.userName}
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-3">
                   <p className="text-gray-400 mr-4 lg:mb-0 lg:mr-0">
                     {post.likes.length} Likes
