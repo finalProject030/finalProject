@@ -26,13 +26,18 @@ const postSchema = new mongoose.Schema(
       ref: "User", // Reference the User model
       required: true,
     },
+    image: {
+      type: String,
+      default: "",
+    },
     isPublic: {
       type: Boolean,
       default: false,
       required: true,
     },
-    likes: [likeSchema], // Array of likes
+    likes: [likeSchema], // Array of likes\
   },
+
   { timestamps: true }
 );
 

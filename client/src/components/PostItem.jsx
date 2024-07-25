@@ -24,11 +24,20 @@ const PostItem = ({
   copyPost,
 }) => {
   return (
-    <div className="relative flex flex-col gap-2 mb-4  ml-1 p-4 bg-white rounded-lg shadow-lg shadow-cyan-500/50 dark:bg-white dark:text-black-300 hover:bg-opacity-70">
+    <div className="relative flex flex-col gap-2 mb-4 ml-1 p-4 bg-white rounded-lg shadow-lg shadow-cyan-500/50 dark:bg-white dark:text-black-300 hover:bg-opacity-70">
       <div className="row-span-1">
         <Link to={`/post/${post._id}`}>
           <h3 className="text-lg m-4 font-semibold">{post.title}</h3>
           <p className="text-sm text-gray-600">{formatDate(post.createdAt)}</p>
+
+          {post.image && (
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-48 object-cover rounded-lg mb-4" // Adjusted height to 48 units, change as needed
+            />
+          )}
+
           {post.content.split("\n").map((paragraph, index) => (
             <p key={index} className="text-base">
               {paragraph}
@@ -40,7 +49,7 @@ const PostItem = ({
       <div className="absolute top-0 right-0">
         <button
           type="button"
-          className="inline-flex justify-center w-full  px-4 py-2 text-sm font-medium text-gray-700  dark:text-gray-300 "
+          className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300"
           onClick={() =>
             setDropdownOpen(post._id === dropdownOpen ? null : post._id)
           }

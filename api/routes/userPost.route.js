@@ -38,12 +38,13 @@ router.put("/:postId", verifyToken, async (req, res, next) => {
     const postId = req.params.postId;
 
     // Get the updated post data from the request body
-    const { title, content } = req.body;
+    const { title, content, image } = req.body;
 
-    // Find the post and update its title and content
+    console.log(image);
+    // Find the post and update its title, content, and image
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
-      { title, content },
+      { title, content, image },
       { new: true }
     );
 
@@ -54,6 +55,7 @@ router.put("/:postId", verifyToken, async (req, res, next) => {
         message: "Post not found",
       });
     }
+
     // Send success response with the updated post
     res.status(200).json({
       success: true,
