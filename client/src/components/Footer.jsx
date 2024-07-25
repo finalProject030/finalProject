@@ -97,7 +97,7 @@ const Footer = () => {
         </div>
         <div className="px-4 py-6 bg-gray-100 dark:bg-gray-500 ">
           <div className="flex flex-wrap	items-center	justify-center	gap-12">
-            <div class="logo">
+            <div>
               <img
                 className="w-14 h-auto filter grayscale opacity-80 hover:opacity-100 transition-opacity"
                 src={gemini}
@@ -105,7 +105,7 @@ const Footer = () => {
                 alt="gemini"
               />
             </div>
-            <div class="logo">
+            <div>
               <img
                 className="w-14 h-auto filter grayscale opacity-100 hover:opacity-100 transition-opacity"
                 src={react}
@@ -113,7 +113,7 @@ const Footer = () => {
                 alt="react"
               />
             </div>
-            <div class="logo">
+            <div>
               <img
                 className="w-14 h-auto filter grayscale opacity-80 hover:opacity-100 transition-opacity"
                 src={Node}
@@ -121,7 +121,7 @@ const Footer = () => {
                 alt="Node"
               />
             </div>
-            <div class="logo">
+            <div>
               <img
                 className="w-20 h-auto filter grayscale opacity-80 hover:opacity-100 transition-opacity"
                 src={Firebase}
@@ -129,7 +129,7 @@ const Footer = () => {
                 alt="Firebase"
               />
             </div>
-            <div class="logo">
+            <div>
               <img
                 className="w-10 h-auto filter grayscale opacity-80 hover:opacity-100 transition-opacity"
                 src={mongoDB}
@@ -138,7 +138,7 @@ const Footer = () => {
               />
             </div>
 
-            <div class="logo">
+            <div>
               <img
                 className="w-20 h-auto filter grayscale opacity-80 hover:opacity-100 transition-opacity"
                 src={MybMA}
