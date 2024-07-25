@@ -9,6 +9,7 @@ import {
 import LoadingSpinner from "../components/LoadingSpinner";
 import PuffLoader from "react-spinners/PuffLoader";
 import { format, formatDistanceToNow } from "date-fns";
+import { urlServer } from "../variables";
 
 const PostPage = () => {
   const { postId } = useParams();
