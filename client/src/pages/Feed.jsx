@@ -160,7 +160,7 @@ const Feed = () => {
   return (
     <>
       {/* Wave shape */}
-      <div className="left-0 w-full -mb-1">
+      {/* <div className="left-0 w-full -mb-1">
         <svg
           className="fill-current text-white dark:text-gray-800"
           xmlns="http://www.w3.org/2000/svg"
@@ -171,12 +171,14 @@ const Feed = () => {
             d="M0,64L48,85.3C96,107,192,149,288,170.7C384,192,480,192,576,165.3C672,139,768,85,864,64C960,43,1056,53,1152,74.7C1248,96,1344,128,1392,144L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
           ></path>
         </svg>
-      </div>
-      <div className="container mx-auto px-4 py-8 min-h-screen">
-        <h2 className="text-4xl md:text-7xl font-bold mb-4 flex justify-center items-center">
+      </div> */}
+      <div className="container my-20 mx-auto bg-gray-100 rounded-lg border border-gray-200 px-4 py-8 min-h-screen">
+        <h2 className="text-4xl share-tech md:text-7xl font-bold mb-4 flex justify-center items-center">
           Public Posts
         </h2>
-        {loading && <PuffLoader />}
+        <div className="flex justify-center	 mx-auto	">
+          {loading && <PuffLoader />}
+        </div>
         {error && <p className="text-red-500">Error: {error}</p>}
 
         <div className="mt-8 grid gap-8">

@@ -158,7 +158,7 @@ const UserPosts = () => {
             />
           </div>
           {/* Posts Section */}
-          <div className="col-span-1 md:col-span-4">
+          <div className="col-span-1 md:col-span-4 flex justify-center	items-center	">
             {loading ? (
               <PuffLoader />
             ) : (

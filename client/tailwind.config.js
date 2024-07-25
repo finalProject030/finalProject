@@ -3,6 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        "share-tech": ['"Share Tech"', "sans-serif"],
+      },
       colors: {
         "regal-blue": "#243c5a",
       },
