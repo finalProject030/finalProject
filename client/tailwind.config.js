@@ -3,6 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      colors: {
+        "regal-blue": "#243c5a",
+      },
       backgroundImage: {
         "custom-gradient":
           "linear-gradient(-150deg, #222222 15%, #373737 70%, #3c4859 94%)",

@@ -16,6 +16,7 @@ import PostPage from "./pages/PostPage";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import PrivacyPolicy from "./components/PrivacyPolicy";
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
         </Route>
       </Routes>
       <Footer />
+      <ScrollToTop />
     </BrowserRouter>
   );
 }

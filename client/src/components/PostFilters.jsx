@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const PostFilters = ({
   filter,
@@ -8,38 +8,135 @@ const PostFilters = ({
   sortBy,
   setSortBy,
   placeholder,
+  isSticky,
+  handleToggleSticky,
 }) => {
+  const [filterOpen, setFilterOpen] = useState(false);
+
   return (
-    <div className="bg-gray-900 dark:bg-gray-800 dark:text-gray-300 rounded-lg shadow-lg p-4">
-      <h1 className="text-lg font-semibold mb-4 text-gray-300">Filters</h1>
-      <input
-        type="text"
-        placeholder={placeholder}
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="w-full border border-gray-300 rounded-md px-4 py-2 mb-2 focus:outline-none focus:ring focus:border-blue-300"
-      />
-      <select
-        value={visibilityFilter}
-        onChange={(e) => setVisibilityFilter(e.target.value)}
-        className="w-full border border-gray-300 rounded-md px-4 py-2 mb-2 focus:outline-none focus:ring focus:border-blue-300"
-      >
-        <option value="all">All</option>
-        <option value="public">Public</option>
-        <option value="private">Private</option>
-      </select>
-      <label className="block text-sm font-medium  text-gray-500 mb-2">
-        Sort by:
-      </label>
-      <select
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
-        className="w-full border border-gray-300 rounded-md px-4 py-2 mb-2 focus:outline-none focus:ring focus:border-blue-300"
-      >
-        <option value="newest">Newest</option>
-        <option value="older">Older</option>
-        <option value="mostLikes">Most Likes</option>
-      </select>
+    <div className="">
+      {/* Large screens */}
+      <div className="hidden md:block h-dvh p-4 bg-white rounded-lg shadow-lg">
+        <h2 className=" mb-4 text-4xl font-bold ">Filters</h2>
+        <input
+          type="text"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder={placeholder}
+          className="w-full p-2 mb-4 border rounded-lg "
+        />
+        <div className="mb-4">
+          <label className="block mb-2 font-bold">Visibility</label>
+          <div className="flex flex-col ">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={visibilityFilter === "all"}
+                onChange={() => setVisibilityFilter("all")}
+                className="mr-2"
+              />
+              All
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={visibilityFilter === "public"}
+                onChange={() => setVisibilityFilter("public")}
+                className="mr-2"
+              />
+              Public
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={visibilityFilter === "private"}
+                onChange={() => setVisibilityFilter("private")}
+                className="mr-2"
+              />
+              Private
+            </label>
+          </div>
+        </div>
+        <div>
+          <label className="block mb-2  text-2xl font-bold">Sort By</label>
+          <div className="flex flex-col ">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={sortBy === "newest"}
+                onChange={() => setSortBy("newest")}
+                className="mr-2"
+              />
+              Newest
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={sortBy === "older"}
+                onChange={() => setSortBy("older")}
+                className="mr-2"
+              />
+              Oldest
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={sortBy === "mostLikes"}
+                onChange={() => setSortBy("mostLikes")}
+                className="mr-2"
+              />
+              Most Likes
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Small screens */}
+      <div className="block md:hidden w-full">
+        <button
+          onClick={() => setFilterOpen((prev) => !prev)}
+          className="bg-gradient-to-r from-blue-500 to-blue-700 container     text-white p-3 rounded-lg mb-4 shadow-lg hover:bg-gradient-to-l hover:from-blue-600 hover:to-blue-800 transition duration-300 ease-in-out transform hover:scale-10"
+        >
+          Filters
+        </button>
+
+        {filterOpen && (
+          <div className="p-4 bg-white rounded-lg shadow-lg mb-4">
+            <h2 className="text-2xl  mb-4">Filters</h2>
+            <input
+              type="text"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder={placeholder}
+              className="w-full p-2 mb-4 border rounded-lg"
+            />
+            <div className="mb-4">
+              <label className="block mb-2 text-xl">Visibility</label>
+              <select
+                value={visibilityFilter}
+                onChange={(e) => setVisibilityFilter(e.target.value)}
+                className="w-full p-2 border rounded-lg"
+              >
+                <option value="all">All</option>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+              </select>
+            </div>
+            <div>
+              <label className="block mb-2">Sort By</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full p-2 border rounded-lg"
+              >
+                <option value="newest">Newest</option>
+                <option value="older">Oldest</option>
+                <option value="mostLikes">Most Likes</option>
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

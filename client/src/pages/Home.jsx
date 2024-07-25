@@ -7,6 +7,7 @@ import logo3 from "../../assets/logo3.png";
 import video1 from "../../assets/Dashboard.png";
 import MybMA from "../../assets/MybMA.png";
 import gemini from "../../assets/gemini.webp";
+import ScrollToTop from "../components/ScrollToTop";
 
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -119,6 +120,7 @@ const Home = () => {
 
       {/* Contact Form (if needed) */}
       <ContactForm />
+      <ScrollToTop />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { HiDotsVertical } from "react-icons/hi";
 import PostFilters from "../PostFilters";
@@ -15,8 +15,15 @@ const UserPosts = () => {
   const [filter, setFilter] = useState("");
   const [visibilityFilter, setVisibilityFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [dropdownOpen, setDropdownOpen] = useState(null); // State to manage dropdown visibility
+  const [dropdownOpen, setDropdownOpen] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
+
+  const [isSticky, setIsSticky] = useState(true); // State to manage stickiness
+
+  // Toggle function
+  const handleToggleSticky = () => {
+    setIsSticky((prevIsSticky) => !prevIsSticky);
+  };
 
   useEffect(() => {
     if (currentUser) {
@@ -26,7 +33,6 @@ const UserPosts = () => {
 
   const fetchUserPosts = async (userId) => {
     try {
-      // const res = await fetch(`/api/post/${userId}`, {
       setLoading(true);
       const res = await fetch(`${urlServer}/api/post/${userId}`, {
         method: "GET",
@@ -42,7 +48,6 @@ const UserPosts = () => {
       }
     } catch (error) {
       setLoading(false);
-
       console.log(error);
     }
   };
@@ -92,15 +97,13 @@ const UserPosts = () => {
       }
     }
   };
+
   const copyPost = (title, content) => {
-    // Combine title and content with a line break
     const textToCopy = `${title}\n${content}`;
-    // Copy text to clipboard
     navigator.clipboard.writeText(textToCopy);
   };
 
   const applyFilter = () => {
-    // Filter posts based on the filter value, visibility filter, and content
     let filteredPosts = posts.filter(
       (post) =>
         post.title.toLowerCase().includes(filter.toLowerCase()) ||
@@ -113,7 +116,6 @@ const UserPosts = () => {
       filteredPosts = filteredPosts.filter((post) => !post.isPublic);
     }
 
-    // Apply sorting based on filter
     switch (sortBy) {
       case "newest":
         filteredPosts.sort(
@@ -137,25 +139,14 @@ const UserPosts = () => {
 
   return (
     <>
-      {/* Wave shape */}
-      <div className="left-0 w-full -mb-1">
-        <svg
-          className="fill-current text-white dark:text-gray-800"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 320"
-        >
-          <path
-            fillOpacity="1"
-            d="M0,64L48,85.3C96,107,192,149,288,170.7C384,192,480,192,576,165.3C672,139,768,85,864,64C960,43,1056,53,1152,74.7C1248,96,1344,128,1392,144L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
-          ></path>
-        </svg>
-      </div>
+      <div className="container mx-auto py-8 px-4 max-w-screen-lg">
+        <h1 className="text-7xl text-center mb-2  font-bold border-4 border-gray rounded-lg p-4 shadow-lg bg-gradient-to-r from-gray-300 to-white text-black">
+          My Posts
+        </h1>
 
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-7xl font-bold text-center mb-8">My Posts</h1>
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-6 ">
           {/* Filter Section */}
-          <div className="col-span-1 md:col-span-2">
+          <div className="col-span-1 md:col-span-2 ">
             <PostFilters
               filter={filter}
               setFilter={setFilter}
@@ -163,7 +154,7 @@ const UserPosts = () => {
               setVisibilityFilter={setVisibilityFilter}
               sortBy={sortBy}
               setSortBy={setSortBy}
-              placeholder="Search by title or content" // Add placeholder prop
+              placeholder="Search by title or content"
             />
           </div>
           {/* Posts Section */}
@@ -171,7 +162,7 @@ const UserPosts = () => {
             {loading ? (
               <PuffLoader />
             ) : (
-              <>
+              <div className="  bg-gray-300 p-3 mx-2 rounded-lg">
                 {error && (
                   <p className="text-center text-red-500">Error: {error}</p>
                 )}
@@ -186,12 +177,11 @@ const UserPosts = () => {
                     copyPost={copyPost}
                   />
                 ))}
-              </>
+              </div>
             )}
           </div>
         </div>
       </div>
-      {/* Render selected post page if a post is selected */}
       {selectedPost && <PostPage post={selectedPost._id} />}
     </>
   );

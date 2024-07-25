@@ -24,7 +24,7 @@ const PostItem = ({
   copyPost,
 }) => {
   return (
-    <div className="relative flex flex-col gap-2 m-2 ml-1 p-4 bg-white rounded-lg shadow-lg shadow-cyan-500/50 dark:bg-white dark:text-black-300 hover:bg-opacity-70">
+    <div className="relative flex flex-col gap-2 mb-4  ml-1 p-4 bg-white rounded-lg shadow-lg shadow-cyan-500/50 dark:bg-white dark:text-black-300 hover:bg-opacity-70">
       <div className="row-span-1">
         <Link to={`/post/${post._id}`}>
           <h3 className="text-lg m-4 font-semibold">{post.title}</h3>
@@ -69,7 +69,9 @@ const PostItem = ({
           {post.isPublic ? "Make Private" : "Make Public"}
         </button>
       </div>
-      <SocialMediaShare text={post.content} title={post.title} content={""} />
+      <div className="mx-auto">
+        <SocialMediaShare text={post.content} title={post.title} content={""} />
+      </div>
     </div>
   );
 };
