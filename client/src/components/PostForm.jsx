@@ -140,7 +140,8 @@ export default function PostCreationForm() {
       "- Include a catchy headline that grabs attention.",
       "- Write a brief introduction to the topic to provide context.",
       `- Keep the post concise at around ${wordCount} words.`,
-      `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
+      `- divide the text into ${paragraphCount} paragraphs.`,
+      // `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
       emojis === "yes"
         ? `- Use emojis to add visual appeal!`
         : "- Avoid using emojis to maintain a professional tone.",
@@ -149,6 +150,8 @@ export default function PostCreationForm() {
       `Plese pay carfull attention to this: ${freeText}`,
       // "Below is the question and its accepted answer for reference:",
       "Below is the information that you will use to create the post:",
+
+      // divide the text into 3 equal-length sections.
     ];
     summary.forEach((sum) => (instructions += "\n" + sum));
 

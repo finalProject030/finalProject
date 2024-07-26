@@ -316,135 +316,137 @@ const Posts = () => {
           <div>
             <h1 className="text-center text-3xl font-bold mb-4 mt-8">
               Interesting Questions and Answers from Stack Overflow
-              {/* Stack Overflow Questions Tagged with {tagged} */}
             </h1>
             <div className="mb-4">
               <p className="text-center text-gray-200 dark:text-gray-300">
                 Welcome to the Stack Overflow Question Explorer!
               </p>
-              <p className="text-left rtl:text-right text-gray-200 dark:text-gray-300">
+              <p className="text-center rtl:text-right text-gray-200 dark:text-gray-300">
                 Enter the subject you're interested in, and we'll show you the
                 10 most popular questions and their answers from Stack Overflow.
               </p>
-              <p className="text-left rtl:text-right text-gray-200 dark:text-gray-300">
+              <p className="text-center rtl:text-right text-gray-200 dark:text-gray-300">
                 After reviewing the questions, you can select up to 4 of them to
                 create a professional post for publishing on your blog or other
                 digital platforms.
               </p>
             </div>
           </div>
-          <div>
-            <form
-              className="flex flex-col mb-4 max-w-screen-lg"
-              onSubmit={handleFormSubmit}
-            >
-              <label className="mb-2 text-lg font-semibold">
-                Enter Subject:*
-              </label>
-              <div className="flex items-center">
-                <div className="relative flex-grow">
-                  <input
-                    type="text"
-                    value={tagged}
-                    onChange={handleTagChange}
-                    disabled={loading}
-                    className={`w-full border rounded-l px-3 py-2 transition duration-200 ease-in-out ${
-                      loading
-                        ? "bg-gray-200 cursor-not-allowed"
-                        : "focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
-                    }`}
-                    placeholder="Search"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`absolute top-0 right-0 text-black rounded-r px-4 py-3 transition duration-300 ease-in-out focus:outline-none ${
-                      loading ? "bg-gray-200 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    <BsSearch />
-                  </button>
-                </div>
-              </div>
-            </form>
 
-            <div
-              id="accordion-collapse"
-              data-accordion="collapse"
-              className="mb-10 flex flex-col max-w-screen-lg "
-            >
-              <h2 id="accordion-collapse-heading-4">
-                <button
-                  type="button"
-                  className="flex items-center  justify-between w-full p-5 font-medium rtl:text-right text-gray-500 bg-gray-100 border  border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-400 dark:border-gray-300 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-200 gap-3 mb-4"
-                  data-accordion-target="#accordion-collapse-body-4"
-                  aria-expanded="false"
-                  aria-controls="accordion-collapse-body-4"
-                  onClick={toggleFilters}
-                >
-                  <span>Filters</span>
-                  <svg
-                    data-accordion-icon
-                    className="w-3 h-3 rotate-180 shrink-0"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 10 6"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 5 5 1 1 5"
-                    />
-                  </svg>
-                </button>
-              </h2>
-              <div
-                id="accordion-collapse-body-4"
-                className="hidden"
-                aria-labelledby="accordion-collapse-heading-4"
+
+          <div className="flex justify-center items-center ">
+            <div className="w-full max-w-screen-lg">
+              <form
+                className="flex flex-col mb-4 max-w-screen-lg"
+                onSubmit={handleFormSubmit}
               >
-                <div className="p-5  text-gray-500 bg-gray-100 border  border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-400 dark:border-gray-300 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-200 gap-3">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block">Sort By:</label>
-                      <Select
-                        defaultValue={filterQuestionsList[0]}
-                        options={filterQuestionsList}
-                        onChange={(e) => setSort(e.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="block">Order:</label>
-                      <Select
-                        defaultValue={orderQuestionsList[0]}
-                        options={orderQuestionsList}
-                        onChange={(e) => setOrder(e.value)}
-                      />
-                    </div>
+                <label className="mb-2 text-lg font-semibold">
+                  Enter Subject:*
+                </label>
+                <div className="flex items-center">
+                  <div className="relative flex-grow">
+                    <input
+                      type="text"
+                      value={tagged}
+                      onChange={handleTagChange}
+                      disabled={loading}
+                      className={`w-full border rounded-l px-3 py-2 transition duration-200 ease-in-out ${
+                        loading
+                          ? "bg-gray-200 cursor-not-allowed"
+                          : "focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
+                      }`}
+                      placeholder="Search"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className={`absolute top-0 right-0 text-black rounded-r px-4 py-3 transition duration-300 ease-in-out focus:outline-none ${
+                        loading ? "bg-gray-200 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      <BsSearch />
+                    </button>
                   </div>
-                  <button
-                    className="mt-3 text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                    onClick={handleFormSubmit}
-                  >
-                    apply filters
-                  </button>
                 </div>
-              </div>
-              {Object.keys(checkedItems).length > 0 && (
-                <button
-                  type="button"
-                  className="text-white bg-gradient-to-r mt-4 from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                  onClick={handleToggleComponent}
+              </form>
+
+              <div
+                id="accordion-collapse"
+                data-accordion="collapse"
+                className="mb-10 flex flex-col max-w-screen-lg "
+              >
+                <h2 id="accordion-collapse-heading-4">
+                  <button
+                    type="button"
+                    className="flex items-center  justify-between w-full p-5 font-medium rtl:text-right text-gray-500 bg-gray-100 border  border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-400 dark:border-gray-300 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-200 gap-3 mb-4"
+                    data-accordion-target="#accordion-collapse-body-4"
+                    aria-expanded="false"
+                    aria-controls="accordion-collapse-body-4"
+                    onClick={toggleFilters}
+                  >
+                    <span>Filters</span>
+                    <svg
+                      data-accordion-icon
+                      className="w-3 h-3 rotate-180 shrink-0"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 10 6"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 5 5 1 1 5"
+                      />
+                    </svg>
+                  </button>
+                </h2>
+                <div
+                  id="accordion-collapse-body-4"
+                  className="hidden"
+                  aria-labelledby="accordion-collapse-heading-4"
                 >
-                  Move to the next step
-                </button>
-              )}
+                  <div className="p-5  text-gray-500 bg-gray-100 border  border-gray-200 rounded-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-400 dark:border-gray-300 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-200 gap-3">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block">Sort By:</label>
+                        <Select
+                          defaultValue={filterQuestionsList[0]}
+                          options={filterQuestionsList}
+                          onChange={(e) => setSort(e.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block">Order:</label>
+                        <Select
+                          defaultValue={orderQuestionsList[0]}
+                          options={orderQuestionsList}
+                          onChange={(e) => setOrder(e.value)}
+                        />
+                      </div>
+                    </div>
+                    <button
+                      className="mt-3 text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      onClick={handleFormSubmit}
+                    >
+                      apply filters
+                    </button>
+                  </div>
+                </div>
+                {Object.keys(checkedItems).length > 0 && (
+                  <button
+                    type="button"
+                    className="text-white bg-gradient-to-r mt-4 from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                    onClick={handleToggleComponent}
+                  >
+                    Move to the next step
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-
           {loading ? (
             <div className="flex justify-center items-center m-5 ">
               <PuffLoader color="#36d7b7" loading />

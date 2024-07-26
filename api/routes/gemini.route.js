@@ -30,7 +30,8 @@ async function processMessageToChatGemini(userMessage) {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
     // For text-only input, use the gemini-pro model
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // Generate content based on the user message
     const result = await model.generateContent(userMessage);
