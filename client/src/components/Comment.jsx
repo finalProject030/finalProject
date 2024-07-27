@@ -17,6 +17,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
           headers: {
             "Content-Type": "application/json",
             authorization: localStorage.getItem("token"),
+            "Cache-Control": "no-cache", // Disable cache
           },
         });
         const data = await res.json();
@@ -67,7 +68,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
       <div className="flex-1">
         <div className="flex items-center mb-1">
           <span className="font-bold mr-1 text-xs truncate">
-            {user ? `${user.username}` : ""}
+            {user ? `@${user.username}` : ""}
           </span>
           <span className="text-gray-500 text-xs">
             {moment(comment.createdAt).fromNow()}
