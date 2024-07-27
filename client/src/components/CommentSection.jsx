@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Alert, Button, Modal, Textarea } from "flowbite-react";
 import Comment from "./Comment";
-import { urlServer } from "../../variables";
+import { urlServer } from "../variables";
 
 export default function CommentSection({ postId }) {
   const [comment, setComment] = useState("");
