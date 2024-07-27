@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
@@ -6,7 +6,8 @@ import { Alert, Button, Modal, Textarea } from "flowbite-react";
 import Comment from "./Comment";
 import { urlServer } from "../variables";
 
-export default function CommentSection({ postId }) {
+// Use forwardRef to pass the ref to the Textarea component
+const CommentSection = forwardRef(({ postId, commentInputRef }, ref) => {
   const [comment, setComment] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const [commentToDelete, setCommentToDelete] = useState(null);
@@ -39,6 +40,9 @@ export default function CommentSection({ postId }) {
         setCommentError(null);
         setComment("");
         setComments([data, ...comments]);
+        if (commentInputRef && commentInputRef.current) {
+          commentInputRef.current.focus();
+        }
       }
     } catch (error) {
       setCommentError(error.message);
@@ -167,9 +171,11 @@ export default function CommentSection({ postId }) {
           className="border border-teal-500 rounded-md p-3"
         >
           <Textarea
+            ref={commentInputRef}
             placeholder="Add a comment..."
             rows="3"
             maxLength="200"
+            className="p-1"
             onChange={(e) => setComment(e.target.value)}
             value={comment}
           />
@@ -279,4 +285,8 @@ export default function CommentSection({ postId }) {
       </Modal>
     </div>
   );
-}
+});
+
+CommentSection.displayName = "CommentSection"; // Needed for forwardRef
+
+export default CommentSection;

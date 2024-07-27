@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import { BiLike, BiDislike } from "react-icons/bi";
+import { BiLike, BiDislike, BiShareAlt, BiComment } from "react-icons/bi";
 import { urlServer } from "../variables";
 import { format, formatDistanceToNow } from "date-fns";
 import PuffLoader from "react-spinners/PuffLoader";
@@ -13,6 +13,14 @@ const Feed = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
+  const commentInputRef = useRef(null);
+
+  const handleAddComment = (postId) => {
+    // Assuming you want to focus on the comment input in the CommentSection component
+    if (commentInputRef.current) {
+      commentInputRef.current.focus();
+    }
+  };
 
   const Modal = ({ imageSrc, onClose }) => {
     if (!imageSrc) return null; // Don't render if there's no image
@@ -71,7 +79,7 @@ const Feed = () => {
 
       if (data.success) {
         const currentUserId = currentUser._id;
-        const postsWithUserLiked = await Promise.all(
+        const postsWithUserLikedAndComments = await Promise.all(
           data.posts.map(async (post) => {
             const userLiked = post.likes.some(
               (like) => like.user === currentUserId
@@ -88,17 +96,32 @@ const Feed = () => {
             const userData = await userResponse.json();
             const profilePictureURL = userData.avatar;
             const userName = userData.username;
+
+            // Fetch comment count for the post
+            const commentsResponse = await fetch(
+              `${urlServer}/api/comment/getPostComments/${post._id}`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  authorization: localStorage.getItem("token"),
+                },
+              }
+            );
+            const commentsData = await commentsResponse.json();
+            const commentCount = commentsData.length;
+
             return {
               ...post,
               userLiked,
               profilePictureURL,
               userName,
+              commentCount,
               loading: false,
             };
           })
         );
 
-        setPublicPosts(postsWithUserLiked);
+        setPublicPosts(postsWithUserLikedAndComments);
         setLoading(false);
       } else {
         setError(data.message);
@@ -201,7 +224,7 @@ const Feed = () => {
           </div>
         ) : (
           <div className="mt-8 grid gap-8">
-            <h1 className="text-7xl text-center mb-2  font-bold border-4 border-gray rounded-lg p-4 shadow-lg bg-gradient-to-r from-gray-300 to-white text-black">
+            <h1 className="text-7xl text-center mb-2 font-bold border-4 border-gray rounded-lg p-4 shadow-lg bg-gradient-to-r from-gray-300 to-white text-black">
               Feed
             </h1>
 
@@ -233,49 +256,75 @@ const Feed = () => {
                   ))}
                 </div>
 
-                <div className="flex flex-col lg:flex-row items-center lg:justify-between mb-3">
-                  {post.profilePictureURL && (
+                <div className="flex flex-col p-4 bg-white dark:bg-gray-800">
+                  {/* Profile and Likes Section */}
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
                     <div className="flex items-center mb-2 lg:mb-0">
-                      <img
-                        className="w-7 h-7 rounded-full mr-2"
-                        src={post.profilePictureURL}
-                        alt="Profile"
-                      />
-                      <span className="font-medium dark:text-white">
-                        {post.userName}
-                      </span>
+                      {post.profilePictureURL && (
+                        <img
+                          className="w-12 h-12 rounded-full border-2 border-gray-300 dark:border-gray-700"
+                          src={post.profilePictureURL}
+                          alt="Profile"
+                        />
+                      )}
+                      <div className="ml-4">
+                        <span className="text-lg font-semibold dark:text-white">
+                          {post.userName}
+                        </span>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                          {post.likes.length}{" "}
+                          {post.likes.length === 1 ? "Like" : "Likes"} •{" "}
+                          {post.commentCount}{" "}
+                          {post.commentCount === 1 ? "Comment" : "Comments"}
+                        </p>
+                      </div>
                     </div>
-                  )}
 
-                  <div className="flex items-center gap-3">
-                    <p className="text-gray-400 mr-4 lg:mb-0 lg:mr-0">
-                      {post.likes.length} Likes
-                    </p>
-                    {post.loading ? (
+                    {/* Navigation Buttons */}
+                    <div className="flex items-center gap-4">
                       <button
-                        className="flex ml-3 items-center bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded transition duration-300 transform hover:scale-105 mb-2 lg:mb-0"
-                        disabled
+                        onClick={() => handleAddComment(post._id)}
+                        className="flex items-center text-green-500 hover:text-green-600 transition-colors duration-300"
                       >
-                        Loading...
+                        <span className="mr-2">Comment</span>
+                        <BiComment className="w-5 h-5" />
                       </button>
-                    ) : post.userLiked ? (
                       <button
-                        onClick={() => handleDislikePost(post._id)}
-                        className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                        onClick={() =>
+                          post.userLiked
+                            ? handleDislikePost(post._id)
+                            : handleLikePost(post._id)
+                        }
+                        className={`flex items-center ${
+                          post.userLiked
+                            ? "text-red-500 hover:text-red-600"
+                            : "text-blue-500 hover:text-blue-600"
+                        } transition-colors duration-300`}
                       >
-                        <BiDislike className="" />
+                        <span className="mr-2">
+                          {post.userLiked ? "Dislike" : "Like"}
+                        </span>
+                        {post.userLiked ? (
+                          <BiDislike className="w-5 h-5" />
+                        ) : (
+                          <BiLike className="w-5 h-5" />
+                        )}
                       </button>
-                    ) : (
-                      <button
-                        onClick={() => handleLikePost(post._id)}
-                        className="text-white bg-gradient-to-r mt-4 from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                      {/* <button
+                        onClick={() => handleShare(post.uri)}
+                        className="flex items-center text-gray-600 hover:text-gray-700 transition-colors duration-300"
                       >
-                        <BiLike className="" />
-                      </button>
-                    )}
+                        <span className="mr-2">Share</span>
+                        <BiShareAlt className="w-5 h-5" />
+                      </button> */}
+                    </div>
                   </div>
-                  <CommentSection postId={post._id} />
                 </div>
+
+                <CommentSection
+                  postId={post._id}
+                  commentInputRef={commentInputRef}
+                />
               </div>
             ))}
           </div>
