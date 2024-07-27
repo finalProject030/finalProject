@@ -9,7 +9,7 @@ import {
 import LoadingSpinner from "../components/LoadingSpinner";
 import PuffLoader from "react-spinners/PuffLoader";
 import { format, formatDistanceToNow } from "date-fns";
-import { urlServer } from "../variables";
+import { urlServer, scrollToTop } from "../variables";
 import CommentSection from "../components/CommentSection";
 
 const PostPage = () => {
@@ -203,7 +203,7 @@ const PostPage = () => {
     }
   };
 
-  const handleDeleteButtonClick = async () => {
+  const handleDeleteImage = async () => {
     if (window.confirm("Are you sure you want to delete the image?")) {
       setImageFile(previousImage); // Restore previous image
       try {
@@ -238,6 +238,28 @@ const PostPage = () => {
         fetchPost();
       } catch (error) {
         console.error("Error updating post:", error);
+      }
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      try {
+        const response = await fetch(`${urlServer}/api/post/${postId}`, {
+          method: "DELETE",
+          headers: {
+            authorization: localStorage.getItem("token"),
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete post");
+        }
+
+        scrollToTop();
+        navigate("/user-posts"); // Redirect to homepage after deletion
+      } catch (error) {
+        console.error("Error deleting post:", error);
       }
     }
   };
@@ -333,7 +355,7 @@ const PostPage = () => {
                 Upload Image
               </button>
               <button
-                onClick={handleDeleteButtonClick}
+                onClick={handleDeleteImage}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Delete Image
@@ -384,6 +406,12 @@ const PostPage = () => {
               } text-white rounded hover:bg-opacity-80`}
             >
               {post.post.isPublic ? "Make Private" : "Make Public"}
+            </button>
+            <button
+              onClick={handleDeletePost}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Delete Post
             </button>
           </div>
           <CommentSection postId={post.post._id} />
