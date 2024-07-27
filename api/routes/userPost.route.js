@@ -36,7 +36,6 @@ router.put("/:postId", verifyToken, async (req, res, next) => {
   try {
     // Get the postId from the request params
     const postId = req.params.postId;
-
     // Get the updated post data from the request body
     const { title, content, image } = req.body;
 
@@ -188,7 +187,6 @@ router.post("/", async (req, res, next) => {
   try {
     // console.log("im here!! ");
     // Extract post data from request body
-    console.log(req.body);
     const { title, content, author } = req.body;
 
     // Create a new post document
@@ -312,16 +310,13 @@ router.post("/:postId/dislike", verifyToken, async (req, res, next) => {
   }
 });
 
-// Define the route handler to get a post by its ID
 router.get("/post/:postId", verifyToken, async (req, res, next) => {
   try {
-    // Get the postId from the request params
     const postId = req.params.postId;
+    const userId = req.user.id; // Access userId from req.user
 
-    // Query the database for the post with the given ID
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).exec();
 
-    // Check if the post exists
     if (!post) {
       return res.status(404).json({
         success: false,
@@ -329,14 +324,19 @@ router.get("/post/:postId", verifyToken, async (req, res, next) => {
       });
     }
 
-    // Send the post data as a response
+    if (post.author.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: "Post retrieved successfully",
       post: post,
     });
   } catch (error) {
-    // Pass any errors to the error handling middleware
     next(error);
   }
 });

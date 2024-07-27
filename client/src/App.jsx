@@ -17,6 +17,7 @@ import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import ScrollToTop from "./components/ScrollToTop";
+import NotFound from "./components/NotFound";
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/about" element={<About />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="*" element={<NotFound />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />

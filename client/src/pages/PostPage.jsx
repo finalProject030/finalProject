@@ -15,6 +15,8 @@ import CommentSection from "../components/CommentSection";
 const PostPage = () => {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
   const [editing, setEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
   const [editedTitle, setEditedTitle] = useState("");
@@ -31,13 +33,18 @@ const PostPage = () => {
   const [publishError, setPublishError] = useState(null);
 
   const fetchPost = async () => {
+    setLoading(true); // Start loading
+    setError(null); // Reset error state
     try {
-      const response = await fetch(`${urlServer}/api/post/post/${postId}`, {
-        method: "GET",
-        headers: {
-          authorization: localStorage.getItem("token"),
-        },
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/post/post/${postId}`,
+        {
+          method: "GET",
+          headers: {
+            authorization: localStorage.getItem("token"),
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch post");
       }
@@ -50,8 +57,12 @@ const PostPage = () => {
       setPreviousImage(postData.post.image); // Save previous image URL
     } catch (error) {
       console.error("Error fetching post:", error);
+      setError(error.message); // Set error message
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
+
   useEffect(() => {
     fetchPost();
   }, [postId]);
@@ -234,10 +245,33 @@ const PostPage = () => {
     }
   };
 
-  if (!post) {
+  if (loading) {
     return (
       <div className="col-span-1 md:col-span-4 flex justify-center h-dvh items-center">
         <PuffLoader />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-red-50">
+        <div className="text-center bg-white p-8 rounded-lg shadow-lg border border-red-200">
+          <h1 className="text-5xl font-bold text-red-600 mb-4">Oops!</h1>
+          <p className="text-lg text-red-800 mb-6">Something went wrong:</p>
+          <p className="text-md text-red-600 mb-8">{error}</p>
+          <a href="/" className="text-blue-500 underline hover:text-blue-700">
+            Go back to Home
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="col-span-1 md:col-span-4 flex justify-center items-center">
+        <p>No post found</p>
       </div>
     );
   }
@@ -247,7 +281,7 @@ const PostPage = () => {
   return (
     <div className="container mx-auto my-20 px-4">
       <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
-        <h1 className="text-7xl text-center mb-2  font-bold border-4 border-gray rounded-lg p-4 shadow-lg bg-gradient-to-r from-gray-300 to-white text-black">
+        <h1 className="text-7xl text-center mb-2 font-bold border-4 border-gray rounded-lg p-4 shadow-lg bg-gradient-to-r from-gray-300 to-white text-black">
           Post Page
         </h1>
 
