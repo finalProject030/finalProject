@@ -9,6 +9,7 @@ import {
 import OAuth from "../components/OAuth";
 import { urlServer } from "../variables";
 import Facebook from "../components/Facebook";
+import logo3 from "../../assets/logo3.png";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -49,45 +50,58 @@ export default function SignIn() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-600 to-blue-300 min-h-screen flex flex-col justify-center items-center">
-      <div className="p-3 max-w-xl mx-auto w-full bg-white rounded-lg shadow-lg">
-        <h1 className="text-3xl text-center font-semibold my-7">SignIn</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="border p-3 rounded-lg"
-            id="email"
-            onChange={handleChange}
+    <div className="bg-gradient-to-b from-gray-600 to-blue-300 min-h-screen flex items-center justify-center">
+      {/* Form Container */}
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full flex flex-row items-center">
+        <div>
+          <img
+            src={logo3} // Logo image
+            alt="Logo"
+            className="w-52 h-52 mb-4 p-8 m-8 object-contain rounded-lg shadow-lg hidden sm:block"
           />
-          <input
-            type="password"
-            placeholder="Password"
-            className="border p-3 rounded-lg"
-            id="password"
-            onChange={handleChange}
-          />
-          <button
-            disabled={loading}
-            className="bg-blue-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
-          >
-            {loading ? "Loading..." : "Sign In"}
-          </button>
-          <OAuth />
-          <Facebook />
-        </form>
-        <div className="flex justify-between items-center mt-5">
-          <Link to={"/forgot-password"}>
-            <span className="text-blue-700">Forgot Password?</span>
-          </Link>
-          <div className="flex gap-2">
-            <p>Don't have an account?</p>
-            <Link to={"/sign-up"}>
-              <span className="text-blue-700">Sign up</span>
-            </Link>
-          </div>
         </div>
-        {error && <p className="text-red-500 mt-5">{error}</p>}
+        <div>
+          <h1 className="text-3xl text-center font-semibold mb-6">Sign In</h1>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+            <input
+              type="email"
+              placeholder="Email"
+              className="border p-3 rounded-lg w-full"
+              id="email"
+              onChange={handleChange}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="border p-3 rounded-lg w-full"
+              id="password"
+              onChange={handleChange}
+            />
+            <button
+              disabled={loading}
+              className="bg-blue-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80 w-full"
+            >
+              {loading ? "Loading..." : "Sign In"}
+            </button>
+            <OAuth />
+            <Facebook />
+          </form>
+          <div className="flex justify-between items-center mt-5 w-full">
+            <Link to={"/forgot-password"}>
+              <span className="text-blue-700 hover:underline">
+                Forgot Password?
+              </span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <p className="text-gray-700">Don't have an account?</p>
+              <Link to={"/sign-up"}>
+                <span className="text-blue-700 hover:underline">Sign Up</span>
+              </Link>
+            </div>
+          </div>
+
+          {error && <p className="text-red-500 mt-5">{error}</p>}
+        </div>
       </div>
     </div>
   );
