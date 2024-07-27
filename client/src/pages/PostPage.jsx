@@ -36,15 +36,12 @@ const PostPage = () => {
     setLoading(true); // Start loading
     setError(null); // Reset error state
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/post/post/${postId}`,
-        {
-          method: "GET",
-          headers: {
-            authorization: localStorage.getItem("token"),
-          },
-        }
-      );
+      const response = await fetch(`${urlServer}/api/post/post/${postId}`, {
+        method: "GET",
+        headers: {
+          authorization: localStorage.getItem("token"),
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch post");
       }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import { BiLike, BiDislike, BiShareAlt, BiComment } from "react-icons/bi";
+import { BiLike, BiDislike, BiComment } from "react-icons/bi";
 import { urlServer } from "../variables";
 import { format, formatDistanceToNow } from "date-fns";
 import PuffLoader from "react-spinners/PuffLoader";
@@ -13,12 +13,13 @@ const Feed = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
-  const commentInputRef = useRef(null);
+
+  // Create a ref mapping for comment inputs
+  const commentRefs = useRef({});
 
   const handleAddComment = (postId) => {
-    // Assuming you want to focus on the comment input in the CommentSection component
-    if (commentInputRef.current) {
-      commentInputRef.current.focus();
+    if (commentRefs.current[postId]) {
+      commentRefs.current[postId].focus();
     }
   };
 
@@ -75,7 +76,6 @@ const Feed = () => {
         },
       });
       const data = await response.json();
-      console.log(data);
 
       if (data.success) {
         const currentUserId = currentUser._id;
@@ -323,7 +323,9 @@ const Feed = () => {
 
                 <CommentSection
                   postId={post._id}
-                  commentInputRef={commentInputRef}
+                  commentInputRef={(ref) =>
+                    (commentRefs.current[post._id] = ref)
+                  }
                 />
               </div>
             ))}
