@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Alert, Button, Modal, Textarea } from "flowbite-react";
 import Comment from "./Comment";
+import { urlServer } from "../../variables";
 
 export default function CommentSection({ postId }) {
   const [comment, setComment] = useState("");
@@ -21,7 +22,7 @@ export default function CommentSection({ postId }) {
       return;
     }
     try {
-      const res = await fetch("http://localhost:3000/api/comment/create", {
+      const res = await fetch(`${urlServer}/api/comment/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +49,7 @@ export default function CommentSection({ postId }) {
     const getComments = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/comment/getPostComments/${postId}`,
+          `${urlServer}/api/comment/getPostComments/${postId}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -74,7 +75,7 @@ export default function CommentSection({ postId }) {
         return;
       }
       const res = await fetch(
-        `http://localhost:3000/api/comment/likeComment/${commentId}`,
+        `${urlServer}/api/comment/likeComment/${commentId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -118,7 +119,7 @@ export default function CommentSection({ postId }) {
         return;
       }
       const res = await fetch(
-        `http://localhost:3000/api/comment/deleteComment/${commentId}`,
+        `${urlServer}/api/comment/deleteComment/${commentId}`,
         {
           headers: {
             "Content-Type": "application/json",
