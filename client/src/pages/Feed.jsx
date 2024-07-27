@@ -4,6 +4,7 @@ import { BiLike, BiDislike } from "react-icons/bi";
 import { urlServer } from "../variables";
 import { format, formatDistanceToNow } from "date-fns";
 import PuffLoader from "react-spinners/PuffLoader";
+import CommentSection from "../components/CommentSection";
 
 const Feed = () => {
   const [publicPosts, setPublicPosts] = useState([]);
@@ -273,6 +274,7 @@ const Feed = () => {
                       </button>
                     )}
                   </div>
+                  <CommentSection postId={post._id} />
                 </div>
               </div>
             ))}

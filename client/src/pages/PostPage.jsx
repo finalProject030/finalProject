@@ -10,6 +10,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import PuffLoader from "react-spinners/PuffLoader";
 import { format, formatDistanceToNow } from "date-fns";
 import { urlServer } from "../variables";
+import CommentSection from "../components/CommentSection";
 
 const PostPage = () => {
   const { postId } = useParams();
@@ -246,7 +247,9 @@ const PostPage = () => {
   return (
     <div className="container mx-auto my-20 px-4">
       <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
-        <h1 className="text-4xl font-bold mb-4 text-center">Post Page</h1>
+        <h1 className="text-7xl text-center mb-2  font-bold border-4 border-gray rounded-lg p-4 shadow-lg bg-gradient-to-r from-gray-300 to-white text-black">
+          Post Page
+        </h1>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
@@ -352,6 +355,7 @@ const PostPage = () => {
               {post.post.isPublic ? "Make Private" : "Make Public"}
             </button>
           </div>
+          <CommentSection postId={post.post._id} />
         </div>
       </div>
     </div>

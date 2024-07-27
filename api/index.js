@@ -10,7 +10,7 @@ import tranformTextRouter from "./routes/transformText.route.js";
 import geminiRouter from "./routes/gemini.route.js";
 import cookieParser from "cookie-parser";
 import userPostsRouter from "./routes/userPost.route.js";
-// import commentRoutes from "./routes/comment.route.js";
+import commentRoutes from "./routes/comment.route.js";
 import axios from "axios";
 import path from "path";
 
@@ -45,7 +45,7 @@ app.use("/api/chat", chatRouter);
 app.use("/api/transformText", tranformTextRouter);
 app.use("/api/gemini", geminiRouter);
 app.use("/api/post", userPostsRouter);
-// app.use("/api/comment", commentRoutes);
+app.use("/api/comment", commentRoutes);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "/client/dist")));

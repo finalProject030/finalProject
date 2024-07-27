@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { HiDotsVertical } from "react-icons/hi";
 import PostDropdown from "./PostDropDown";
 import SocialMediaShare from "./SocialMediaShare";
+import CommentSection from "./CommentSection";
 
 // Define formatDate function
 const formatDate = (dateString) => {
@@ -81,6 +82,7 @@ const PostItem = ({
       <div className="mx-auto">
         <SocialMediaShare text={post.content} title={post.title} content={""} />
       </div>
+      <CommentSection postId={post._id} />
     </div>
   );
 };
