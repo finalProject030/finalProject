@@ -4,6 +4,8 @@ import { HiDotsVertical } from "react-icons/hi";
 import PostDropdown from "./PostDropDown";
 import SocialMediaShare from "./SocialMediaShare";
 import CommentSection from "./CommentSection";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog } from '@fortawesome/free-solid-svg-icons'; // Import the faCog icon
 
 // Define formatDate function
 const formatDate = (dateString) => {
@@ -55,7 +57,9 @@ const PostItem = ({
             setDropdownOpen(post._id === dropdownOpen ? null : post._id)
           }
         >
-          <HiDotsVertical />
+        <FontAwesomeIcon icon={faCog} style={{marginRight: '5px'}}/> Settings
+
+          {/* <HiDotsVertical /> */}
         </button>
         {dropdownOpen === post._id && (
           <PostDropdown
@@ -72,15 +76,20 @@ const PostItem = ({
           onClick={() => toggleVisibility(post._id, post.isPublic)}
           className={`${
             post.isPublic
-              ? "text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-              : "text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              ? "text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              : "text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
           } hover:bg-opacity-75 text-white font-semibold py-2 px-2 rounded mr-2`}
         >
           {post.isPublic ? "Make Private" : "Make Public"}
         </button>
       </div>
-      <div className="mx-auto">
-        <SocialMediaShare text={post.content} title={post.title} content={""} />
+      <div className="mx-auto" style={{ marginTop: '50px'}} // Adjust margin values as needed
+      >
+        <SocialMediaShare 
+          text={post.title + " " + post.content} 
+          title={post.title} 
+          content={post.content} 
+        />
       </div>
       <CommentSection postId={post._id} />
     </div>

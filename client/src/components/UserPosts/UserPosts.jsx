@@ -162,7 +162,7 @@ const UserPosts = () => {
             {loading ? (
               <PuffLoader />
             ) : (
-              <div className="  bg-gray-300 p-3 mx-1 rounded-lg">
+              <div className="bg-gray-300 p-3 mx-1 rounded-lg">
                 {error && (
                   <p className="text-center text-red-500">Error: {error}</p>
                 )}

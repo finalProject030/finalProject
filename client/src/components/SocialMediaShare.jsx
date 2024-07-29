@@ -8,21 +8,30 @@ export default function SocialMediaShare(props) {
   const encodedTitle = encodeURIComponent(props.title);
   const encodedContent = encodeURIComponent(props.content);
   const text=encodeURIComponent(props.text);
+  const iconStyle = { 
+    marginRight: '10px', // Space between icons
+    width: '40px', // Adjust width
+    height: '40px' // Adjust height
+  };
 
   return ( 
     <div>
 
-      {/* <SocialIcon url={'https://www.facebook.com/sharer/sharer.php?u=hi.com' + encodeURIComponent('http://facebook.com') + '&quote=' + encodeURIComponent(text)}
-        target="_blank"/> */}
-
       <SocialIcon url={'https://www.linkedin.com/shareArticle?mini=true&text=' + text}
-        target="_blank"/>
+        target="_blank"
+        style={iconStyle} // Space between icons
+/>
 
-      <SocialIcon url={'https://twitter.com/intent/tweet?text=' + text}
-          target="_blank"/>
+      <SocialIcon url={'https://x.com/intent/tweet?text=' + text}
+          target="_blank"
+          style={iconStyle} // Space between icons
+
+/>
             
       <SocialIcon url={'https://www.reddit.com/web/submit?title=' + encodedTitle + '&text=' + encodedContent + '&type=TEXT'}
-        target="_blank"/>
+        target="_blank"
+        style={iconStyle} // Space between icons
+/>
     
     </div>   
 

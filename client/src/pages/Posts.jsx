@@ -224,7 +224,7 @@ const Posts = () => {
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: "An error occurred while fetching this kind of data. Please try again later.",
+        text: "We couldn't find any results matching your search. Please try again.",
       });
     }
   };
@@ -527,7 +527,6 @@ const Posts = () => {
                 type="button"
                 onClick={() => {
                   setSearch(true);
-                  // fetchQuestions();
                 }}
                 disabled={loading}
               >

@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { recoilSelectedStep, recoilSelectedPosts } from "../recoil/state";
+import TextField from "@mui/material/TextField";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import ListItemText from "@mui/material/ListItemText";
+import Select from "@mui/material/Select";
+import Checkbox from "@mui/material/Checkbox";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import { Input, inputClasses } from '@mui/base/Input';
 // import { globalJsonData } from "../recoil/state";
 import { constSelector, useRecoilState } from "recoil";
 import { useSelector } from "react-redux";
@@ -11,6 +22,7 @@ import SocialMediaShare from "./SocialMediaShare";
 import "line-awesome/dist/line-awesome/css/line-awesome.min.css";
 import { createRoot } from "react-dom/client";
 import Rights from "./Rights";
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 
 let summary = "";
 
@@ -42,15 +54,10 @@ export default function PostCreationForm() {
   // Function send message to Gemini
   async function sendMessageToServer() {
     if (summary == "") summary = await summerizeQuestionAnswer();
-
-    console.log(summary);
-    // return;
-
-    // return;
-    // console.log("API GEMINI");
     try {
       const valueToSend = generateJsonInstructions(summary);
-      console.log(valueToSend);
+      // console.log("value to send:\n\n");
+      // console.log(valueToSend);
       const response = await fetch(`${urlServer}/api/gemini`, {
         method: "POST",
         headers: {
@@ -135,58 +142,32 @@ export default function PostCreationForm() {
     if (summary == undefined) return "";
 
     // Initial set of instructions
-    let instructions = [
-      "Hi, I want you to create a post for LinkedIn by following exactly these instructions:",
-      "- Include a catchy headline that grabs attention.",
-      "- Write a brief introduction to the topic to provide context.",
-      `- Keep the post concise at around ${wordCount} words.`,
-      `- divide the text into ${paragraphCount} paragraphs.`,
+    const instructions = [
+      "Hi, I want you to create a post for LinkedIn by following exactly these instructions:\n",
+      summary.length > 1 
+      ? `- Notice that you have couple of posts and you should create only one post\n`+
+        `- Ignore the posts numbers, they are not relevant.\n`+
+        `- Make one post only from the posts\n`
+      : `- Notice that you have one post and you should create only one post\n`,
+      "- Include a catchy headline that grabs attention.\n",
+      "- Write a brief introduction to the topic to provide context.\n",
+      `- Keep the post concise at around ${wordCount} words.\n`,
+      `- divide the text into ${paragraphCount} paragraphs.\n`,
       // `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
       emojis === "yes"
-        ? `- Use emojis to add visual appeal!`
-        : "- Avoid using emojis to maintain a professional tone.",
-      "- Incorporate relevant hashtags to increase visibility.",
-      "- End with a call to action, such as asking for comments or opinions.",
-      `Plese pay carfull attention to this: ${freeText}`,
-      // "Below is the question and its accepted answer for reference:",
-      "Below is the information that you will use to create the post:",
-
-      // divide the text into 3 equal-length sections.
+        ? `- Use emojis to add visual appeal!\n`
+        : "- Avoid using emojis to maintain a professional tone.\n",
+      "- Incorporate relevant hashtags to increase visibility.\n",
+      "- End with a call to action, such as asking for comments or opinions.\n",
+      `Plese pay carfull attention to this: ${freeText}\n`,
+      "Below is the information that you will use to create the post:\n",
     ];
-    summary.forEach((sum) => (instructions += "\n" + sum));
-
-    // Additional instructions based on selected posts
-    // const selectedPostsMessage = Object.entries(selectedItems).map(
-    //   ([questionId, item]) => {
-    //     if (item.answers === undefined) return;
-    //     const acceptedAnswers = item.answers.filter(
-    //       (answer) => answer.is_accepted
-    //     );
-    //     let message = `\nQuestion ID: ${questionId}\n\nQuestion Body: ${item.body}\n\n`;
-
-    //     if (acceptedAnswers.length > 0) {
-    //       message += "Accepted Answers:\n";
-    //       message += acceptedAnswers
-    //         .map((acceptedAnswer, index) => {
-    //           return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
-    //         })
-    //         .join("");
-    //     } else {
-    //       message += "No accepted answers found.\n\n";
-    //     }
-    //     return message;
-    //   }
-    // );
-
-    // Combine initial instructions and selected posts message
-    // instructions = instructions.concat(selectedPostsMessage);
-
+  
     // Set the JSON instructions state
     setJsonInstructions(instructions);
-    console.log(instructions);
-
     // Construct the message to send
-    const message = `${instructions}`;
+    const message = `${instructions}\n${summary}`;
+    console.log(message);
     setMessageToSend(message);
     return message;
   };
@@ -197,10 +178,6 @@ export default function PostCreationForm() {
     scrollToTop();
   }, []);
 
-  // function stripHtmlTags(html) {
-  //   const doc = new DOMParser().parseFromString(html, "text/html");
-  //   return doc.body.textContent || "";
-  // }
 
   // Function to handle form submission
   const handleFormSubmit = async (event) => {
@@ -208,24 +185,6 @@ export default function PostCreationForm() {
     setLoading(true);
     setHandleSubmit(true);
     try {
-      // generateJsonInstructions(); // Generate JSON instructions
-      // const selectedPostsMessage = Object.entries(selectedItems).map(
-      //   ([questionId, item]) => {
-      //     return `Question ID: ${questionId}\n\nQuestion Body: ${
-      //       item.body
-      //     }\n\nAccepted Answers:\n${item.answers
-      //       .filter((answer) => answer.is_accepted)
-      //       .map((acceptedAnswer, index) => {
-      //         return `Answer ${index + 1}:\n${acceptedAnswer.body}\n\n`;
-      //       })
-      //       .join("")}`;
-      //   }
-      // );
-      // const message = `${jsonInstructions}\n\nSelected Posts:\n${selectedPostsMessage.join(
-      //   "\n\n"
-      // )}`;
-      // console.log(message);
-      // setMessageToSend(message);
       await sendMessageToServer(); // Send message to Gemini
     } catch (error) {
       console.error("Error handling form submission:", error);
@@ -358,7 +317,6 @@ export default function PostCreationForm() {
   };
 
   const getInfo = (geminiResponse1) => {
-    // console.log("im gminie response:\n\n" + geminiResponse1);
     let i, j;
     let title = "";
     let content = "";
@@ -413,11 +371,10 @@ export default function PostCreationForm() {
                 Instructions for build your post:
               </h2>
 
-              <form
+              {/* <form
                 onSubmit={handleFormSubmit}
                 className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
               >
-                {/* {!handleSubmit && ( */}
                 <div>
                   <div className="mb-4">
                     <label
@@ -436,60 +393,6 @@ export default function PostCreationForm() {
                       <option value="no">No</option>
                     </select>
                   </div>
-                  {/* {emojis === "yes" && (
-                    <>
-                      <div className="mb-4">
-                        <label
-                          htmlFor="maxEmojis"
-                          className="block font-semibold mb-1"
-                        >
-                          Maximum number of emojis:
-                        </label>
-                        <input
-                          type="number"
-                          id="maxEmojis"
-                          value={maxEmojis}
-                          onChange={(e) =>
-                            setMaxEmojis(parseInt(e.target.value))
-                          }
-                          className="p-2 border rounded-md w-full"
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label
-                          htmlFor="minEmojis"
-                          className="block font-semibold mb-1"
-                        >
-                          Minimum number of emojis:
-                        </label>
-                        <input
-                          type="number"
-                          id="minEmojis"
-                          value={minEmojis}
-                          onChange={(e) =>
-                            setMinEmojis(parseInt(e.target.value))
-                          }
-                          className="p-2 border rounded-md w-full"
-                        />
-                      </div>
-                    </>
-                  )} */}
-                  {/* <div className="mb-4">
-                    <label
-                      htmlFor="wordCount"
-                      className="block font-semibold mb-1"
-                    >
-                      Desired word count:
-                    </label>
-                    <input
-                      type="number"
-                      id="wordCount"
-                      value={wordCount}
-                      onChange={(e) => setWordCount(parseInt(e.target.value))}
-                      className="p-2 border rounded-md w-full"
-                    />
-                  </div> */}
-
                   <label
                     htmlFor="wordCount"
                     className="block mb-2  font-semibold    text-gray-900 dark:text-black"
@@ -545,7 +448,6 @@ export default function PostCreationForm() {
                     </div>
                   </div>
                 </div>
-                {/* )}  */}
 
                 <div className="flex justify-center w-full ">
                   <button
@@ -556,7 +458,95 @@ export default function PostCreationForm() {
                     Create My Post
                   </button>
                 </div>
-              </form>
+              </form> */}
+
+              <Box
+              onSubmit={handleFormSubmit}            
+              component="form"
+              sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+              width: 400,
+              margin: "auto",
+              padding: 4,
+              borderRadius: 2,
+              boxShadow: 3,
+              bgcolor: "background.paper",
+            }}
+          >
+            <FormControl fullWidth={true} >
+            <InputLabel id="demo-simple-select-label">Do you want emojis?</InputLabel>
+            <Select
+              value={emojis}
+              sx={{ mb: 5 }}
+              onChange={(e) => setEmojis(e.target.value)}
+              labelid="demo-simple-select-label"
+              id="demo-simple-select"
+              required
+            >
+              <MenuItem value="yes">Yes</MenuItem>
+              <MenuItem value="no">No</MenuItem>
+            </Select>
+
+            <TextField
+              type="number"
+              sx={{ mb: 5 }}
+              id="wordCount"
+              label="Desired word count"
+              variant="outlined"
+              fullWidth
+              value={wordCount}
+              onChange={(e) => setWordCount(parseInt(e.target.value))}
+              inputProps={{
+                min: 20, // Ensure the minimum value is 20
+              }}
+              required
+              >
+              </TextField>
+
+              <TextField
+              type="number"
+              sx={{ mb: 5 }}
+              id="paragraphCount"
+              label="Desired paragraph count"
+              variant="outlined"
+              fullWidth
+              value={paragraphCount}
+              onChange={(e) => setParagraphCount(parseInt(e.target.value))}
+              inputProps={{
+                min: 1, // Ensure the minimum value is 1
+              }}
+              required
+              >
+              </TextField>
+
+              
+              <TextField
+                id="outlined-multiline-flexible"
+                label="Free Text"
+                placeholder="Write your additional rules here..."
+                value={freeText}
+                onChange={handleInputChange}
+                multiline
+                maxRows={4}
+              />
+              <div className="text-right text-sm text-gray-500" >
+                {maxChars - freeText.length} characters remaining
+              </div>
+              <Button 
+                variant="contained" 
+                color="success"
+                type="submit" 
+                sx={{ mt: 5, mb: 1.5 }}
+                disabled={loading || loading}>
+                Create My Post
+                <DoneAllIcon/>
+              </Button> 
+              
+            </FormControl>
+          </Box>
 
               <div className="flex justify-center w-full ">
                 <button
