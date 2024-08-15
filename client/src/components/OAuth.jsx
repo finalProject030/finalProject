@@ -59,11 +59,11 @@ export default function OAuth() {
         <a
         onClick={handleGoogleClick}
         data-icon="google-c"
-        className="inline-flex items-center justify-center w-9 h-9 bg-transparent border-none outline-none shadow-none hover:bg-gray-300 transition-colors duration-300 cursor-pointer"
         role="button" // Add role attribute for accessibility
         aria-disabled={loading} // Set aria-disabled attribute for accessibility
       >
-        <svg viewBox="0 0 24 24"  className="w-9 h-9">
+        <svg viewBox="0 0 24 24" className="w-9 h-9 rounded-full hover:bg-gray-400" >
+        
           <path fillRule="evenodd" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm.044-5.213c2.445 0 4.267-1.551 4.556-3.781v-1.891h-4.519v1.89h2.602a2.893 2.893 0 0 1-2.724 1.93c-1.194 0-2.677-1.1-2.677-2.843 0-1.621 1.161-2.876 2.677-2.876.739 0 1.413.279 1.922.736l1.399-1.376a4.744 4.744 0 1 0-3.236 8.212z" />
         </svg>
       </a>

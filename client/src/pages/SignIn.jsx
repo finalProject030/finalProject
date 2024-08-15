@@ -104,9 +104,8 @@ export default function SignIn() {
             <button 
             onClick={() => navigate("/forgot-password")} 
             type="button" 
-            className="text-black-700 
-            hover:underline">
-              <LockResetIcon/>
+            className="text-black-700 hover:underline">
+              <LockResetIcon className="mr-1" />
               Forgot Password?
               </button>
 
@@ -120,9 +119,9 @@ export default function SignIn() {
               </button>
             </div>
 
-            <div className="flex flex-col items-center text-center mt-6 w-full">
+            <div className="flex flex-col items-center text-center mt-10 w-full">
             <p> Or you can sign up with </p>
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4 mt-2">
               <OAuth />
               <Facebook /> 
             </div>
