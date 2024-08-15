@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import cors from "cors"; // Import cors package
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
-import listingRouter from "./routes/listing.route.js";
 import chatRouter from "./routes/chat.route.js";
 import tranformTextRouter from "./routes/transformText.route.js";
 import geminiRouter from "./routes/gemini.route.js";
@@ -40,7 +39,6 @@ app.use(
 // Use your routers
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/listing", listingRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/transformText", tranformTextRouter);
 app.use("/api/gemini", geminiRouter);

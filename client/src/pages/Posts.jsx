@@ -12,7 +12,6 @@ import { BsSearch } from "react-icons/bs";
 import PuffLoader from "react-spinners/PuffLoader";
 import ReactHtmlParser from "html-react-parser";
 
-
 const HTMLCodeDisplay = ({ htmlCode }) => {
   return (
     <pre
@@ -102,8 +101,6 @@ const Posts = () => {
         }
 
         if (questionsData === "") {
-          console.log("ffff");
-
           try {
             let api = "";
             api = `https://api.stackexchange.com/2.3/search/excerpts?page=${pageNumber}&pagesize=100&order=${order}&sort=${sort}&q=${tagged}&site=stackoverflow`;
@@ -129,7 +126,6 @@ const Posts = () => {
               if (questions.length === 0) setQuestions(randomQuestions);
               else questions.push(...randomQuestions);
               await fetchAnswers(randomQuestions);
-              console.log("hi");
             }
           } catch (error) {
             setLoading(false);
@@ -333,7 +329,6 @@ const Posts = () => {
             </div>
           </div>
 
-
           <div className="flex justify-center items-center ">
             <div className="w-full max-w-screen-lg">
               <form
@@ -477,9 +472,9 @@ const Posts = () => {
                   </button>
                   {expandedQuestions[question.question_id] && (
                     <div className="max-h-[300px] overflow-y-auto mb-5 p-4 border border-gray-300 rounded-md bg-gray-200">
-                        {ReactHtmlParser(question.body)}
-                      </div>
-                      // dangerouslySetInnerHTML={{ __html: question.body }}
+                      {ReactHtmlParser(question.body)}
+                    </div>
+                    // dangerouslySetInnerHTML={{ __html: question.body }}
                     // />
                   )}
 

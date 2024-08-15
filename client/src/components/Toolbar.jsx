@@ -6,8 +6,6 @@ import { BsCheckCircleFill } from "react-icons/bs";
 const Toolbar = ({ currentStep }) => {
   const getStepClass = (step) => {
     if (currentStep === step) {
-      console.log("1");
-
       return "bg-blue-100 text-blue-600 dark:bg-blue-800 dark:text-blue-300";
     }
     if (
@@ -15,7 +13,6 @@ const Toolbar = ({ currentStep }) => {
       (step === "selectedPosts" &&
         (currentStep === "selectedPosts" || currentStep === "postCreationForm"))
     ) {
-      console.log("2");
       return "bg-blue-100 text-blue-600 dark:bg-blue-800 dark:text-blue-300";
     }
     return "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-100";
