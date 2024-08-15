@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
-import { urlServer } from "../variables";
+import { scrollToTop, urlServer } from "../variables";
 import Facebook from "../components/Facebook";
+
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -58,6 +59,7 @@ export default function SignUp() {
       setLoading(false);
       setError(null);
       navigate("/sign-in");
+      scrollToTop();
     } catch (error) {
       setLoading(false);
       setError(error.message);

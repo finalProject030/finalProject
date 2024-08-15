@@ -29,8 +29,8 @@ let summary = "";
 export default function PostCreationForm() {
   const [emojis, setEmojis] = useState("yes");
   const [step, setStep] = useRecoilState(recoilSelectedStep);
-  const [wordCount, setWordCount] = useState(100);
-  const [paragraphCount, setParagraphCount] = useState(1);
+  const [wordCount, setWordCount] = useState("Standard");
+  const [paragraphCount, setParagraphCount] = useState("1");
   const [loading, setLoading] = useState(false);
   const [handleSubmit, setHandleSubmit] = useState(false);
   const [jsonInstructions, setJsonInstructions] = useState("");
@@ -71,6 +71,8 @@ export default function PostCreationForm() {
       }
 
       const data = await response.json();
+      console.log("im here the message:");
+      console.log(data.message);
       const geminiResponseString = `${data.message}`;
       setGeminiResponse(geminiResponseString);
       // Handle response from Gemini if needed
@@ -140,6 +142,18 @@ export default function PostCreationForm() {
   // Function to generate JSON instructions
   const generateJsonInstructions = (summary) => {
     if (summary == undefined) return "";
+    let counter = "";
+    switch(wordCount){
+      case 'Consice': 
+        counter = "Please generate a short and concise response. Keep it brief and focus only on the most essential information.";
+        break;
+      case 'Standard':
+        counter = "Please generate a well-rounded response of moderate length. Include key details, but keep it succinct and balanced.";
+        break;
+      case 'Comprehensive':
+        counter = "Please generate a comprehensive and thorough response. Cover all relevant aspects of the topic in detail, leaving nothing out.";
+        break;
+      }
 
     // Initial set of instructions
     const instructions = [
@@ -151,22 +165,23 @@ export default function PostCreationForm() {
       : `- Notice that you have one post and you should create only one post\n`,
       "- Include a catchy headline that grabs attention.\n",
       "- Write a brief introduction to the topic to provide context.\n",
-      `- Keep the post concise at around ${wordCount} words.\n`,
-      `- divide the text into ${paragraphCount} paragraphs.\n`,
-      // `- Include exactly ${paragraphCount} paragraph(s) to organize your content effectively.`,
+      `- ${counter}\n`,
       emojis === "yes"
         ? `- Use emojis to add visual appeal!\n`
         : "- Avoid using emojis to maintain a professional tone.\n",
       "- Incorporate relevant hashtags to increase visibility.\n",
       "- End with a call to action, such as asking for comments or opinions.\n",
-      `Plese pay carfull attention to this: ${freeText}\n`,
+      // `Important: all the response need to be in exactly ${paragraphCount} paragraphs\n`,
+      freeText !== "" 
+        ? `Plese pay carfull attention to this: ${freeText}\n`
+        : "",
       "Below is the information that you will use to create the post:\n",
     ];
   
     // Set the JSON instructions state
     setJsonInstructions(instructions);
     // Construct the message to send
-    const message = `${instructions}\n${summary}`;
+    const message = `${instructions}\n${summary}\n\nThis is the end of the information.\n\nNotice:Very Important: Ensure the text consists of exactly ${paragraphCount} paragraphs.\n`;
     console.log(message);
     setMessageToSend(message);
     return message;
@@ -353,9 +368,7 @@ export default function PostCreationForm() {
       let first = content.indexOf("```");
       let f = content.substring(0, first);
       let str = content.substring(first, content.length);
-      // console.log("im str first" + str);
       str = str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      // console.log("Fixed string: " + str);
       return f + str;
     }
     return content;
@@ -368,98 +381,8 @@ export default function PostCreationForm() {
           {!handleSubmit && (
             <div>
               <h2 className="text-2xl font-bold mb-4">
-                Instructions for build your post:
+                Instructions to build your post:
               </h2>
-
-              {/* <form
-                onSubmit={handleFormSubmit}
-                className="max-w-md mx-auto p-4 mt-4 bg-gray-100 shadow-md rounded-md"
-              >
-                <div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="emojis"
-                      className="block font-semibold mb-1"
-                    >
-                      Do you want emojis?
-                    </label>
-                    <select
-                      id="emojis"
-                      value={emojis}
-                      onChange={(e) => setEmojis(e.target.value)}
-                      className="p-2 border rounded-md w-full dark:bg-gray-700 dark:text-white"
-                    >
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <label
-                    htmlFor="wordCount"
-                    className="block mb-2  font-semibold    text-gray-900 dark:text-black"
-                  >
-                    Desired word count:
-                  </label>
-                  <input
-                    type="number"
-                    id="wordCount"
-                    aria-describedby="helper-text-explanation"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    value={wordCount}
-                    onChange={(e) => setWordCount(parseInt(e.target.value))}
-                    required
-                  />
-                  <div className="my-4">
-                    <label
-                      htmlFor="paragraphCount"
-                      className="block mb-2 font-semibold  text-gray-900 dark:text-black"
-                    >
-                      Desired paragraph count:
-                    </label>
-                    <input
-                      type="number"
-                      id="paragraphCount"
-                      aria-describedby="helper-text-explanation"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      value={paragraphCount}
-                      onChange={(e) =>
-                        setParagraphCount(parseInt(e.target.value))
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="freeText"
-                      className="block mb-2  font-semibold  text-gray-900 dark:text-black"
-                    >
-                      Your message:
-                    </label>
-                    <textarea
-                      id="freeText"
-                      type="text"
-                      value={freeText}
-                      onChange={handleInputChange}
-                      rows="4"
-                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Write your additional rules here..."
-                    ></textarea>
-                    <div className="text-right text-sm text-gray-500">
-                      {maxChars - freeText.length} characters remaining
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center w-full ">
-                  <button
-                    type="submit"
-                    className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                    disabled={loading || loading}
-                  >
-                    Create My Post
-                  </button>
-                </div>
-              </form> */}
-
               <Box
               onSubmit={handleFormSubmit}            
               component="form"
@@ -480,7 +403,6 @@ export default function PostCreationForm() {
             <InputLabel id="demo-simple-select-label">Do you want emojis?</InputLabel>
             <Select
               value={emojis}
-              sx={{ mb: 5 }}
               onChange={(e) => setEmojis(e.target.value)}
               labelid="demo-simple-select-label"
               id="demo-simple-select"
@@ -489,40 +411,48 @@ export default function PostCreationForm() {
               <MenuItem value="yes">Yes</MenuItem>
               <MenuItem value="no">No</MenuItem>
             </Select>
+            </FormControl>
 
-            <TextField
-              type="number"
-              sx={{ mb: 5 }}
-              id="wordCount"
-              label="Desired word count"
-              variant="outlined"
-              fullWidth
+        <FormControl fullWidth={true} >
+          <InputLabel id="demo-simple-select-size">Desired length of your post</InputLabel>
+            <Select
               value={wordCount}
-              onChange={(e) => setWordCount(parseInt(e.target.value))}
-              inputProps={{
-                min: 20, // Ensure the minimum value is 20
-              }}
+              onChange={(e) => setWordCount(e.target.value)}
+              id="demo-simple-select-size123"
               required
-              >
-              </TextField>
+            >
+              <MenuItem value="Consice">Concise</MenuItem>
+              <MenuItem value="Standard">Standard</MenuItem>
+              <MenuItem value="Comprehensive">Comprehensive</MenuItem>
+            </Select>
+            </FormControl>
 
-              <TextField
-              type="number"
-              sx={{ mb: 5 }}
-              id="paragraphCount"
-              label="Desired paragraph count"
-              variant="outlined"
-              fullWidth
+          <FormControl fullWidth={true} >
+          <InputLabel id="demo-simple-select-size">Desired paragraph count</InputLabel>
+            <Select
               value={paragraphCount}
-              onChange={(e) => setParagraphCount(parseInt(e.target.value))}
+              onChange={(e) => {
+                if(e.target.value == "5 or more")
+                  setParagraphCount("5 or more");
+                else
+                  setParagraphCount(parseInt(e.target.value));
+              }}
+                
               inputProps={{
                 min: 1, // Ensure the minimum value is 1
               }}
               required
-              >
-              </TextField>
+            >
+              <MenuItem value="1">1</MenuItem>
+              <MenuItem value="2">2</MenuItem>
+              <MenuItem value="3">3</MenuItem>
+              <MenuItem value="4">4</MenuItem>
+              <MenuItem value="5 or more">5 or more</MenuItem>
+            </Select>
+            </FormControl>
 
-              
+
+              <FormControl fullWidth={true} >
               <TextField
                 id="outlined-multiline-flexible"
                 label="Free Text"
@@ -535,6 +465,9 @@ export default function PostCreationForm() {
               <div className="text-right text-sm text-gray-500" >
                 {maxChars - freeText.length} characters remaining
               </div>
+              </FormControl>
+
+              
               <Button 
                 variant="contained" 
                 color="success"
@@ -545,7 +478,7 @@ export default function PostCreationForm() {
                 <DoneAllIcon/>
               </Button> 
               
-            </FormControl>
+            {/* </FormControl> */}
           </Box>
 
               <div className="flex justify-center w-full ">

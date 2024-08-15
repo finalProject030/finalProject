@@ -4,7 +4,9 @@ import { app } from "../firebase";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
-import { urlServer } from "../variables";
+import { scrollToTop, urlServer } from "../variables";
+import FacebookIcon from '@mui/icons-material/Facebook';
+
 
 const Facebook = () => {
   const dispatch = useDispatch();
@@ -42,6 +44,7 @@ const Facebook = () => {
       dispatch(signInSuccess(data));
       localStorage.setItem("token", data.token);
       navigate("/");
+      scrollToTop();
     } catch (error) {
       console.error("Error signing in with Facebook:", error);
       // Handle errors gracefully and provide user feedback
@@ -59,6 +62,7 @@ const Facebook = () => {
         loading ? "opacity-50 cursor-not-allowed" : ""
       }`}
     >
+      <FacebookIcon />
       {loading ? (
         <svg
           className="animate-spin h-5 w-5 mr-3"

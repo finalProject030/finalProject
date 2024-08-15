@@ -10,6 +10,12 @@ import OAuth from "../components/OAuth";
 import { urlServer } from "../variables";
 import Facebook from "../components/Facebook";
 import logo3 from "../../assets/logo3.png";
+import { scrollToTop } from "../variables";
+import Box from "@mui/material/Box";
+import LockResetIcon from '@mui/icons-material/LockReset';
+import AddIcon from '@mui/icons-material/Add';
+
+
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -44,6 +50,7 @@ export default function SignIn() {
       localStorage.setItem("token", data.token);
       dispatch(signInSuccess(data));
       navigate("/");
+      scrollToTop();
     } catch (error) {
       dispatch(signInFailure(error.message));
     }
@@ -51,8 +58,7 @@ export default function SignIn() {
 
   return (
     <div className="bg-gradient-to-b from-gray-600 to-blue-300 min-h-screen flex items-center justify-center">
-      {/* Form Container */}
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full flex flex-row items-center">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full flex flex-row items-center gap-10">
         <div>
           <img
             src={logo3} // Logo image
@@ -61,48 +67,77 @@ export default function SignIn() {
           />
         </div>
         <div>
-          <h1 className="text-3xl text-center font-semibold mb-6">Sign In</h1>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+          <Box className="flex flex-col gap-4 w-full"
+           sx={{
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3,
+            padding: 4,
+            borderRadius: 2,
+            boxShadow: 3,
+            bgcolor: "background.paper",
+          }}>
+            <h1 className="text-5xl text-center font-semibold mb-10">Sign In</h1>
+            <form onSubmit={handleSubmit} >
             <input
               type="email"
               placeholder="Email"
-              className="border p-3 rounded-lg w-full"
               id="email"
+              className="border p-3 rounded-lg w-full mb-4" 
               onChange={handleChange}
             />
             <input
               type="password"
               placeholder="Password"
-              className="border p-3 rounded-lg w-full"
               id="password"
+              className="border p-3 rounded-lg w-full mb-4" 
               onChange={handleChange}
             />
             <button
               disabled={loading}
-              className="bg-blue-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80 w-full"
+              className="bg-blue-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80 mb-10 w-full"
             >
               {loading ? "Loading..." : "Sign In"}
             </button>
-            <OAuth />
-            <Facebook />
-          </form>
-          <div className="flex justify-between items-center mt-5 w-full">
-            <Link to={"/forgot-password"}>
-              <span className="text-blue-700 hover:underline">
-                Forgot Password?
-              </span>
-            </Link>
-            <div className="flex items-center gap-2">
-              <p className="text-gray-700">Don't have an account?</p>
-              <Link to={"/sign-up"}>
-                <span className="text-blue-700 hover:underline">Sign Up</span>
-              </Link>
-            </div>
-          </div>
+            
+          <div className="flex items-center justify-between w-full">
+            <button 
+            onClick={() => navigate("/forgot-password")} 
+            type="button" 
+            className="text-black-700 
+            hover:underline">
+              <LockResetIcon/>
+              Forgot Password?
+              </button>
 
+              <button 
+            onClick={() => navigate("/sign-up")}
+            type="button" 
+            className="text-black-700 
+            hover:underline">
+              <AddIcon/>
+              Sign Up
+              </button>
+            </div>
+
+            <div className="flex flex-col items-center text-center mt-6 w-full">
+            <p> Or you can sign up with </p>
+            <div className="flex gap-4 mt-4">
+              <OAuth />
+              <Facebook /> 
+            </div>
+            </div>
+          </form>
+          </Box>
+          
           {error && <p className="text-red-500 mt-5">{error}</p>}
         </div>
       </div>
     </div>
+
+
+
+
+
   );
 }
