@@ -7,6 +7,7 @@ import { urlServer } from "../../variables";
 import PostPage from "../../pages/PostPage";
 import PuffLoader from "react-spinners/PuffLoader";
 import SocialMediaShare from "../SocialMediaShare";
+import Swal from "sweetalert2";
 
 const UserPosts = () => {
   const { currentUser, error } = useSelector((state) => state.user);
@@ -45,6 +46,13 @@ const UserPosts = () => {
       if (data.success) {
         setPosts(data.posts);
         setLoading(false);
+        if (data.posts.length === 0) {
+          Swal.fire({
+            icon: "warning",
+            title: "Oops...",
+            text: "You don't have any saved posts yet.",
+          });
+        }
       }
     } catch (error) {
       setLoading(false);

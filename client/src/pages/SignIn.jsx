@@ -12,10 +12,9 @@ import Facebook from "../components/Facebook";
 import logo3 from "../../assets/logo3.png";
 import { scrollToTop } from "../variables";
 import Box from "@mui/material/Box";
-import LockResetIcon from '@mui/icons-material/LockReset';
-import AddIcon from '@mui/icons-material/Add';
-
-
+import LockResetIcon from "@mui/icons-material/LockReset";
+import AddIcon from "@mui/icons-material/Add";
+import Swal from "sweetalert2";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -44,6 +43,11 @@ export default function SignIn() {
       const data = await res.json();
 
       if (data.success === false) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "User not found!",
+        });
         dispatch(signInFailure(data.message));
         return;
       }
@@ -67,76 +71,75 @@ export default function SignIn() {
           />
         </div>
         <div>
-          <Box className="flex flex-col gap-4 w-full"
-           sx={{
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 3,
-            padding: 4,
-            borderRadius: 2,
-            boxShadow: 3,
-            bgcolor: "background.paper",
-          }}>
-            <h1 className="text-5xl text-center font-semibold mb-10">Sign In</h1>
-            <form onSubmit={handleSubmit} >
-            <input
-              type="email"
-              placeholder="Email"
-              id="email"
-              className="border p-3 rounded-lg w-full mb-4" 
-              onChange={handleChange}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              id="password"
-              className="border p-3 rounded-lg w-full mb-4" 
-              onChange={handleChange}
-            />
-            <button
-              disabled={loading}
-              className="bg-blue-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80 mb-10 w-full"
-            >
-              {loading ? "Loading..." : "Sign In"}
-            </button>
-            
-          <div className="flex items-center justify-between w-full">
-            <button 
-            onClick={() => navigate("/forgot-password")} 
-            type="button" 
-            className="text-black-700 hover:underline">
-              <LockResetIcon className="mr-1" />
-              Forgot Password?
+          <Box
+            className="flex flex-col gap-4 w-full"
+            sx={{
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+              padding: 4,
+              borderRadius: 2,
+              boxShadow: 3,
+              bgcolor: "background.paper",
+            }}
+          >
+            <h1 className="text-5xl text-center font-semibold mb-10">
+              Sign In
+            </h1>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="email"
+                placeholder="Email"
+                id="email"
+                className="border p-3 rounded-lg w-full mb-4"
+                onChange={handleChange}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                id="password"
+                className="border p-3 rounded-lg w-full mb-4"
+                onChange={handleChange}
+              />
+              <button
+                disabled={loading}
+                className="bg-blue-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80 mb-10 w-full"
+              >
+                {loading ? "Loading..." : "Sign In"}
               </button>
 
-              <button 
-            onClick={() => navigate("/sign-up")}
-            type="button" 
-            className="text-black-700 
-            hover:underline">
-              <AddIcon/>
-              Sign Up
-              </button>
-            </div>
+              <div className="flex items-center justify-between w-full">
+                <button
+                  onClick={() => navigate("/forgot-password")}
+                  type="button"
+                  className="text-black-700 hover:underline"
+                >
+                  <LockResetIcon className="mr-1" />
+                  Forgot Password?
+                </button>
 
-            <div className="flex flex-col items-center text-center mt-10 w-full">
-            <p> Or you can sign up with </p>
-            <div className="flex gap-4 mt-2">
-              <OAuth />
-              <Facebook /> 
-            </div>
-            </div>
-          </form>
+                <button
+                  onClick={() => navigate("/sign-up")}
+                  type="button"
+                  className="text-black-700 
+            hover:underline"
+                >
+                  <AddIcon />
+                  Sign Up
+                </button>
+              </div>
+
+              <div className="flex flex-col items-center text-center mt-10 w-full">
+                <p> Or you can sign up with </p>
+                <div className="flex gap-4 mt-2">
+                  <OAuth />
+                  <Facebook />
+                </div>
+              </div>
+            </form>
           </Box>
-          
-          {error && <p className="text-red-500 mt-5">{error}</p>}
         </div>
       </div>
     </div>
-
-
-
-
-
   );
 }
