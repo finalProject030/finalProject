@@ -65,10 +65,12 @@ const Facebook = () => {
         >
           <svg
             viewBox="0 0 24 24"
-            className="w-9 h-9 rounded-full hover:bg-gray-400"
+            className="w-9 h-9 rounded-full"
+
+            // className="w-9 h-9 rounded-full hover:bg-gray-400"
           >
             <path
-              fill-rule="evenodd"
+              fillRule="evenodd"
               d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm2.52-14.923v1.686h-1.004c-.366 0-.613.077-.74.23-.128.153-.192.383-.192.69v1.207h1.871l-.249 1.891h-1.622v4.849h-1.955V12.78H9v-1.89h1.629V9.497c0-.792.221-1.407.664-1.843.443-.437 1.033-.655 1.77-.655.626 0 1.111.026 1.456.077z"
             ></path>
           </svg>
