@@ -59,16 +59,17 @@ const Facebook = () => {
         <LoadingSpinner /> // Render the loading spinner when loading
       ) : (
         <a
-          onClick={handleFacebookClick}
+          onClick={(e) => {
+            e.preventDefault();
+            handleFacebookClick();
+          }}
           role="button" // Add role attribute for accessibility
           data-icon="facebook"
           aria-disabled={loading} // Set aria-disabled attribute for accessibility
         >
           <svg
             viewBox="0 0 24 24"
-            className="w-9 h-9 rounded-full"
-
-            // className="w-9 h-9 rounded-full hover:bg-gray-400"
+            className="w-9 h-9 rounded-full hover:bg-gray-400"
           >
             <path
               fillRule="evenodd"
