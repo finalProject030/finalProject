@@ -60,7 +60,8 @@ export default function OAuth() {
         >
           <svg
             viewBox="0 0 24 24"
-            className="w-9 h-9 rounded-full hover:bg-gray-400"
+            // className="w-9 h-9 rounded-full hover:bg-gray-400"
+            className="w-9 h-9 rounded-full"
           >
             <path
               fillRule="evenodd"
