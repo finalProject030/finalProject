@@ -62,6 +62,7 @@ const Facebook = () => {
           onClick={handleFacebookClick}
           role="button" // Add role attribute for accessibility
           data-icon="facebook"
+          aria-disabled={loading} // Set aria-disabled attribute for accessibility
         >
           <svg
             viewBox="0 0 24 24"
