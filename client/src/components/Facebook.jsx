@@ -5,7 +5,9 @@ import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import { scrollToTop, urlServer } from "../variables";
-import LoadingSpinner from "./LoadingSpinner";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import LoadingSpinner from "./LoadingSpinner"; // Import the LoadingSpinner component
+import Swal from "sweetalert2";
 
 const Facebook = () => {
   const dispatch = useDispatch();
@@ -13,16 +15,19 @@ const Facebook = () => {
   const [loading, setLoading] = useState(false);
 
   const handleFacebookClick = async () => {
+    setLoading(true);
     const provider = new FacebookAuthProvider();
     const auth = getAuth(app);
 
     try {
-      setLoading(true);
-      // Trigger the popup directly from the user action
-      const result = await signInWithPopup(auth, provider);
+      const result = await new Promise((resolve, reject) => {
+        signInWithPopup(auth, provider)
+          .then((result) => resolve(result))
+          .catch((error) => reject(error));
+      });
+
       const user = result.user;
 
-      // Perform the subsequent actions after the popup is resolved
       const res = await fetch(`${urlServer}/api/auth/facebook`, {
         method: "POST",
         headers: {
@@ -42,8 +47,13 @@ const Facebook = () => {
       navigate("/");
       scrollToTop();
     } catch (error) {
-      console.error("Error in handleFacebookClick:", error);
-      alert("An error occurred. Please try again.");
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "Oops...",
+      //   text: error,
+      // });
+      console.error("Error signing in with Facebook:", error);
+      // Handle errors gracefully and provide user feedback
     } finally {
       setLoading(false);
     }
@@ -52,16 +62,18 @@ const Facebook = () => {
   return (
     <div>
       {loading ? (
-        <LoadingSpinner />
+        <LoadingSpinner /> // Render the loading spinner when loading
       ) : (
         <a
           onClick={handleFacebookClick}
-          role="button"
+          role="button" // Add role attribute for accessibility
           data-icon="facebook"
-          aria-disabled={loading}
-          style={{ cursor: loading ? "not-allowed" : "pointer" }}
+          aria-disabled={loading} // Set aria-disabled attribute for accessibility
         >
-          <svg viewBox="0 0 24 24" className="w-9 h-9 rounded-full">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-9 h-9 rounded-full hover:bg-gray-400"
+          >
             <path
               fillRule="evenodd"
               d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm2.52-14.923v1.686h-1.004c-.366 0-.613.077-.74.23-.128.153-.192.383-.192.69v1.207h1.871l-.249 1.891h-1.622v4.849h-1.955V12.78H9v-1.89h1.629V9.497c0-.792.221-1.407.664-1.843.443-.437 1.033-.655 1.77-.655.626 0 1.111.026 1.456.077z"
