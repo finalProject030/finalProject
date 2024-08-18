@@ -50,7 +50,7 @@ const Facebook = () => {
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: "User not found!",
+        text: error,
       });
       console.error("Error signing in with Facebook:", error);
       // Handle errors gracefully and provide user feedback
