@@ -108,7 +108,7 @@ const Home = () => {
           channel="youtube"
           youtube={{ mute: 0, autoplay: 0 }}
           isOpen={isOpen}
-          videoId="RVVnzM53_CA"
+          videoId="BhDK6nDkSx4"
           onClose={() => setOpen(false)}
         />
       </div>
