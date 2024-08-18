@@ -212,7 +212,9 @@ const Posts = () => {
         answersData.forEach(({ questionId, answers }) => {
           answersMap[questionId] = answers;
         });
-        setAnswers(answersMap);
+
+        if (answers === "{}") setAnswers(answersMap);
+        else setAnswers({ ...answers, ...answersMap });
       } catch (error) {
         console.error("Error fetching answers data:", error);
       }
