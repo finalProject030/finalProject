@@ -47,7 +47,7 @@ export default function SocialMediaShare(props) {
       />
 
       <SocialIcon
-        url={`https://mobile.twitter.com/intent/tweet?text=${text}`}
+        url={`https://mobile.x.com/intent/tweet?text=${text}`}
         target="_blank"
         style={iconStyle}
       />
