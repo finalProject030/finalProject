@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { urlServer } from "../variables";
+import Box from "@mui/material/Box";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -40,7 +41,18 @@ const ForgotPassword = () => {
 
   return (
     <div className="bg-gradient-to-b from-gray-600 to-blue-300 min-h-screen flex flex-col justify-center items-center">
-      <div className="p-3 max-w-xl mx-auto w-full bg-white rounded-lg shadow-lg">
+      <Box
+        className="flex flex-col gap-4 w-full max-w-lg sm:max-w-md md:max-w-sm lg:max-w-lg mx-auto overflow-auto box-border p-4 bg-white rounded-lg shadow-lg"
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 3,
+          padding: 4,
+          borderRadius: 2,
+          boxShadow: 3,
+          bgcolor: "background.paper",
+        }}
+      >
         <h1 className="text-3xl text-center font-semibold my-7">
           Forgot Password
         </h1>
@@ -62,7 +74,7 @@ const ForgotPassword = () => {
           </button>
         </form>
         {message && <p className="text-blue-700 mt-5">{message}</p>}
-        <div className="flex justify-between items-center mt-5">
+        <div className="flex items-center justify-between w-full mt-10">
           <Link to={"/sign-in"}>
             <span className="text-blue-700">Back to Sign In</span>
           </Link>
@@ -70,7 +82,7 @@ const ForgotPassword = () => {
             <span className="text-blue-700">Sign up</span>
           </Link>
         </div>
-      </div>
+      </Box>
     </div>
   );
 };
