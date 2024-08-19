@@ -61,7 +61,7 @@ export default function SelectedPosts() {
     <div className="bg-cover bg-no-repeat bg-center flex flex-col my-20 justify-center items-center space-y-6 w-full px-4">
       {step === "selectedPosts" && (
         <>
-          <h2 className="text-2xl font-bold mb-4">Selected Posts Component:</h2>
+          <h2 className="text-2xl font-bold mb-4">Selected Posts </h2>
           {Object.entries(selectedItems).map(([questionId, item]) => (
             <div
               key={questionId}
